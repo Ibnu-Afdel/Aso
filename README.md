@@ -144,6 +144,25 @@ uv run --package backend python backend/app/main.py
 ```
 If `TELEGRAM_BOT_TOKEN` or `TELEGRAM_WEBHOOK_URL` are missing, the app will fail fast with a Pydantic validation error.
 
+## Fast CLI (code generation)
+Run with:
+```
+make help
+```
+or:
+```
+uv run --package backend fast help
+```
+
+Create a module:
+```
+make module name=orders
+```
+or:
+```
+uv run --package backend fast make-module orders
+```
+
 ## Module Structure
 Each module contains:
 ```
