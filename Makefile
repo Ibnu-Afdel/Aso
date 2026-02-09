@@ -1,7 +1,11 @@
 APP_DIR=backend
 
-run:
-	cd $(APP_DIR) && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+setup:
+	cp -n .env.example .env
+	uv sync
+
+run: setup
+	uv run --package backend uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 docker-up:
 	docker compose -f docker/docker-compose.yml up --build
@@ -10,7 +14,10 @@ docker-down:
 	docker compose -f docker/docker-compose.yml down
 
 migrate:
-	cd $(APP_DIR) && alembic upgrade head
+	uv run --package backend alembic -c $(APP_DIR)/alembic.ini upgrade head
 
 revision:
-	cd $(APP_DIR) && alembic revision --autogenerate -m "init"
+	uv run --package backend alembic -c $(APP_DIR)/alembic.ini revision --autogenerate -m "init"
+
+sync:
+	uv sync

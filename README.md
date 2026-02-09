@@ -130,12 +130,9 @@ cp .env.example .env
 ```
 Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_URL`.
 
-### 2) Install dependencies (choose one)
+### 2) Install dependencies
 ```
-cd backend && pip install -r requirements.txt
-```
-```
-uv sync
+make setup
 ```
 
 ### 3) Run (choose one)
@@ -143,8 +140,9 @@ uv sync
 make run
 ```
 ```
-uv run python backend/app/main.py
+uv run --package backend python backend/app/main.py
 ```
+If `TELEGRAM_BOT_TOKEN` or `TELEGRAM_WEBHOOK_URL` are missing, the app will fail fast with a Pydantic validation error.
 
 ## Module Structure
 Each module contains:
@@ -210,12 +208,11 @@ Repositories talk to the DB only. They must not call Telegram, send emails, or c
 1. Copy environment file:
    - `cp .env.example .env`
 2. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_URL`.
-3. Install dependencies (choose one):
-  - `cd backend && pip install -r requirements.txt`
-  - `uv sync`
+3. Install dependencies:
+  - `make setup`
 4. Start the app (choose one):
   - `make run`
-  - `uv run python backend/app/main.py`
+  - `uv run --package backend python backend/app/main.py`
 
 ## Docker
 - Build and run:
@@ -240,11 +237,11 @@ Services:
 - Create revision:
   - `make revision`
 - Or directly:
-  - `alembic revision --autogenerate -m "init"`
+  - `uv run --package backend alembic -c backend/alembic.ini revision --autogenerate -m "init"`
 - Apply migrations:
   - `make migrate`
 - Or directly:
-  - `alembic upgrade head`
+  - `uv run --package backend alembic -c backend/alembic.ini upgrade head`
 
 ## Scripts
 Useful automation lives in `backend/scripts/`:
