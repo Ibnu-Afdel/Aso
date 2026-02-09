@@ -1,9 +1,47 @@
-# Telegram FastAPI Template
+# Telegram + FastAPI Modular Backend Template
 
 ## Overview
-A production-ready but minimal monolith template for Telegram bots and FastAPI applications using aiogram v3, async SQLAlchemy, and PostgreSQL. It follows a Laravel-inspired modular layout and a simple DDD-inspired layering: handlers/routes → services → repositories → database.
+This repository is an **opinionated backend template** for building:
+- Telegram bots (aiogram v3)
+- FastAPI APIs
+- Telegram WebApps
+- Modular monolith backends
+- Docker-deployable services
 
-## Architecture
+It is designed for teams with a **Laravel / service-layer background** who want a clean, scalable Python architecture.
+
+This template enforces:
+- modular architecture
+- separation of concerns
+- async-first design
+- production-ready patterns
+
+This is **not** a starter for scripts. It is a **long-term backend foundation**.
+
+## Philosophy
+This template follows:
+- Modular monolith
+- Simple DDD
+- Service layer architecture
+- Async Python
+- Clean separation between interface and logic
+
+It is heavily inspired by Laravel structure but adapted to Python best practices.
+
+## What this template IS
+- A production-ready skeleton
+- A scalable backend foundation
+- A Telegram bot + API combo
+- A modular architecture base
+- A Docker-first project
+
+## What this template is NOT
+- Not a full SaaS starter
+- Not a microservice system
+- Not a heavy DDD enterprise setup
+- Not a monolithic script bot
+
+## Architecture Rules
 - **Modules** contain pure business logic (no FastAPI, no aiogram, no Telegram objects).
 - **Bot handlers** call services.
 - **API routes** call services.
@@ -11,61 +49,179 @@ A production-ready but minimal monolith template for Telegram bots and FastAPI a
 - **Repositories** talk to the database.
 - **Async** everywhere.
 
-### Request Flow Diagram (text)
+## Architecture Layers
+| Layer | Location | Responsibility |
+| --- | --- | --- |
+| Interface | bot/, api/ | Receive input |
+| Application | modules/*/service.py | Business logic |
+| Domain | modules/*/models.py | Data models |
+| Infrastructure | modules/*/repository.py | DB access |
+| Core | core/ | Config, DB, logging |
+
+## Request Flow Diagram (text)
 ```
-Telegram -> /bot/webhook -> Handler -> Service -> Repository -> DB
-HTTP     -> /health      -> Route   -> Service -> Repository -> DB
+Telegram → /bot/webhook → handler → service → repository → DB
+HTTP     → /health      → route   → service → repository → DB
 ```
+
+Modules never talk to Telegram directly.
 
 ## Folder Structure
 | Path | Purpose |
-|---|---|
+| --- | --- |
 | backend/app/main.py | FastAPI application entrypoint |
 | backend/app/core | Settings, DB, logging, security |
-| backend/app/modules | Business logic modules |
+| backend/app/modules | Business logic modules (includes users example) |
 | backend/app/bot | aiogram dispatcher and handlers |
 | backend/app/api | FastAPI routes and dependencies |
-| backend/app/services | Shared service layer (skeleton) |
-| backend/app/integrations | External service integrations |
-| backend/app/jobs | Background job workers |
-| backend/app/webapp | Web UI assets (optional) |
+| backend/app/services | Shared services (skeleton) |
+| backend/app/integrations | External integrations |
+| backend/app/jobs | Background workers |
+| backend/app/webapp | Telegram WebApp assets |
+| backend/tests | Unit test folder (created day one) |
+| backend/scripts | Admin and automation scripts |
 | backend/alembic | Database migrations |
-| docker | Dockerfile and docker-compose |
+| docker | Dockerfile, compose, nginx config |
+| .env.example | Environment template |
+
+## Module Structure
+Each module contains:
+```
+modules/users/
+  models.py
+  schemas.py
+  repository.py
+  service.py
+```
+Modules contain business logic only.
+Modules MUST NOT import:
+- aiogram
+- FastAPI Request
+- Telegram objects
+
+## Bot Layer Rules
+Bot handlers:
+- Receive message
+- Call service
+- Send response
+
+Bot handlers must NOT:
+- Query DB directly
+- Contain business logic
+- Implement payment logic
+- Handle complex workflows
+
+Bad:
+```
+handler → DB query
+```
+
+Good:
+```
+handler → service → repo
+```
+
+## API Layer Rules
+Routes behave like Laravel controllers. They call services and must not contain business logic.
+
+## Services Layer
+Services contain business logic and orchestrate repositories, external APIs, and validation. They are reusable from bot, API, and jobs.
+
+## Repository Layer
+Repositories talk to the DB only. They must not call Telegram, send emails, or contain business logic.
+
+## Red Line Rules (Important)
+### DO NOT
+- Import aiogram inside modules
+- Put DB queries inside handlers
+- Put business logic inside routes
+- Call Telegram API from services
+- Mix layers
+
+### ALWAYS
+- Handlers call services
+- Services call repositories
+- Modules stay pure
+- Keep async everywhere
 
 ## Running Locally
 1. Copy environment file:
    - `cp .env.example .env`
 2. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_URL`.
-3. Install dependencies:
-   - `cd backend && uv pip install -r requirements.txt`
-4. Start the app:
-   - `make run`
+3. Install dependencies (choose one):
+  - `cd backend && pip install -r requirements.txt`
+  - `uv sync`
+4. Start the app (choose one):
+  - `make run`
+  - `uv run python backend/app/main.py`
 
-## Docker Usage
+## Docker
 - Build and run:
   - `make docker-up`
+- Or directly:
+  - `docker compose up --build`
 - Stop:
   - `make docker-down`
+
+Services:
+- app
+- postgres
+- redis
 
 ## Migrations
 - Create revision:
   - `make revision`
+- Or directly:
+  - `alembic revision --autogenerate -m "init"`
 - Apply migrations:
   - `make migrate`
+- Or directly:
+  - `alembic upgrade head`
 
-## How to Create a Module
-1. Create a folder under `backend/app/modules/<module_name>`.
-2. Add `models.py`, `repository.py`, and `service.py`.
-3. Keep modules pure (no FastAPI/aiogram imports).
-4. Call the service from routes/handlers.
+## Scripts
+Useful automation lives in `backend/scripts/`:
+- `set_webhook.py` (set Telegram webhook)
+- `seed_data.py` (seed database)
+- `admin_tasks.py` (admin tasks placeholder)
+
+## How to Add a New Module
+```
+modules/products/
+  models.py
+  schemas.py
+  repository.py
+  service.py
+```
+
+Register models in metadata and keep the module pure.
 
 ## How to Add a Bot Handler
 1. Create `backend/app/bot/handlers/<name>.py`.
 2. Add a router and handler function.
 3. Include the router in `backend/app/bot/dispatcher.py`.
 
+Example:
+```
+bot/handlers/start.py
+```
+
+Handler must call service.
+
 ## Deployment Notes
 - Use a public HTTPS URL for `TELEGRAM_WEBHOOK_URL`.
-- Ensure the `/bot/webhook` endpoint is reachable.
+- Ensure `/bot/webhook` is reachable.
 - Run migrations before starting the app.
 - Use a production ASGI server (e.g., `uvicorn` behind a reverse proxy).
+- Optional: use the provided Nginx config at `docker/nginx.conf`.
+
+## AI Development Rules
+When using AI agents, specify the layer to modify and enforce the module pattern.
+
+Example prompt:
+"Add feature inside modules/orders service layer only."
+
+## Long-Term Scaling
+This template supports a large modular monolith, easy microservice extraction, and team development.
+
+## Final Notes
+This template is intentionally opinionated. Consistency is more important than flexibility. Follow the rules strictly.
