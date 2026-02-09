@@ -1,5 +1,11 @@
 # Telegram + FastAPI Modular Backend Template
 
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-green.svg)](https://fastapi.tiangolo.com)
+[![aiogram](https://img.shields.io/badge/aiogram-3.x-blue.svg)](https://aiogram.dev)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-red.svg)](https://www.sqlalchemy.org)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED.svg)](https://www.docker.com)
+
 ## Overview
 This repository is an **opinionated backend template** for building:
 - Telegram bots (aiogram v3)
@@ -66,6 +72,39 @@ HTTP     → /health      → route   → service → repository → DB
 
 Modules never talk to Telegram directly.
 
+## Architecture Diagram
+```
+┌───────────────────────────────┐
+│           Telegram             │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│          FastAPI App           │
+│   /bot/webhook & /health       │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│  Bot Handlers & API Routes     │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│            Services            │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│          Repositories          │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│          PostgreSQL            │
+└───────────────────────────────┘
+```
+
 ## Folder Structure
 | Path | Purpose |
 | --- | --- |
@@ -83,6 +122,29 @@ Modules never talk to Telegram directly.
 | backend/alembic | Database migrations |
 | docker | Dockerfile, compose, nginx config |
 | .env.example | Environment template |
+
+## Quick Start
+### 1) Configure
+```
+cp .env.example .env
+```
+Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_URL`.
+
+### 2) Install dependencies (choose one)
+```
+cd backend && pip install -r requirements.txt
+```
+```
+uv sync
+```
+
+### 3) Run (choose one)
+```
+make run
+```
+```
+uv run python backend/app/main.py
+```
 
 ## Module Structure
 Each module contains:
@@ -168,6 +230,12 @@ Services:
 - postgres
 - redis
 
+## API Endpoints
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | /bot/webhook | Telegram webhook receiver |
+| GET | /health | Health check |
+
 ## Migrations
 - Create revision:
   - `make revision`
@@ -225,3 +293,28 @@ This template supports a large modular monolith, easy microservice extraction, a
 
 ## Final Notes
 This template is intentionally opinionated. Consistency is more important than flexibility. Follow the rules strictly.
+
+## Tech Stack
+- **Python 3.11+**
+- **FastAPI** (ASGI web framework)
+- **aiogram v3** (Telegram bot framework)
+- **SQLAlchemy 2.0** (async ORM)
+- **PostgreSQL**
+- **Docker**
+
+## Configuration Reference
+| Variable | Required | Description |
+| --- | --- | --- |
+| APP_NAME | ❌ | Application name |
+| ENVIRONMENT | ❌ | Environment label (development/production) |
+| DEBUG | ❌ | Debug mode |
+| TELEGRAM_BOT_TOKEN | ✅ | Telegram bot token |
+| TELEGRAM_WEBHOOK_URL | ✅ | Public webhook URL |
+| DATABASE_URL | ✅ | Async SQLAlchemy database URL |
+| REDIS_URL | ❌ | Redis URL |
+
+## Useful Links
+- FastAPI: https://fastapi.tiangolo.com
+- aiogram: https://aiogram.dev
+- SQLAlchemy: https://www.sqlalchemy.org
+- PostgreSQL: https://www.postgresql.org
