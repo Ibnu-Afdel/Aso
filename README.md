@@ -163,6 +163,19 @@ or:
 uv run --package backend fast make-module orders
 ```
 
+## Developer Tools
+Lint and format (Ruff):
+```
+make lint
+make lint-fix
+make format
+```
+
+Interactive shell (IPython):
+```
+make shell
+```
+
 ## Module Structure
 Each module contains:
 ```

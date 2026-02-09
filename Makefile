@@ -23,6 +23,18 @@ module:
 help:
 	uv run --package backend fast help
 
+shell:
+	uv run --package backend ipython
+
+lint:
+	uv run --package backend ruff check backend
+
+format:
+	uv run --package backend ruff format backend
+
+lint-fix:
+	uv run --package backend ruff check --fix backend
+
 docker-up:
 	docker compose -f docker/docker-compose.yml up --build
 

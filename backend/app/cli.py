@@ -161,13 +161,17 @@ def help_command() -> None:
         - uv run --package backend fast help
 
         Helpful Make targets
-        - make setup
-        - make run
-        - make sync
-        - make migrate
-        - make revision
-        - make docker-up
-        - make docker-down
+        - make setup        # create .env and install deps
+        - make run          # start dev server
+        - make sync         # install/update deps
+        - make shell        # open IPython in project env
+        - make lint         # ruff check (backend)
+        - make lint-fix     # ruff check --fix (backend)
+        - make format       # ruff format (backend)
+        - make migrate      # apply db migrations
+        - make revision     # create migration
+        - make docker-up    # start docker stack
+        - make docker-down  # stop docker stack
         """
     ).strip()
     _print_box("Fast CLI Help", body)
