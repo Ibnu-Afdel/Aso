@@ -1,0 +1,44 @@
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
+from aiogram import types
+
+from app.api.routes.health import router as health_router
+from app.bot.dispatcher import get_dispatcher
+from app.core.config import get_settings
+from app.core.logging import setup_logging
+from app.integrations.telegram import setup_telegram_webhook, teardown_telegram_webhook
+
+settings = get_settings()
+
+dp = get_dispatcher()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    setup_logging()
+    await setup_telegram_webhook(dp)
+    yield
+    await teardown_telegram_webhook(dp)
+
+
+app = FastAPI(title=settings.app_name, lifespan=lifespan)
+
+app.include_router(health_router)
+
+
+@app.post("/bot/webhook")
+async def telegram_webhook(request: Request):
+    update = types.Update.model_validate(await request.json())
+    try:
+        await dp.feed_webhook_update(dp.bot, update)
+    except Exception as exc:  # noqa: BLE001
+        return JSONResponse(status_code=500, content={"error": str(exc)})
+    return {"ok": True}
+
+
+@app.exception_handler(SQLAlchemyError)
+async def db_exception_handler(_: Request, exc: SQLAlchemyError):
+    return JSONResponse(status_code=500, content={"error": "database_error", "details": str(exc)})
