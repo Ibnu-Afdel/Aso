@@ -172,6 +172,11 @@ def help_command() -> None:
         - make revision     # create migration
         - make docker-up    # start docker stack
         - make docker-down  # stop docker stack
+
+        Run options
+        - make run PORT=8001          # run on a different port
+        - make run HOST=0.0.0.0       # expose to local network
+        - make run HOST=0.0.0.0 PORT=9000
         """
     ).strip()
     _print_box("Fast CLI Help", body)

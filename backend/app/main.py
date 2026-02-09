@@ -13,15 +13,17 @@ from app.integrations.telegram import setup_telegram_webhook, teardown_telegram_
 
 settings = get_settings()
 
-dp = get_dispatcher()
+dp = get_dispatcher() if settings.bot_enabled else None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
-    await setup_telegram_webhook(dp)
+    if settings.bot_enabled and dp is not None:
+        await setup_telegram_webhook(dp)
     yield
-    await teardown_telegram_webhook(dp)
+    if settings.bot_enabled and dp is not None:
+        await teardown_telegram_webhook(dp)
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
@@ -31,6 +33,11 @@ app.include_router(health_router)
 
 @app.post("/bot/webhook")
 async def telegram_webhook(request: Request):
+    if not settings.bot_enabled or dp is None:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "telegram_bot_disabled"},
+        )
     update = types.Update.model_validate(await request.json())
     try:
         await dp.feed_webhook_update(dp.bot, update)

@@ -4,8 +4,11 @@ setup:
 	cp -n .env.example .env
 	uv sync
 
+HOST ?= 127.0.0.1
+PORT ?= 8000
+
 run: setup
-	uv run --package backend uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+	uv run --package backend uvicorn app.main:app --reload --host $(HOST) --port $(PORT)
 
 MODULE_NAME := $(word 2,$(MAKECMDGOALS))
 

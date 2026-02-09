@@ -246,6 +246,18 @@ Repositories talk to the DB only. They must not call Telegram, send emails, or c
   - `make run`
   - `uv run --package backend python backend/app/main.py`
 
+### Run Options (Host/Port)
+Defaults:
+- `HOST=127.0.0.1`
+- `PORT=8000`
+
+Examples:
+```
+make run PORT=8001
+make run HOST=0.0.0.0
+make run HOST=0.0.0.0 PORT=9000
+```
+
 ## Docker
 - Build and run:
   - `make docker-up`
