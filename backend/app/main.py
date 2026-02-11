@@ -33,16 +33,11 @@ app.include_router(health_router)
 
 @app.post("/bot/webhook")
 async def telegram_webhook(request: Request):
-    if not settings.bot_enabled or dp is None:
-        return JSONResponse(
-            status_code=503,
-            content={"error": "telegram_bot_disabled"},
-        )
-    try:
-        await get_telegram_webhook_app_service().handle_update(dp, await request.json())
-    except Exception as exc:  # noqa: BLE001
-        return JSONResponse(status_code=500, content={"error": str(exc)})
-    return {"ok": True}
+    return await get_telegram_webhook_app_service().handle_request(
+        await request.json(),
+        bot_enabled=settings.bot_enabled,
+        dispatcher=dp,
+    )
 
 
 @app.exception_handler(SQLAlchemyError)
