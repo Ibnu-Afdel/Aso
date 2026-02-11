@@ -5,16 +5,15 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.routes.health import router as health_router
+from app.bootstrap.container import get_telegram_webhook_app_service
 from app.bot.dispatcher import get_dispatcher
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.integrations.telegram import setup_telegram_webhook, teardown_telegram_webhook
-from app.services.telegram_webhook import TelegramWebhookAppService
 
 settings = get_settings()
 
 dp = get_dispatcher() if settings.bot_enabled else None
-telegram_webhook_service = TelegramWebhookAppService()
 
 
 @asynccontextmanager
@@ -40,7 +39,7 @@ async def telegram_webhook(request: Request):
             content={"error": "telegram_bot_disabled"},
         )
     try:
-        await telegram_webhook_service.handle_update(dp, await request.json())
+        await get_telegram_webhook_app_service().handle_update(dp, await request.json())
     except Exception as exc:  # noqa: BLE001
         return JSONResponse(status_code=500, content={"error": str(exc)})
     return {"ok": True}

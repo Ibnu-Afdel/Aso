@@ -1,11 +1,10 @@
 from fastapi import APIRouter
 
-from app.services.health import HealthAppService
+from app.bootstrap.container import get_health_app_service
 
 router = APIRouter()
-health_app_service = HealthAppService()
 
 
 @router.get("/health")
 async def health_check():
-    return await health_app_service.status()
+    return await get_health_app_service().status()
