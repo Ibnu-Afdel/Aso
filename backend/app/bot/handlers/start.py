@@ -1,9 +1,7 @@
 from aiogram import Router, types
 from aiogram.filters import CommandStart
 
-from app.core.db import async_session_maker
-from app.modules.users.repository import UserRepository
-from app.modules.users.service import UserService
+from app.services.users import user_app_service
 
 router = Router()
 
@@ -13,9 +11,6 @@ async def start_handler(message: types.Message):
     if not message.from_user:
         return
 
-    async with async_session_maker() as session:
-        repo = UserRepository(session)
-        service = UserService(repo)
-        await service.ensure_user(telegram_id=message.from_user.id)
+    await user_app_service.ensure_user(telegram_id=message.from_user.id)
 
     await message.answer("Hello! Your account is registered.")

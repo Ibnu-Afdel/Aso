@@ -45,3 +45,6 @@ uv.lock
 
 # Docker
 *.pid
+
+# Local handoff notes
+abouteme.md
