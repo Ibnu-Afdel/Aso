@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.routes.health import router as health_router
 from app.bootstrap.container import get_telegram_webhook_app_service
+from app.bootstrap.session_middleware import add_session_middleware
 from app.bot.dispatcher import get_dispatcher
 from app.core.config import get_settings
 from app.core.logging import setup_logging
@@ -27,6 +28,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
+add_session_middleware(app)
 
 app.include_router(health_router)
 
