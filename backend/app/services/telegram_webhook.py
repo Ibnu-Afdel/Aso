@@ -19,7 +19,7 @@ class TelegramWebhookAppService:
         bot_enabled: bool,
         dispatcher: Dispatcher | None,
     ) -> JSONResponse | dict[str, bool]:
-        async with self._session_manager.session_scope():
+        async with self._session_manager.session_scope(commit_on_exit=True):
             if not bot_enabled or dispatcher is None:
                 return JSONResponse(
                     status_code=503,

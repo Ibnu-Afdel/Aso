@@ -24,7 +24,6 @@ def get_user_app_service() -> UserAppService:
     if _user_app_service is None:
         _user_app_service = UserAppService(
             get_session_manager(),
-            async_session_maker,
             _build_user_module_service,
         )
     return _user_app_service

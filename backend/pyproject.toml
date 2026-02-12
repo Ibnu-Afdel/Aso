@@ -9,6 +9,7 @@ dependencies = [
   "aiogram==3.6.0",
   "SQLAlchemy==2.0.30",
   "asyncpg==0.29.0",
+  "aiosqlite==0.20.0",
   "pydantic-settings==2.3.4",
   "alembic==1.13.1",
   "python-dotenv==1.0.1",
