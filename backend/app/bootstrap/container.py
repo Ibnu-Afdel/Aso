@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.bootstrap.logging import configure_logging
 from app.core.db import async_session_maker
+from app.core.config import get_settings
 from app.modules.users.repository import UserRepository
 from app.modules.users.service import UserService
 from app.bootstrap.session_manager import SessionManager
@@ -12,6 +14,7 @@ _user_app_service: UserAppService | None = None
 _health_app_service: HealthAppService | None = None
 _telegram_webhook_app_service: TelegramWebhookAppService | None = None
 _session_manager: SessionManager | None = None
+_logging_initialized = False
 
 
 def _build_user_module_service(session: AsyncSession) -> UserService:
@@ -48,3 +51,11 @@ def get_session_manager() -> SessionManager:
     if _session_manager is None:
         _session_manager = SessionManager(async_session_maker)
     return _session_manager
+
+
+def initialize_logging() -> None:
+    global _logging_initialized
+    if _logging_initialized:
+        return
+    configure_logging(get_settings())
+    _logging_initialized = True

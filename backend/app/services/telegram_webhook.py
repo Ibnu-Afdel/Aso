@@ -1,11 +1,9 @@
-import logging
-
 from aiogram import Dispatcher, types
 from fastapi.responses import JSONResponse
+from loguru import logger
 
+from app.bootstrap.request_context import get_request_id
 from app.bootstrap.session_manager import SessionManager
-
-logger = logging.getLogger(__name__)
 
 
 class TelegramWebhookAppService:
@@ -30,7 +28,10 @@ class TelegramWebhookAppService:
                 update = types.Update.model_validate(payload)
                 await dispatcher.feed_webhook_update(dispatcher.bot, update)
             except Exception as exc:  # noqa: BLE001
-                logger.exception("telegram webhook processing failed")
+                logger.bind(
+                    request_id=get_request_id(),
+                    event_type="telegram_webhook_error",
+                ).exception("telegram webhook processing failed")
                 return JSONResponse(status_code=500, content={"error": str(exc)})
 
             return {"ok": True}
