@@ -152,31 +152,30 @@ def help_command() -> None:
         - Services call repositories; handlers/routes call services
 
         Useful CLI commands
-        - make module name=orders
-        - make module orders
-        - make help
+        - python manage.py make module orders
+        - python manage.py make model orders
+        - uv run fast help
 
         Direct CLI (after uv sync)
         - uv run fast make-module orders
         - uv run fast help
 
-        Helpful Make targets
-        - make setup        # create .env and install deps
-        - make run          # start dev server
-        - make sync         # install/update deps
-        - make shell        # open IPython in project env
-        - make lint         # ruff check (app + tests)
-        - make lint-fix     # ruff check --fix (app + tests)
-        - make format       # ruff format (app + tests)
-        - make migrate      # apply db migrations
-        - make revision     # create migration
-        - make docker-up    # start docker stack
-        - make docker-down  # stop docker stack
+        Helpful manage.py commands
+        - python manage.py setup
+        - python manage.py run --reload
+        - python manage.py sync
+        - python manage.py shell
+        - python manage.py lint --fix
+        - python manage.py format --check
+        - python manage.py migrate
+        - python manage.py makemigration -m "init"
+        - python manage.py docker-up
+        - python manage.py docker-down
 
         Run options
-        - make run PORT=8001          # run on a different port
-        - make run HOST=0.0.0.0       # expose to local network
-        - make run HOST=0.0.0.0 PORT=9000
+        - python manage.py run --port 8001
+        - python manage.py run --host 0.0.0.0
+        - python manage.py run --host 0.0.0.0 --port 9000
         """
     ).strip()
     _print_box("Fast CLI Help", body)

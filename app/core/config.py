@@ -30,9 +30,7 @@ class Settings(BaseSettings):
             if not self.telegram_webhook_url:
                 missing.append("TELEGRAM_WEBHOOK_URL")
             if missing:
-                raise ValueError(
-                    "BOT_ENABLED=true requires: " + ", ".join(missing)
-                )
+                raise ValueError("BOT_ENABLED=true requires: " + ", ".join(missing))
         return self
 
 

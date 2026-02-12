@@ -132,12 +132,12 @@ Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_URL`.
 
 ### 2) Install dependencies
 ```
-make setup
+python manage.py setup
 ```
 
 ### 3) Run (choose one)
 ```
-make run
+python manage.py run --reload
 ```
 ```
 uv run uvicorn app.main:app --reload
@@ -145,9 +145,9 @@ uv run uvicorn app.main:app --reload
 If `TELEGRAM_BOT_TOKEN` or `TELEGRAM_WEBHOOK_URL` are missing, the app will fail fast with a Pydantic validation error.
 
 ## Fast CLI (code generation)
-Run with:
+View command help:
 ```
-make help
+python manage.py --help
 ```
 or:
 ```
@@ -156,7 +156,7 @@ uv run fast help
 
 Create a module:
 ```
-make module name=orders
+python manage.py make module orders
 ```
 or:
 ```
@@ -166,14 +166,14 @@ uv run fast make-module orders
 ## Developer Tools
 Lint and format (Ruff):
 ```
-make lint
-make lint-fix
-make format
+python manage.py lint
+python manage.py lint --fix
+python manage.py format
 ```
 
 Interactive shell (IPython):
 ```
-make shell
+python manage.py shell
 ```
 
 ## Module Structure
@@ -241,9 +241,9 @@ Repositories talk to the DB only. They must not call Telegram, send emails, or c
    - `cp .env.example .env`
 2. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_URL`.
 3. Install dependencies:
-  - `make setup`
+  - `python manage.py setup`
 4. Start the app (choose one):
-  - `make run`
+  - `python manage.py run --reload`
   - `uv run uvicorn app.main:app --reload`
 
 ### Run Options (Host/Port)
@@ -253,18 +253,18 @@ Defaults:
 
 Examples:
 ```
-make run PORT=8001
-make run HOST=0.0.0.0
-make run HOST=0.0.0.0 PORT=9000
+python manage.py run --port 8001
+python manage.py run --host 0.0.0.0
+python manage.py run --host 0.0.0.0 --port 9000
 ```
 
 ## Docker
 - Build and run:
-  - `make docker-up`
+  - `python manage.py docker-up`
 - Or directly:
   - `docker compose up --build`
 - Stop:
-  - `make docker-down`
+  - `python manage.py docker-down`
 
 Services:
 - app
@@ -279,11 +279,11 @@ Services:
 
 ## Migrations
 - Create revision:
-  - `make revision`
+  - `python manage.py makemigration -m "init"`
 - Or directly:
   - `uv run alembic -c alembic.ini revision --autogenerate -m "init"`
 - Apply migrations:
-  - `make migrate`
+  - `python manage.py migrate`
 - Or directly:
   - `uv run alembic -c alembic.ini upgrade head`
 

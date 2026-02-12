@@ -23,7 +23,9 @@ async def test_missing_database_url_fails_startup(monkeypatch) -> None:
 
 @pytest.mark.asyncio
 async def test_startup_checks_pass_with_required_env(monkeypatch) -> None:
-    monkeypatch.setenv("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost:5432/db")
+    monkeypatch.setenv(
+        "DATABASE_URL", "postgresql+asyncpg://user:pass@localhost:5432/db"
+    )
     monkeypatch.setenv("ENVIRONMENT", "production")
     monkeypatch.setenv("BOT_ENABLED", "false")
 

@@ -75,7 +75,9 @@ async def test_repository_create_does_not_persist_without_commit() -> None:
 
     async with session_manager.session_scope():
         session = session_manager.get_session()
-        persisted = await session.scalar(select(EntityModel).where(EntityModel.telegram_id == 10001))
+        persisted = await session.scalar(
+            select(EntityModel).where(EntityModel.telegram_id == 10001)
+        )
         assert persisted is None
 
     await engine.dispose()
@@ -90,7 +92,9 @@ async def test_app_service_commit_on_exit_persists_data() -> None:
 
     async with session_manager.session_scope():
         session = session_manager.get_session()
-        persisted = await session.scalar(select(EntityModel).where(EntityModel.telegram_id == 10002))
+        persisted = await session.scalar(
+            select(EntityModel).where(EntityModel.telegram_id == 10002)
+        )
         assert persisted is not None
 
     await engine.dispose()
@@ -117,7 +121,9 @@ async def test_exception_inside_service_rolls_back() -> None:
 
     async with session_manager.session_scope():
         session = session_manager.get_session()
-        persisted = await session.scalar(select(EntityModel).where(EntityModel.telegram_id == 10003))
+        persisted = await session.scalar(
+            select(EntityModel).where(EntityModel.telegram_id == 10003)
+        )
         assert persisted is None
 
     await engine.dispose()
@@ -132,12 +138,16 @@ async def test_nested_commit_request_only_commits_at_outer_scope() -> None:
     async with session_manager.session_scope(commit_on_exit=False):
         await app_service.ensure_user(telegram_id=10004)
         session = session_manager.get_session()
-        visible_in_tx = await session.scalar(select(EntityModel).where(EntityModel.telegram_id == 10004))
+        visible_in_tx = await session.scalar(
+            select(EntityModel).where(EntityModel.telegram_id == 10004)
+        )
         assert visible_in_tx is not None
 
     async with session_manager.session_scope():
         session = session_manager.get_session()
-        persisted = await session.scalar(select(EntityModel).where(EntityModel.telegram_id == 10004))
+        persisted = await session.scalar(
+            select(EntityModel).where(EntityModel.telegram_id == 10004)
+        )
         assert persisted is not None
 
     await engine.dispose()
