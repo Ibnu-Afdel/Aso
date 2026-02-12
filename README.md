@@ -108,18 +108,18 @@ Modules never talk to Telegram directly.
 ## Folder Structure
 | Path | Purpose |
 | --- | --- |
-| backend/app/main.py | FastAPI application entrypoint |
-| backend/app/core | Settings, DB, logging, security |
-| backend/app/modules | Business logic modules (includes users example) |
-| backend/app/bot | aiogram dispatcher and handlers |
-| backend/app/api | FastAPI routes and dependencies |
-| backend/app/services | Shared services (skeleton) |
-| backend/app/integrations | External integrations |
-| backend/app/jobs | Background workers |
-| backend/app/webapp | Telegram WebApp assets |
-| backend/tests | Unit test folder (created day one) |
-| backend/scripts | Admin and automation scripts |
-| backend/alembic | Database migrations |
+| app/main.py | FastAPI application entrypoint |
+| app/core | Settings, DB, logging, security |
+| app/modules | Business logic modules (includes users example) |
+| app/bot | aiogram dispatcher and handlers |
+| app/api | FastAPI routes and dependencies |
+| app/services | Shared services (skeleton) |
+| app/integrations | External integrations |
+| app/jobs | Background workers |
+| app/webapp | Telegram WebApp assets |
+| tests | Unit test folder (created day one) |
+| scripts | Admin and automation scripts |
+| alembic | Database migrations |
 | docker | Dockerfile, compose, nginx config |
 | .env.example | Environment template |
 
@@ -140,7 +140,7 @@ make setup
 make run
 ```
 ```
-uv run --package backend python backend/app/main.py
+uv run uvicorn app.main:app --reload
 ```
 If `TELEGRAM_BOT_TOKEN` or `TELEGRAM_WEBHOOK_URL` are missing, the app will fail fast with a Pydantic validation error.
 
@@ -151,7 +151,7 @@ make help
 ```
 or:
 ```
-uv run --package backend fast help
+uv run fast help
 ```
 
 Create a module:
@@ -160,7 +160,7 @@ make module name=orders
 ```
 or:
 ```
-uv run --package backend fast make-module orders
+uv run fast make-module orders
 ```
 
 ## Developer Tools
@@ -244,7 +244,7 @@ Repositories talk to the DB only. They must not call Telegram, send emails, or c
   - `make setup`
 4. Start the app (choose one):
   - `make run`
-  - `uv run --package backend python backend/app/main.py`
+  - `uv run uvicorn app.main:app --reload`
 
 ### Run Options (Host/Port)
 Defaults:
@@ -281,14 +281,14 @@ Services:
 - Create revision:
   - `make revision`
 - Or directly:
-  - `uv run --package backend alembic -c backend/alembic.ini revision --autogenerate -m "init"`
+  - `uv run alembic -c alembic.ini revision --autogenerate -m "init"`
 - Apply migrations:
   - `make migrate`
 - Or directly:
-  - `uv run --package backend alembic -c backend/alembic.ini upgrade head`
+  - `uv run alembic -c alembic.ini upgrade head`
 
 ## Scripts
-Useful automation lives in `backend/scripts/`:
+Useful automation lives in `scripts/`:
 - `set_webhook.py` (set Telegram webhook)
 - `seed_data.py` (seed database)
 - `admin_tasks.py` (admin tasks placeholder)
@@ -305,9 +305,9 @@ modules/products/
 Register models in metadata and keep the module pure.
 
 ## How to Add a Bot Handler
-1. Create `backend/app/bot/handlers/<name>.py`.
+1. Create `app/bot/handlers/<name>.py`.
 2. Add a router and handler function.
-3. Include the router in `backend/app/bot/dispatcher.py`.
+3. Include the router in `app/bot/dispatcher.py`.
 
 Example:
 ```

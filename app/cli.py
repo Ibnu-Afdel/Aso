@@ -10,11 +10,11 @@ app = typer.Typer(add_completion=False, help="Fast CLI for the FastGram template
 
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return Path(__file__).resolve().parents[1]
 
 
 def _modules_dir() -> Path:
-    return _repo_root() / "backend" / "app" / "modules"
+    return _repo_root() / "app" / "modules"
 
 
 def _normalize_module_name(raw: str) -> str:
@@ -147,7 +147,7 @@ def help_command() -> None:
     body = textwrap.dedent(
         """\
         What is a module?
-        - A self-contained business unit under backend/app/modules/<name>
+        - A self-contained business unit under app/modules/<name>
         - It always has: models.py, schemas.py, repository.py, service.py
         - Services call repositories; handlers/routes call services
 
@@ -157,17 +157,17 @@ def help_command() -> None:
         - make help
 
         Direct CLI (after uv sync)
-        - uv run --package backend fast make-module orders
-        - uv run --package backend fast help
+        - uv run fast make-module orders
+        - uv run fast help
 
         Helpful Make targets
         - make setup        # create .env and install deps
         - make run          # start dev server
         - make sync         # install/update deps
         - make shell        # open IPython in project env
-        - make lint         # ruff check (backend)
-        - make lint-fix     # ruff check --fix (backend)
-        - make format       # ruff format (backend)
+        - make lint         # ruff check (app + tests)
+        - make lint-fix     # ruff check --fix (app + tests)
+        - make format       # ruff format (app + tests)
         - make migrate      # apply db migrations
         - make revision     # create migration
         - make docker-up    # start docker stack
