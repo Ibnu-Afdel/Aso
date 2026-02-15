@@ -34,6 +34,12 @@ async def main() -> None:
             )
             return
 
+        if not settings.telegram_webhook_url:
+            raise SystemExit(
+                "TELEGRAM_WEBHOOK_URL is required to set webhook. "
+                "Set it in .env or use --delete to remove webhook."
+            )
+
         await bot.set_webhook(settings.telegram_webhook_url)
         print(f"Webhook set to {settings.telegram_webhook_url}")
     finally:

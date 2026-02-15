@@ -44,6 +44,9 @@ app.include_router(health_router)
 
 @app.post("/bot/webhook")
 async def telegram_webhook(request: Request):
+    secret = request.headers.get("X-Telegram-Bot-Api-Secret-Token")
+    if settings.telegram_webhook_secret and secret != settings.telegram_webhook_secret:
+        return JSONResponse(status_code=403, content={"error": "invalid_secret"})
     return await get_telegram_webhook_app_service().handle_request(
         await request.json(),
         bot_enabled=settings.bot_enabled,

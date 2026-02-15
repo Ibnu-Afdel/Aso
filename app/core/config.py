@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     telegram_delivery_mode: Literal["polling", "webhook"] = "polling"
     telegram_bot_token: str | None = None
     telegram_webhook_url: str | None = None
+    telegram_webhook_secret: str | None = None
 
     database_url: str = "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
     redis_url: str = "redis://redis:6379/0"
