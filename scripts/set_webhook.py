@@ -24,6 +24,8 @@ def _parse_args() -> argparse.Namespace:
 async def main() -> None:
     args = _parse_args()
     settings = get_settings()
+    if not settings.bot_enabled or not settings.telegram_bot_token:
+        raise SystemExit("BOT_ENABLED and TELEGRAM_BOT_TOKEN required for webhook script")
     bot = Bot(token=settings.telegram_bot_token)
     try:
         if args.delete:
@@ -40,7 +42,10 @@ async def main() -> None:
                 "Set it in .env or use --delete to remove webhook."
             )
 
-        await bot.set_webhook(settings.telegram_webhook_url)
+        await bot.set_webhook(
+            settings.telegram_webhook_url,
+            secret_token=settings.telegram_webhook_secret or None,
+        )
         print(f"Webhook set to {settings.telegram_webhook_url}")
     finally:
         await bot.session.close()
