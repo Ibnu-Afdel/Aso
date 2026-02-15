@@ -114,7 +114,7 @@ def make_module(
                 async def create(self, **data) -> {class_name}:
                     item = {class_name}(**data)
                     self._session.add(item)
-                    await self._session.commit()
+                    await self._session.flush()
                     await self._session.refresh(item)
                     return item
             """
@@ -139,7 +139,10 @@ def make_module(
         path.write_text(content, encoding="utf-8")
 
     typer.secho(f"Created module: {module_dir}", fg=typer.colors.GREEN)
-    typer.echo("Next: wire it into handlers/routes and add migrations if needed.")
+    typer.echo(
+        "Next: add an app service that uses session_scope(commit_on_exit=True), "
+        "wire handlers/routes, and add migrations if needed."
+    )
 
 
 @app.command("help")

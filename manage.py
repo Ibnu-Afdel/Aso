@@ -131,7 +131,10 @@ def cmd_doctor(args: argparse.Namespace) -> None:
 
 def cmd_make_module(args: argparse.Namespace) -> None:
     _ensure_uv()
-    _run(["uv", "run", "fast", "make-module", args.name])
+    cmd = ["uv", "run", "python", "-m", "app.cli", "make-module", args.name]
+    if args.force:
+        cmd.append("--force")
+    _run(cmd)
 
 
 def cmd_make_model(args: argparse.Namespace) -> None:
@@ -258,9 +261,11 @@ def _build_parser() -> argparse.ArgumentParser:
     make_sub = p_make.add_subparsers(dest="make_command", required=True)
     p_make_module = make_sub.add_parser("module")
     p_make_module.add_argument("name")
+    p_make_module.add_argument("--force", action="store_true")
     p_make_module.set_defaults(func=cmd_make_module)
     p_make_model = make_sub.add_parser("model")
     p_make_model.add_argument("name")
+    p_make_model.add_argument("--force", action="store_true")
     p_make_model.set_defaults(func=cmd_make_model)
 
     p_migrate = sub.add_parser("migrate")

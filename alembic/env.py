@@ -8,6 +8,8 @@ from alembic import context
 
 from app.core.config import get_settings
 from app.core.db import Base
+# Import all model modules so they register with Base.metadata
+from app.modules.users import models as _users_models  # noqa: F401
 
 settings = get_settings()
 
