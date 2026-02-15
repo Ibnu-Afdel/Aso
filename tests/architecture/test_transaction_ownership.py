@@ -1,153 +1,105 @@
-import pytest
-from sqlalchemy import Integer, select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy.pool import StaticPool
+from contextlib import asynccontextmanager
 
-from app.bootstrap.session_manager import SessionManager
+import pytest
+
+import app.core.db as db
+import app.services.users as users_service_module
 from app.services.users import UserAppService
 
 
-class Base(DeclarativeBase):
-    pass
+class _FakeSession:
+    def __init__(self) -> None:
+        self.commits = 0
+        self.rollbacks = 0
+
+    async def commit(self) -> None:
+        self.commits += 1
+
+    async def rollback(self) -> None:
+        self.rollbacks += 1
 
 
-class EntityModel(Base):
-    __tablename__ = "test_entities"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    telegram_id: Mapped[int] = mapped_column(Integer, unique=True, index=True)
-
-
-class EntityRepository:
-    def __init__(self, session: AsyncSession) -> None:
+class _FakeSessionMaker:
+    def __init__(self, session: _FakeSession) -> None:
         self._session = session
 
-    async def get_by_telegram_id(self, telegram_id: int) -> EntityModel | None:
-        return await self._session.scalar(
-            select(EntityModel).where(EntityModel.telegram_id == telegram_id)
-        )
-
-    async def create(self, telegram_id: int) -> EntityModel:
-        entity = EntityModel(telegram_id=telegram_id)
-        self._session.add(entity)
-        await self._session.flush()
-        return entity
-
-
-class EntityModuleService:
-    def __init__(self, repo: EntityRepository) -> None:
-        self._repo = repo
-
-    async def ensure_user(self, telegram_id: int) -> EntityModel:
-        existing = await self._repo.get_by_telegram_id(telegram_id)
-        if existing is not None:
-            return existing
-        return await self._repo.create(telegram_id)
-
-
-async def _build_test_stack():
-    engine = create_async_engine(
-        "sqlite+aiosqlite:///:memory:",
-        poolclass=StaticPool,
-    )
-    session_factory = async_sessionmaker(engine, expire_on_commit=False)
-    session_manager = SessionManager(session_factory)
-
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-    return engine, session_manager
-
-
-def _module_service_factory(session: AsyncSession) -> EntityModuleService:
-    return EntityModuleService(EntityRepository(session))
+    @asynccontextmanager
+    async def __call__(self):
+        yield self._session
 
 
 @pytest.mark.asyncio
-async def test_repository_create_does_not_persist_without_commit() -> None:
-    engine, session_manager = await _build_test_stack()
+async def test_session_scope_without_commit_does_not_commit(monkeypatch) -> None:
+    session = _FakeSession()
+    monkeypatch.setattr(db, "async_session_maker", _FakeSessionMaker(session))
 
-    async with session_manager.session_scope(commit_on_exit=False):
-        session = session_manager.get_session()
-        repo = EntityRepository(session)
-        await repo.create(telegram_id=10001)
+    async with db.session_scope(commit_on_exit=False):
+        pass
 
-    async with session_manager.session_scope():
-        session = session_manager.get_session()
-        persisted = await session.scalar(
-            select(EntityModel).where(EntityModel.telegram_id == 10001)
-        )
-        assert persisted is None
-
-    await engine.dispose()
+    assert session.commits == 0
+    assert session.rollbacks == 0
 
 
 @pytest.mark.asyncio
-async def test_app_service_commit_on_exit_persists_data() -> None:
-    engine, session_manager = await _build_test_stack()
+async def test_session_scope_commit_on_exit_commits(monkeypatch) -> None:
+    session = _FakeSession()
+    monkeypatch.setattr(db, "async_session_maker", _FakeSessionMaker(session))
 
-    app_service = UserAppService(session_manager, _module_service_factory)
-    await app_service.ensure_user(telegram_id=10002)
+    async with db.session_scope(commit_on_exit=True):
+        pass
 
-    async with session_manager.session_scope():
-        session = session_manager.get_session()
-        persisted = await session.scalar(
-            select(EntityModel).where(EntityModel.telegram_id == 10002)
-        )
-        assert persisted is not None
-
-    await engine.dispose()
+    assert session.commits == 1
+    assert session.rollbacks == 0
 
 
 @pytest.mark.asyncio
-async def test_exception_inside_service_rolls_back() -> None:
-    engine, session_manager = await _build_test_stack()
+async def test_session_scope_rolls_back_on_exception(monkeypatch) -> None:
+    session = _FakeSession()
+    monkeypatch.setattr(db, "async_session_maker", _FakeSessionMaker(session))
 
-    class ExplodingAppService:
-        def __init__(self, sm: SessionManager) -> None:
-            self._sm = sm
-
-        async def create_then_fail(self, telegram_id: int) -> None:
-            async with self._sm.session_scope(commit_on_exit=True):
-                session = self._sm.get_session()
-                repo = EntityRepository(session)
-                await repo.create(telegram_id=telegram_id)
-                raise RuntimeError("boom")
-
-    service = ExplodingAppService(session_manager)
     with pytest.raises(RuntimeError, match="boom"):
-        await service.create_then_fail(telegram_id=10003)
+        async with db.session_scope(commit_on_exit=True):
+            raise RuntimeError("boom")
 
-    async with session_manager.session_scope():
-        session = session_manager.get_session()
-        persisted = await session.scalar(
-            select(EntityModel).where(EntityModel.telegram_id == 10003)
-        )
-        assert persisted is None
-
-    await engine.dispose()
+    assert session.commits == 0
+    assert session.rollbacks == 1
 
 
 @pytest.mark.asyncio
-async def test_nested_commit_request_only_commits_at_outer_scope() -> None:
-    engine, session_manager = await _build_test_stack()
+async def test_user_app_service_ensure_user_uses_session_scope(monkeypatch) -> None:
+    in_scope = False
+    seen_ids: list[int] = []
 
-    app_service = UserAppService(session_manager, _module_service_factory)
+    class FakeRepo:
+        def __init__(self, session) -> None:
+            assert in_scope is True
+            self._session = session
 
-    async with session_manager.session_scope(commit_on_exit=False):
-        await app_service.ensure_user(telegram_id=10004)
-        session = session_manager.get_session()
-        visible_in_tx = await session.scalar(
-            select(EntityModel).where(EntityModel.telegram_id == 10004)
-        )
-        assert visible_in_tx is not None
+    class FakeModuleService:
+        def __init__(self, repo: FakeRepo) -> None:
+            self._repo = repo
 
-    async with session_manager.session_scope():
-        session = session_manager.get_session()
-        persisted = await session.scalar(
-            select(EntityModel).where(EntityModel.telegram_id == 10004)
-        )
-        assert persisted is not None
+        async def ensure_user(self, telegram_id: int):
+            assert in_scope is True
+            seen_ids.append(telegram_id)
+            return {"telegram_id": telegram_id}
 
-    await engine.dispose()
+    @asynccontextmanager
+    async def fake_session_scope(commit_on_exit: bool = False):
+        nonlocal in_scope
+        assert commit_on_exit is True
+        in_scope = True
+        try:
+            yield object()
+        finally:
+            in_scope = False
+
+    monkeypatch.setattr(users_service_module, "session_scope", fake_session_scope)
+    monkeypatch.setattr(users_service_module, "UserRepository", FakeRepo)
+    monkeypatch.setattr(users_service_module, "UserService", FakeModuleService)
+
+    app_service = UserAppService()
+    result = await app_service.ensure_user(telegram_id=123)
+
+    assert result == {"telegram_id": 123}
+    assert seen_ids == [123]

@@ -12,7 +12,6 @@ from app.bootstrap.container import (
 )
 from app.bootstrap.request_context import get_request_id
 from app.bootstrap.request_id_middleware import add_request_id_middleware
-from app.bootstrap.session_middleware import add_session_middleware
 from app.bootstrap.startup_checks import run_startup_checks
 from app.bot.dispatcher import get_dispatcher
 from app.core.config import get_settings
@@ -37,7 +36,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 add_request_id_middleware(app)
-add_session_middleware(app)
 
 app.include_router(health_router)
 

@@ -1,3 +1,5 @@
+import logging
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -17,6 +19,23 @@ class Base(DeclarativeBase):
     pass
 
 
+logger = logging.getLogger(__name__)
+
+
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
+
+
+@asynccontextmanager
+async def session_scope(commit_on_exit: bool = False):
+    """Application-level session scope. Use in services that need DB access."""
+    async with async_session_maker() as session:
+        try:
+            yield session
+            if commit_on_exit:
+                await session.commit()
+        except Exception:
+            await session.rollback()
+            logger.exception("Session scope failed; transaction rolled back")
+            raise
