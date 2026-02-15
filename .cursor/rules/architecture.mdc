@@ -1,0 +1,52 @@
+---
+description: Architecture layers, session rules, and module layout
+alwaysApply: true
+---
+
+# FastGram Architecture Rules
+
+## Layers
+- Interface: `app/bot/`, `app/api/` (receive input, call services)
+- Application: `app/modules/*/service.py` (business logic)
+- Domain: `app/modules/*/models.py` (data models)
+- Infrastructure: `app/modules/*/repository.py` (DB access)
+- Core: `app/core/` (config, DB, logging)
+
+## Session Rules
+- Use `session_scope` from `app/core/db.py` when DB access is needed.
+- Controllers (handlers/routes) never open DB sessions.
+- Services own session lifecycle.
+- Repositories receive a session from callers; repositories never create sessions.
+
+## Module Layout
+- Each module must include:
+  - `models.py`
+  - `repository.py`
+  - `service.py`
+  - `schemas.py`
+- Modules must remain pure and must not import framework transport objects.
+- Do not import in `app/modules/*`:
+  - `aiogram`
+  - `fastapi.Request`
+  - Telegram update/message objects
+
+## Handler and Route Rules
+- Handlers/routes stay thin: parse input, call service, return/send output.
+- Do not query DB directly in handlers/routes.
+- Do not place business logic in handlers/routes.
+
+## Where to Add Features
+- Order logic: `app/modules/orders/service.py`
+- Order DB queries: `app/modules/orders/repository.py`
+- New API endpoint: `app/api/routes/`
+- New bot command: `app/bot/handlers/`
+- External API calls: `app/integrations/`
+
+## DO / DON'T
+- DO: handlers call services.
+- DO: services call repositories.
+- DO: use `session_scope` in service layer when DB is needed.
+- DO: keep modules pure.
+- DON'T: put DB queries in handlers.
+- DON'T: put business logic in routes.
+- DON'T: import `aiogram` inside modules.

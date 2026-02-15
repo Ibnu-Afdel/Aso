@@ -16,6 +16,7 @@ def add_request_id_middleware(app: FastAPI) -> None:
         request.state.request_id = request_id
         try:
             response: Response = await call_next(request)
+            response.headers["X-Request-ID"] = request_id
             logger.info(
                 "http_request",
                 extra={
@@ -24,7 +25,6 @@ def add_request_id_middleware(app: FastAPI) -> None:
                     "request_id": request_id,
                 },
             )
+            return response
         finally:
             reset_request_id(token)
-        response.headers["X-Request-ID"] = request_id
-        return response
