@@ -16,22 +16,24 @@ from app.bootstrap.startup_checks import run_startup_checks
 from app.bot.dispatcher import get_dispatcher
 from app.core.config import get_settings
 from app.core.db import engine
-from app.integrations.telegram import setup_telegram_webhook, teardown_telegram_webhook
+from app.integrations.telegram import setup_telegram, teardown_telegram
 
 settings = get_settings()
 
 dp = get_dispatcher() if settings.bot_enabled else None
+bot = dp.bot if dp is not None else None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     initialize_logging()
     await run_startup_checks(settings, engine)
-    if settings.bot_enabled and dp is not None:
-        await setup_telegram_webhook(dp)
+    app.state.polling_task = None
+    if settings.bot_enabled and dp is not None and bot is not None:
+        app.state.polling_task = await setup_telegram(bot, dp)
     yield
-    if settings.bot_enabled and dp is not None:
-        await teardown_telegram_webhook(dp)
+    if settings.bot_enabled and bot is not None:
+        await teardown_telegram(bot, app.state.polling_task)
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)

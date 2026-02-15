@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -11,6 +12,7 @@ class Settings(BaseSettings):
     api_prefix: str = "/api"
 
     bot_enabled: bool = True
+    telegram_delivery_mode: Literal["polling", "webhook"] = "polling"
     telegram_bot_token: str | None = None
     telegram_webhook_url: str | None = None
 
@@ -27,7 +29,10 @@ class Settings(BaseSettings):
             missing = []
             if not self.telegram_bot_token:
                 missing.append("TELEGRAM_BOT_TOKEN")
-            if not self.telegram_webhook_url:
+            if (
+                self.telegram_delivery_mode == "webhook"
+                and not self.telegram_webhook_url
+            ):
                 missing.append("TELEGRAM_WEBHOOK_URL")
             if missing:
                 raise ValueError("BOT_ENABLED=true requires: " + ", ".join(missing))

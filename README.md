@@ -128,7 +128,8 @@ Modules never talk to Telegram directly.
 ```
 cp .env.example .env
 ```
-Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_URL`.
+Set `TELEGRAM_BOT_TOKEN`.
+If using webhook mode, also set `TELEGRAM_DELIVERY_MODE=webhook` and `TELEGRAM_WEBHOOK_URL`.
 
 ### 2) Install dependencies
 ```
@@ -142,7 +143,8 @@ python manage.py run --reload
 ```
 uv run uvicorn app.main:app --reload
 ```
-If `TELEGRAM_BOT_TOKEN` or `TELEGRAM_WEBHOOK_URL` are missing, the app will fail fast with a Pydantic validation error.
+If `TELEGRAM_BOT_TOKEN` is missing, the app will fail fast with a Pydantic validation error.
+`TELEGRAM_WEBHOOK_URL` is required only when `TELEGRAM_DELIVERY_MODE=webhook`.
 
 ## Fast CLI (code generation)
 View command help:
@@ -239,7 +241,8 @@ Repositories talk to the DB only. They must not call Telegram, send emails, or c
 ## Running Locally
 1. Copy environment file:
    - `cp .env.example .env`
-2. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_URL`.
+2. Set `TELEGRAM_BOT_TOKEN`.
+   For webhook mode, set `TELEGRAM_DELIVERY_MODE=webhook` and `TELEGRAM_WEBHOOK_URL`.
 3. Install dependencies:
   - `python manage.py setup`
 4. Start the app (choose one):
@@ -276,6 +279,15 @@ Services:
 | --- | --- | --- |
 | POST | /bot/webhook | Telegram webhook receiver |
 | GET | /health | Health check |
+
+## Telegram Delivery Mode
+- `polling` (default): best for local development, no public URL needed.
+- `webhook`: production mode, requires `TELEGRAM_WEBHOOK_URL`.
+
+Examples:
+- Polling (default): set `TELEGRAM_BOT_TOKEN`, keep `TELEGRAM_DELIVERY_MODE=polling`.
+- Webhook: set `TELEGRAM_DELIVERY_MODE=webhook` and
+  `TELEGRAM_WEBHOOK_URL=https://your-domain.com/bot/webhook`.
 
 ## Migrations
 - Create revision:
@@ -352,7 +364,8 @@ This template is intentionally opinionated. Consistency is more important than f
 | ENVIRONMENT | ❌ | Environment label (development/production) |
 | DEBUG | ❌ | Debug mode |
 | TELEGRAM_BOT_TOKEN | ✅ | Telegram bot token |
-| TELEGRAM_WEBHOOK_URL | ✅ | Public webhook URL |
+| TELEGRAM_DELIVERY_MODE | ❌ | `polling` (default) or `webhook` |
+| TELEGRAM_WEBHOOK_URL | ⚠️ | Required only for `TELEGRAM_DELIVERY_MODE=webhook` |
 | DATABASE_URL | ✅ | Async SQLAlchemy database URL |
 | REDIS_URL | ❌ | Redis URL |
 
