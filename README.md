@@ -289,7 +289,9 @@ Services:
 
 ## Scripts
 Useful automation lives in `scripts/`:
-- `set_webhook.py` (set Telegram webhook)
+- `set_webhook.py`:
+  - set webhook: `uv run python -m scripts.set_webhook`
+  - delete webhook: `uv run python -m scripts.set_webhook --delete`
 - `seed_data.py` (seed database)
 - `admin_tasks.py` (admin tasks placeholder)
 

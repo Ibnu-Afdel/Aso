@@ -187,21 +187,11 @@ def cmd_makemigration(args: argparse.Namespace) -> None:
 
 def cmd_webhook(args: argparse.Namespace) -> None:
     _ensure_uv()
+    cmd = ["uv", "run", "python", "-m", "scripts.set_webhook"]
     if args.delete:
-        delete_script = (
-            "import asyncio;"
-            "from aiogram import Bot;"
-            "from app.core.config import get_settings;"
-            "async def _main():\n"
-            "  settings=get_settings();\n"
-            "  bot=Bot(token=settings.telegram_bot_token);\n"
-            "  await bot.delete_webhook(drop_pending_updates=True);\n"
-            "  await bot.session.close();\n"
-            "asyncio.run(_main())"
-        )
-        _run(["uv", "run", "python", "-c", delete_script])
-        return
-    _run(["uv", "run", "python", "scripts/set_webhook.py"])
+        cmd.append("--delete")
+        cmd.append("--drop-pending-updates")
+    _run(cmd)
 
 
 def _ensure_docker_env() -> None:
