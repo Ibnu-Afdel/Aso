@@ -368,6 +368,8 @@ This template is intentionally opinionated. Consistency is more important than f
 | TELEGRAM_WEBHOOK_URL | ⚠️ | Required only for `TELEGRAM_DELIVERY_MODE=webhook` |
 | DATABASE_URL | ✅ | Async SQLAlchemy database URL |
 | REDIS_URL | ❌ | Redis URL |
+| RATE_LIMIT_BACKEND | ❌ | `memory` (default) or `redis` for bot rate limiting |
+| RATE_LIMIT_PER_MINUTE | ❌ | Max bot messages per user per minute (default 30) |
 
 ## Useful Links
 - FastAPI: https://fastapi.tiangolo.com

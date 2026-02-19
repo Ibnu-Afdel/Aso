@@ -19,6 +19,8 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
     redis_url: str = "redis://redis:6379/0"
+    rate_limit_backend: Literal["memory", "redis"] = "memory"
+    rate_limit_per_minute: int = 30
     fernet_key: str | None = None
     fernet_key_required: bool = False
 
