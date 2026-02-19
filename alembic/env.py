@@ -8,7 +8,9 @@ from alembic import context
 
 from app.core.config import get_settings
 from app.core.db import Base
-# Import all model modules so they register with Base.metadata
+
+# Import all model modules so they register with Base.metadata.
+# When adding a new module: from app.modules.<name> import models as _<name>_models  # noqa: F401
 from app.modules.users import models as _users_models  # noqa: F401
 
 settings = get_settings()

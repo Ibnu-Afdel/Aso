@@ -140,8 +140,10 @@ def make_module(
 
     typer.secho(f"Created module: {module_dir}", fg=typer.colors.GREEN)
     typer.echo(
-        "Next: add an app service that uses session_scope(commit_on_exit=True), "
-        "wire handlers/routes, and add migrations if needed."
+        "Next steps:\n"
+        f"  1. Add to alembic/env.py: from app.modules.{module_name} import models as _{module_name}_models\n"
+        f"  2. python manage.py makemigration -m \"add_{module_name}\"\n"
+        "  3. Add app service in app/services/, wire handlers/routes (see AGENTS.md)"
     )
 
 
