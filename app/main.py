@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 import traceback
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
 from loguru import logger
 
@@ -17,6 +17,7 @@ from app.bot.dispatcher import get_dispatcher
 from app.core.config import get_settings
 from app.core.db import engine
 from app.integrations.telegram import setup_telegram, teardown_telegram
+from app.services.telegram_webhook import TelegramWebhookAppService
 
 settings = get_settings()
 
@@ -43,11 +44,14 @@ app.include_router(health_router)
 
 
 @app.post("/bot/webhook")
-async def telegram_webhook(request: Request):
+async def telegram_webhook(
+    request: Request,
+    svc: TelegramWebhookAppService = Depends(get_telegram_webhook_app_service),
+):
     secret = request.headers.get("X-Telegram-Bot-Api-Secret-Token")
     if settings.telegram_webhook_secret and secret != settings.telegram_webhook_secret:
         return JSONResponse(status_code=403, content={"error": "invalid_secret"})
-    return await get_telegram_webhook_app_service().handle_request(
+    return await svc.handle_request(
         await request.json(),
         bot_enabled=settings.bot_enabled,
         dispatcher=dp,
