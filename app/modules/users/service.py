@@ -1,7 +1,11 @@
+"""Pure business logic for users. No framework imports. Called by app services."""
+
 from app.modules.users.repository import UserRepository
 
 
 class UserService:
+    """User domain logic. Receives repo from caller. Called by UserAppService."""
+
     def __init__(self, repo: UserRepository) -> None:
         self._repo = repo
 

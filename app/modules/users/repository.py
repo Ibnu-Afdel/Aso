@@ -1,3 +1,5 @@
+"""DB access for users. Receives session from caller; never creates or commits."""
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -5,6 +7,8 @@ from app.modules.users.models import User
 
 
 class UserRepository:
+    """User persistence. Session is passed in; flush only, no commit."""
+
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 

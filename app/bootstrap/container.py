@@ -1,3 +1,10 @@
+"""Centralized dependency wiring. Add new app service getters here.
+
+Usage:
+- API routes: Depends(get_<name>_app_service)
+- Bot handlers: inject via ServiceInjectionMiddleware, receive as handler param
+"""
+
 from app.bootstrap.logging import configure_logging
 from app.core.config import get_settings
 from app.services.health import HealthAppService
