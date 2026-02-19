@@ -1,0 +1,45 @@
+---
+description: Rules for app/api/routes/ - API routes are thin controllers
+globs: app/api/routes/**/*.py
+alwaysApply: false
+---
+
+# API Route Rules
+
+Routes receive HTTP requests and return responses. **No DB, no business logic.**
+
+## DO
+- Use `Depends(get_*_app_service)` for services.
+- Parse request (path, query, body via Pydantic).
+- Call app service(s).
+- Return response (dict, JSON, etc.).
+
+## DON'T
+- Import or use `app.core.db`, `session_scope`, `AsyncSession`, `engine`.
+- Import or instantiate `*Repository` or `*Service` directly.
+- Put business logic here (validation, orchestration).
+- Query DB (select, execute, raw SQL).
+
+## Pattern
+```python
+# Good: route uses Depends
+@router.get("/items")
+async def list_items(
+    item_app_service: ItemAppService = Depends(get_item_app_service),
+) -> list[dict]:
+    items = await item_app_service.list_all()
+    return [{"id": i.id, "name": i.name} for i in items]
+```
+
+```python
+# BAD: route touches DB
+from app.core.db import get_session
+@router.get("/items")
+async def list_items():
+    async with get_session() as s:
+        result = await s.execute(select(Item))  # NO
+    return result.scalars().all()
+```
+
+## Service getters
+Add `get_*_app_service` in `app/bootstrap/container.py` and export from `app/api/deps.py`.

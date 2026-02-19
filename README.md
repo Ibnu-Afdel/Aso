@@ -105,6 +105,16 @@ Modules never talk to Telegram directly.
 └───────────────────────────────┘
 ```
 
+## Code Flow (Where to Put Things)
+```
+Handler/Route          App Service           Module                 Repo
+app/bot/handlers/  →   app/services/     →   app/modules/*/service  →  app/modules/*/repository.py
+app/api/routes/        (session_scope)       (business logic)          (DB access only)
+
+Example: /note <text>
+  handlers/notes.py  →  services/notes.py  →  modules/notes/service.py  →  modules/notes/repository.py
+```
+
 ## Folder Structure
 | Path | Purpose |
 | --- | --- |
@@ -124,40 +134,56 @@ Modules never talk to Telegram directly.
 | .env.example | Environment template |
 
 ## Quick Start
-### 1) Configure
-```
-cp .env.example .env
-```
-Set `TELEGRAM_BOT_TOKEN`.
-If using webhook mode, also set `TELEGRAM_DELIVERY_MODE=webhook` and `TELEGRAM_WEBHOOK_URL`.
 
-### 2) Install dependencies
-```
-python manage.py setup
+### Fastest (one command)
+```bash
+cp .env.example .env   # edit .env: set TELEGRAM_BOT_TOKEN
+python manage.py demo  # setup + migrate + run
 ```
 
-### 3) Run (choose one)
-```
-python manage.py run --reload
-```
-```
-uv run uvicorn app.main:app --reload
-```
+### Step by step
+1. Configure:
+   ```bash
+   cp .env.example .env
+   ```
+   Set `TELEGRAM_BOT_TOKEN`. If using webhook mode, also set `TELEGRAM_DELIVERY_MODE=webhook` and `TELEGRAM_WEBHOOK_URL`.
+
+2. Install dependencies:
+   ```bash
+   python manage.py setup
+   ```
+
+3. Run (choose one):
+   ```bash
+   python manage.py run --reload
+   ```
+   ```bash
+   uv run uvicorn app.main:app --reload
+   ```
+
 If `TELEGRAM_BOT_TOKEN` is missing, the app will fail fast with a Pydantic validation error.
 `TELEGRAM_WEBHOOK_URL` is required only when `TELEGRAM_DELIVERY_MODE=webhook`.
 
-## Fast CLI (code generation)
-View command help:
-```
+## Manage Commands
+View all commands:
+```bash
 python manage.py --help
 ```
-or:
-```
-uv run fast help
-```
 
+| Command | Description |
+| --- | --- |
+| `demo` | Setup + migrate + run. One command to get going. |
+| `bootstrap` | Setup + migrate. Prepares project; then `run`. |
+| `run` | Start the app (uvicorn). |
+| `setup` | Create .env from example, install deps. |
+| `migrate` | Apply DB migrations. |
+| `make module <name>` | Scaffold a new module. |
+| `lint`, `format`, `test` | Code quality. |
+| `docker-up`, `docker-down` | Docker compose. |
+
+## Fast CLI (code generation)
 Create a module:
-```
+```bash
 python manage.py make module orders
 ```
 or:

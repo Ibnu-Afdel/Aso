@@ -12,6 +12,12 @@ FORBIDDEN_TOKENS = (
 )
 
 
+_MSG = (
+    "Modules must stay pure (no fastapi, aiogram, Telegram objects). "
+    "Fix: move framework code to handlers or routes. See AGENTS.md."
+)
+
+
 def test_modules_are_framework_agnostic() -> None:
     violations: list[str] = []
 
@@ -21,12 +27,15 @@ def test_modules_are_framework_agnostic() -> None:
         lower = content.lower()
 
         if "fastapi" in lower:
-            violations.append(f"fastapi import/use found in module: app/{rel}")
+            violations.append(f"app/{rel}: fastapi import/use. {_MSG}")
         if "aiogram" in lower:
-            violations.append(f"aiogram import/use found in module: app/{rel}")
+            violations.append(f"app/{rel}: aiogram import/use. {_MSG}")
         if "APIRouter" in content:
-            violations.append(f"APIRouter found in module: app/{rel}")
+            violations.append(f"app/{rel}: APIRouter. {_MSG}")
         if "Dispatcher" in content:
-            violations.append(f"Dispatcher found in module: app/{rel}")
+            violations.append(f"app/{rel}: Dispatcher. {_MSG}")
 
-    assert not violations, "\n".join(violations)
+    assert not violations, (
+        "Architecture violation: framework leak into modules.\n"
+        + "\n".join(violations)
+    )

@@ -1,0 +1,41 @@
+---
+description: Rules for app/bot/handlers/ - bot handlers must stay thin
+globs: app/bot/handlers/**/*.py
+alwaysApply: false
+---
+
+# Bot Handler Rules
+
+Handlers receive Telegram updates and send responses. **Nothing else.**
+
+## DO
+- Parse input (message text, callback data).
+- Call app service(s) via injected params.
+- Send response (reply, edit, etc.).
+- Use `ensure_user(telegram_id)` to resolve user_id when needed.
+
+## DON'T
+- Import or use `app.core.db`, `session_scope`, `AsyncSession`, `engine`.
+- Import or instantiate `*Repository` or `*Service` directly.
+- Put business logic here (validation, calculations, orchestration).
+- Query DB (select, execute, raw SQL).
+
+## Pattern
+```python
+# Good: handler receives service, calls it
+async def my_handler(msg: Message, user_app_service: UserAppService = None):
+    user = await user_app_service.ensure_user(telegram_id=msg.from_user.id)
+    result = await notes_app_service.get_note(user_id=user.id)
+    await msg.answer(str(result))
+```
+
+```python
+# BAD: handler touches DB
+from app.core.db import get_session
+async def my_handler(msg: Message):
+    async with get_session() as s:
+        row = await s.execute(select(User).where(...))  # NO
+```
+
+## Service injection
+Services come from `ServiceInjectionMiddleware`. Add new services in `app/bot/middlewares/service_injection.py`, then receive as handler param.

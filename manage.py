@@ -208,11 +208,41 @@ def cmd_docker_down(_: argparse.Namespace) -> None:
     _run(["docker", "compose", "-f", str(DOCKER_COMPOSE_FILE), "down"])
 
 
+def cmd_demo(args: argparse.Namespace) -> None:
+    """Run setup, migrate, then start the app. One command to get going."""
+    _ensure_uv()
+    _ensure_env()
+    _run(["uv", "sync"])
+    print("Running migrations...")
+    cmd_migrate(argparse.Namespace())
+    print("Starting app...")
+    cmd_run(
+        argparse.Namespace(
+            host=args.host,
+            port=args.port,
+            reload=args.reload,
+            port_auto=args.port_auto,
+        )
+    )
+
+
+def cmd_bootstrap(_: argparse.Namespace) -> None:
+    """Setup + migrate. Ready to run. Use before first 'run'."""
+    _ensure_uv()
+    _ensure_env()
+    _run(["uv", "sync"])
+    cmd_migrate(argparse.Namespace())
+    print("Ready. Run: python manage.py run")
+
+
 def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Project management CLI for FastGram.")
+    parser = argparse.ArgumentParser(
+        description="Project management CLI for FastGram. Use 'demo' to run everything, or 'bootstrap' then 'run'.",
+        epilog="Quick: python manage.py demo | Full: python manage.py --help",
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p_setup = sub.add_parser("setup")
+    p_setup = sub.add_parser("setup", help="Create .env, install deps")
     p_setup.set_defaults(func=cmd_setup)
 
     p_sync = sub.add_parser("sync")
@@ -282,6 +312,22 @@ def _build_parser() -> argparse.ArgumentParser:
 
     p_docker_down = sub.add_parser("docker-down")
     p_docker_down.set_defaults(func=cmd_docker_down)
+
+    p_demo = sub.add_parser(
+        "demo",
+        help="Setup + migrate + run. One command to get the app running.",
+    )
+    p_demo.add_argument("--host", default="127.0.0.1")
+    p_demo.add_argument("--port", type=int, default=8000)
+    p_demo.add_argument("--reload", action="store_true")
+    p_demo.add_argument("--port-auto", action="store_true")
+    p_demo.set_defaults(func=cmd_demo)
+
+    p_bootstrap = sub.add_parser(
+        "bootstrap",
+        help="Setup + migrate. Prepares project; then run 'python manage.py run'.",
+    )
+    p_bootstrap.set_defaults(func=cmd_bootstrap)
 
     return parser
 
