@@ -338,10 +338,13 @@ Handler must call service.
 - Optional: use the provided Nginx config at `docker/nginx.conf`.
 
 ## AI Development Rules
-When using AI agents, specify the layer to modify and enforce the module pattern.
+This template is optimized for AI-assisted development. See `AGENTS.md` for full rules.
 
-Example prompt:
-"Add feature inside modules/orders service layer only."
+**Layer-specific prompts:**
+- "Add a new module `products`: `python manage.py make module products`, then add to alembic/env.py"
+- "Add business logic in `app/modules/users/service.py` only — no handlers, no DB in routes"
+- "Add new API route in `app/api/routes/`, use `Depends(get_*_app_service)`"
+- "Add bot handler in `app/bot/handlers/`, receive services via ServiceInjectionMiddleware"
 
 ## Long-Term Scaling
 This template supports a large modular monolith, easy microservice extraction, and team development.

@@ -32,3 +32,14 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "N", "W", "UP"]
+ignore = ["E501"]  # Line length; enforce later with stricter style
+
+[tool.ruff.format]
+quote-style = "double"

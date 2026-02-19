@@ -142,7 +142,7 @@ def make_module(
     typer.echo(
         "Next steps:\n"
         f"  1. Add to alembic/env.py: from app.modules.{module_name} import models as _{module_name}_models\n"
-        f"  2. python manage.py makemigration -m \"add_{module_name}\"\n"
+        f'  2. python manage.py makemigration -m "add_{module_name}"\n'
         "  3. Add app service in app/services/, wire handlers/routes (see AGENTS.md)"
     )
 

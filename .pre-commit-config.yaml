@@ -1,0 +1,18 @@
+# Optional: install with `pre-commit install`
+# Runs Ruff + architecture tests before each commit
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff lint
+        entry: uv run ruff check app tests
+        language: system
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format --check app tests
+        language: system
+      - id: arch-tests
+        name: architecture tests
+        entry: uv run python -m pytest tests/architecture/ -q
+        language: system
+        pass_filenames: false
