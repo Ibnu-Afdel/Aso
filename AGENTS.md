@@ -1,56 +1,54 @@
 # AI Contribution Rules
 
-This file defines non-negotiable rules for AI-assisted changes in this repository.
+Non-negotiable rules for AI-assisted changes. **Read this before modifying code.**
 
-## Architecture Rules
-- **Modules** contain pure business logic (no FastAPI, no aiogram, no Telegram objects).
-- **Bot handlers** call services.
-- **API routes** call services.
-- **Services** call repositories.
-- **Repositories** talk to the database.
-- **Async** everywhere.
+## Request Flow (canonical)
+```
+handler/route → App Service (app/services/) → Module Service (app/modules/*/service.py) → Repository → DB
+```
 
 ## Layer Responsibilities
 | Layer | Location | Responsibility |
 | --- | --- | --- |
-| Interface | bot/, api/ | Receive input |
-| Application | modules/*/service.py | Business logic |
+| Interface | bot/, api/ | Receive input, call app services via Depends or injection |
+| App boundary | services/ | Own session_scope, orchestrate module services + repos |
+| Application | modules/*/service.py | Business logic (pure, no framework) |
 | Domain | modules/*/models.py | Data models |
-| Infrastructure | modules/*/repository.py | DB access |
+| Infrastructure | modules/*/repository.py | DB access only |
 | Core | core/ | Config, DB, logging |
 
+## Session Ownership
+- **App services** use `session_scope(commit_on_exit=True)` from `app/core/db.py`.
+- Repositories receive session from callers; they never create sessions or commit.
+- Handlers and routes never touch DB or session directly.
+
+## Naming Convention
+- App boundary: `*AppService` (e.g. `UserAppService`) in `app/services/`
+- Module logic: `*Service` (e.g. `UserService`) in `app/modules/*/service.py`
+
 ## Red Line Rules (Do Not Cross)
-- Do **not** import aiogram inside modules.
-- Do **not** put DB queries inside handlers.
+- Do **not** import aiogram inside `app/modules/*`.
+- Do **not** put DB queries inside handlers or routes.
 - Do **not** put business logic inside routes.
-- Do **not** call Telegram API from services.
+- Do **not** call Telegram API from module services.
 - Do **not** mix layers.
 
-## Always
-- Handlers call services.
-- Services call repositories.
-- Modules stay pure.
-- Keep async everywhere.
+## Adding a New App Service
+1. Create `app/services/<name>.py` with `*AppService` using `session_scope(commit_on_exit=True)`.
+2. Add `get_<name>_app_service()` in `app/bootstrap/container.py`.
+3. API routes: use `Depends(get_<name>_app_service)`. Bot handlers: add to `ServiceInjectionMiddleware`, receive as handler param.
 
-## Module Pattern
-Every module must follow:
-```
-modules/<name>/
-  models.py
-  schemas.py
-  repository.py
-  service.py
-```
+## Adding a New Bot Handler
+1. Create `app/bot/handlers/<name>.py` with router.
+2. In `app/bot/dispatcher.py`: `dp.include_router(<name>_router)`.
+3. For services: add to `ServiceInjectionMiddleware` in `app/bot/middlewares/service_injection.py`, then receive as handler param.
 
-## Bot Handler Pattern
-- Create handler in `bot/handlers/<name>.py`.
-- Handler must call service only.
-- Register router in `bot/dispatcher.py`.
-
-## API Route Pattern
-- Routes act like controllers.
-- Routes call services only.
+## Adding a New Module (DB-backed)
+1. `python manage.py make module <name>`.
+2. **Add** `from app.modules.<name> import models as _<name>_models` to `alembic/env.py`.
+3. Create migration: `python manage.py makemigration -m "add_<name>"`.
+4. Add app service in `app/services/` that uses session_scope + module service + repository.
 
 ## When Modifying Code
 - Choose a single layer and apply changes there.
-- If unsure, ask to clarify the layer to change.
+- Use existing patterns (e.g. `UserAppService`, `UserService`) as reference.
