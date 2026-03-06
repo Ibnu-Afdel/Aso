@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     telegram_webhook_url: str | None = None
     telegram_webhook_secret: str | None = None
 
-    database_url: str = "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+    database_url: str = "postgresql+asyncpg://fastapi:password@db:5432/fastapi"
     redis_url: str = "redis://redis:6379/0"
     rate_limit_backend: Literal["memory", "redis"] = "memory"
     rate_limit_per_minute: int = 30

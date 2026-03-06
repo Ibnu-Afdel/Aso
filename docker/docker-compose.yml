@@ -16,9 +16,9 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: fastapi
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: fastapi
     ports:
       - "5432:5432"
     volumes:
