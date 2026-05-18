@@ -1,0 +1,45 @@
+---
+description: Rules for app/modules/ - pure business logic, no framework
+globs: app/modules/**/*.py
+alwaysApply: false
+---
+
+# Module Rules (app/modules/)
+
+Modules contain pure business logic. **No Telegram, no FastAPI.**
+
+## DO
+- Define models (SQLAlchemy), schemas (Pydantic), repository, service.
+- Repository receives `AsyncSession` from caller.
+- Service receives repository, orchestrates logic.
+- Keep async.
+
+## DON'T
+- Import `aiogram`, `fastapi`, `APIRouter`, `Dispatcher`, `Request`.
+- Import Telegram types (Message, Update, CallbackQuery).
+- Import HTTP types (Request, Response).
+- Send messages, call Telegram API.
+- Create DB sessions or commit (caller provides session).
+
+## Imports that MUST NOT appear
+- `from aiogram`
+- `from fastapi`
+- `from telegram`
+
+## Pattern
+```python
+# Good: repository receives session
+class OrderRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+    async def create(self, **data) -> Order:
+        o = Order(**data)
+        self._session.add(o)
+        await self._session.flush()
+        return o
+```
+
+```python
+# BAD: module imports aiogram
+from aiogram.types import Message  # NO - modules stay pure
+```

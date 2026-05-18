@@ -1,0 +1,17 @@
+# Local venv is platform-specific; uv creates fresh env in image
+.venv/
+# Development and CI
+.git/
+.gitignore
+.pytest_cache/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+# Docs and tooling
+docs/
+*.md
+!README.md
+tests/
+manage.py

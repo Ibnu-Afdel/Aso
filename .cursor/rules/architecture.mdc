@@ -1,0 +1,61 @@
+---
+description: Architecture layers, session rules, and module layout
+alwaysApply: true
+---
+
+# FastGram Architecture Rules
+
+## Request Flow (canonical)
+```
+handler/route → App Service (app/services/) → Module Service (app/modules/*/service.py) → Repository → DB
+```
+
+## Layers
+| Layer | Location | Responsibility |
+| --- | --- | --- |
+| Interface | `app/bot/`, `app/api/` | Receive input, call app services |
+| App boundary | `app/services/*.py` | Own session_scope, orchestrate module services + repos |
+| Application | `app/modules/*/service.py` | Business logic (pure, no framework) |
+| Domain | `app/modules/*/models.py` | Data models |
+| Infrastructure | `app/modules/*/repository.py` | DB access only |
+| Core | `app/core/` | Config, DB, logging |
+
+## Naming Convention
+- **App services** (orchestration): `*AppService` (e.g. `UserAppService`) in `app/services/`
+- **Module services** (business logic): `*Service` (e.g. `UserService`) in `app/modules/*/service.py`
+
+## Session Rules
+- Use `session_scope(commit_on_exit=True)` from `app/core/db.py` in app services.
+- Controllers (handlers/routes) never open DB sessions.
+- **App services** own session lifecycle and pass session to repositories.
+- Repositories receive session from callers; repositories never create or commit.
+
+## Module Layout
+- Each module must include: `models.py`, `repository.py`, `service.py`, `schemas.py`
+- Modules must remain pure. Do not import in `app/modules/*`: aiogram, fastapi.Request, Telegram objects.
+
+## Where to Add Features
+- Order logic: `app/modules/orders/service.py` (or `app/modules/users/` as reference)
+- Order DB queries: `app/modules/orders/repository.py`
+- New API endpoint: `app/api/routes/` (use `Depends(get_*_app_service)`)
+- New bot command: `app/bot/handlers/` (receive services via ServiceInjectionMiddleware)
+- App-boundary orchestration: `app/services/`
+- External API calls: `app/integrations/`
+
+## Adding a New App Service
+1. Create `app/services/<name>.py` with class `*AppService`, using `session_scope(commit_on_exit=True)`.
+2. Add `get_<name>_app_service()` in `app/bootstrap/container.py`.
+3. API: use `Depends(get_<name>_app_service)` in routes. Bot: add to `ServiceInjectionMiddleware`, handler receives as param.
+
+## Adding a New Bot Handler
+1. Create `app/bot/handlers/<name>.py` with router and handler.
+2. In `app/bot/dispatcher.py`: `dp.include_router(<name>_router)`.
+3. If handler needs a service: add to `ServiceInjectionMiddleware` and receive as handler param.
+
+## DO / DON'T
+- DO: handlers call app services (via DI). App services call module services and repositories.
+- DO: use `session_scope` in app services only.
+- DO: keep modules pure.
+- DON'T: put DB queries in handlers or routes.
+- DON'T: put business logic in routes.
+- DON'T: import aiogram inside modules.
