@@ -16,7 +16,7 @@
 - [ ] Extend `manage.py doctor` with timeout support and richer diagnostics.
 - [ ] Improve `manage.py make module/model` scaffolding to include app-service + route + handler + tests.
 - [ ] Add `manage.py check` enhancements (optional strict import/layer checks output).
-- [ ] Add pre-commit hooks for Ruff + architecture guard tests.
+- [x] Add pre-commit hooks for Ruff + architecture guard tests.
 
 ## Documentation
 - [ ] Before writing docs, manually verify:
@@ -44,7 +44,7 @@
   - migration drift.
 
 ## Product Hardening
-- [ ] Add health/readiness checks split (`/healthz`, `/readyz`) with DB readiness probe.
+- [x] Add health/readiness checks split (`/healthz`, `/readyz`) with DB readiness probe.
 - [ ] Add stronger startup checks for migration state in CI/CD pipeline.
 - [ ] Add safe defaults for local onboarding (`BOT_ENABLED=false` quick mode).
 - [ ] Add template branding cleanup and starter placeholders for new projects.
