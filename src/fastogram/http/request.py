@@ -137,6 +137,12 @@ class Request(StarletteRequest):
 
     # ------------------------------------------------------------ inspection (sync)
 
+    def query(self, key: str | None = None, default: Any = None) -> Any:
+        """Query-string reads are synchronous (no body I/O, T-14): `request.query("page", default=1)`."""
+        if key is None:
+            return dict(self.query_params)
+        return self.query_params.get(key, default)
+
     def header(self, name: str, default: Any = None) -> Any:
         return self.headers.get(name, default)
 

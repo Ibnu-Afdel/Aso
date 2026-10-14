@@ -25,6 +25,8 @@ def to_response(result: Any) -> Response:
 def jsonable(value: Any) -> Any:
     """FastoGram's JSON encoder: datetimes as ISO 8601, `Decimal` as string, `UUID` as string,
     `Enum` -> value, `Model` -> `to_dict()`, Pydantic -> `model_dump(mode="json")`."""
+    from decimal import Decimal
+
     from pydantic import BaseModel
 
     if isinstance(value, BaseModel):
@@ -36,6 +38,10 @@ def jsonable(value: Any) -> Any:
         return {k: jsonable(v) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
         return [jsonable(v) for v in value]
+    if isinstance(value, Decimal):
+        # `jsonable_encoder` would turn this into a float, losing precision; T-15 calls for a
+        # string (matching Eloquent's own decimal-as-string JSON convention).
+        return str(value)
     from fastapi.encoders import jsonable_encoder
 
     return jsonable_encoder(value)

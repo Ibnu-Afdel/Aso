@@ -50,16 +50,21 @@ def sign_url(url: str, params: dict[str, Any] | None = None, expires: int | None
 
 
 def verify_url(url: str) -> bool:
-    """Recompute the signature over `url` (minus `signature`) and check `expires`."""
+    """Recompute the signature over `url` (minus `signature`) and check `expires`.
+
+    `sign_url()` signs the URL *with* `expires` already in the query string (it is added before
+    `signature` is computed, see `sign_url`), so `expires` must stay in the query here too when
+    rebuilding `base` -- only `signature` itself is excluded from the signed payload.
+    """
     scheme, netloc, path, query, _fragment = urlsplit(url)
     q: dict[str, str] = dict(parse_qsl(query, keep_blank_values=True))
     signature = q.pop("signature", None)
     if not signature:
         return False
-    expires = q.pop("expires", None)
     base = urlunsplit((scheme, netloc, path, urlencode(q), ""))
     if not hmac.compare_digest(_hmac_for(base), signature):
         return False
+    expires = q.get("expires")
     if expires is not None:
         try:
             if time.time() > float(expires):

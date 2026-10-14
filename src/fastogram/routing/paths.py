@@ -11,6 +11,7 @@ string or exactly one `{...}` token -- never mixed, e.g. `/{a}-{b}/`.
 
 from __future__ import annotations
 
+import hashlib
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -18,6 +19,13 @@ from typing import Any
 from urllib.parse import quote
 
 _PARAM = re.compile(r"^\{(\w+)(?::(\w+))?(\?)?\}$")
+
+
+def convertor_name(pattern: str) -> str:
+    """A stable Starlette path-convertor name for a `.where()` regex (T-10 "How it works"):
+    `fg_<hash>`, so the same pattern always reuses the same process-global convertor."""
+    digest = hashlib.sha1(pattern.encode()).hexdigest()[:8]  # noqa: S324 - name, not a security hash
+    return f"fg_{digest}"
 
 
 @dataclass
@@ -55,7 +63,7 @@ def clean_path(path: str) -> str:
     for seg in _segments(path):
         m = _PARAM.match(seg)
         if m:
-            out.append("{" + m.group(1) + "}" + ("?" if m.group(3) else ""))
+            out.append("{" + m.group(1) + ("?" if m.group(3) else "") + "}")
         else:
             out.append(seg)
     return "/" + "/".join(out) if out else "/"

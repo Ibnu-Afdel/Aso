@@ -116,9 +116,16 @@ class RouteRegistry:
         for router, group, groups in self.external_routers:
             route_prefix = "".join(g.get("prefix", "") for g in groups)
             full_prefix = (prefix + route_prefix) if group == "api" else route_prefix
-            before = len(fastapi_app.router.routes)
-            fastapi_app.include_router(router, prefix=full_prefix, include_in_schema=(group == "api"))
-            for route in fastapi_app.router.routes[before:]:
+            for source_route in router.routes:
+                full_path = full_prefix + source_route.path
+                fastapi_app.router.add_api_route(
+                    full_path,
+                    source_route.endpoint,
+                    methods=list(source_route.methods or []),
+                    name=source_route.name,
+                    include_in_schema=(group == "api"),
+                )
+                route = fastapi_app.router.routes[-1]
                 route.app = application.group_stack(group, route.app)  # type: ignore[attr-defined]
 
 

@@ -155,22 +155,24 @@ class BindingsStep:
 
 
 async def _load_binding(model_cls: Any, field: str | None, raw: Any, bound_so_far: dict[str, Any]) -> Any:
+    """Load one route-bound model, scoped through any already-bound parent (T-10: "the child is
+    loaded through the parent"). This applies whether the route binds by the primary key (the
+    common, `field is None` case -- plain `{comment}`) or by another column (`{post:slug}`): the
+    scoping must not depend on which lookup column was used, only on whether a parent precedes
+    it in the path. Goes through the model's own query builder (not a raw `select()`), so default
+    scopes such as soft-deletes still apply, matching `find_or_fail`/`where(...).first_or_fail()`.
+    """
+    from fastogram.database.builder import _pk_column
     from fastogram.exceptions.types import ModelNotFound
 
-    if field is None:
-        return await model_cls.find_or_fail(raw)
-    from sqlalchemy import select
-
-    from fastogram.database.scope import current_scope
-
-    column = getattr(model_cls, field)
-    stmt = select(model_cls).where(column == raw)
+    column = getattr(model_cls, field) if field is not None else _pk_column(model_cls)
+    builder = model_cls.where(column == raw)
     for parent in bound_so_far.values():
         fk_name = f"{type(parent).__name__.lower()}_id"
         fk_column = getattr(model_cls, fk_name, None)
         if fk_column is not None:
-            stmt = stmt.where(fk_column == parent.id)
-    result = (await current_scope().session().scalars(stmt)).first()
+            builder = builder.where(fk_column == parent.id)
+    result = await builder.first()
     if result is None:
         raise ModelNotFound(model_cls.__name__, [raw])
     return result
