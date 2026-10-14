@@ -20,6 +20,11 @@ def reset_fixture_apps() -> None:
             del sys.modules[name]
     from fastogram.database import Model
 
+    from fastogram.cache import flush_all
+    from fastogram.storage import storage
+
+    storage.reset_fakes()
+    flush_all()
     Model.registry.dispose()
     Model.metadata.clear()
     with_registry = getattr(Model.registry, "_class_registry", None)

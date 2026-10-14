@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import pytest
-
 from fastogram.validation.uploaded_file import UploadedFile
 
 
@@ -30,12 +28,23 @@ def test_fake_image_and_create():
     assert created.content_type == "text/csv"
 
 
-async def test_store_and_store_as_raise_not_implemented_until_t43():
-    f = UploadedFile("a.txt", "text/plain", b"x")
-    with pytest.raises(NotImplementedError, match="T-43"):
-        await f.store("uploads")
-    with pytest.raises(NotImplementedError, match="T-43"):
-        await f.store_as("uploads", "b.txt")
+async def test_store_and_store_as_persist_through_fastogram_storage():
+    """T-43 landed: `store()`/`store_as()` now go through `fastogram.storage` instead of raising
+    `NotImplementedError`. `storage.fake()` swaps the disk for a throwaway temp directory."""
+    from fastogram.storage import storage
+
+    storage.fake("local")
+    try:
+        f = UploadedFile("a.txt", "text/plain", b"x")
+        generated_path = await f.store("uploads")
+        assert await storage("local").exists(generated_path)
+        assert await storage("local").get(generated_path) == b"x"
+
+        named_path = await f.store_as("uploads", "b.txt")
+        assert named_path == "uploads/b.txt"
+        assert await storage("local").exists(named_path)
+    finally:
+        storage.reset_fakes()
 
 
 def test_from_upload_file_reads_filename_and_content_type():

@@ -1,16 +1,23 @@
 """`UploadedFile`: a framework-neutral wrapper around an uploaded file (T-19, T-43).
 
 Built from Starlette's `UploadFile` during input collection (`form_request.collect_input`).
-`store()`/`store_as()` need `fastogram.storage` (T-43), which does not exist yet; they raise a
-clear `NotImplementedError` until that package lands.
+`store()`/`store_as()` persist through `fastogram.storage` (T-43).
 """
 
 from __future__ import annotations
 
 import mimetypes
-import uuid
+import secrets
+import string
 from pathlib import PurePosixPath
 from typing import Any
+
+_NAME_ALPHABET = string.ascii_letters + string.digits
+
+
+def _random_name(length: int = 40) -> str:
+    """40 random characters (Laravel's `Str::random(40)` / `hashName()`), never the original name."""
+    return "".join(secrets.choice(_NAME_ALPHABET) for _ in range(length))
 
 
 class UploadedFile:
@@ -34,11 +41,11 @@ class UploadedFile:
         return self._data
 
     async def store(self, directory: str, *, disk: str | None = None) -> str:
-        """Store under a generated name. Needs `fastogram.storage` (T-43)."""
-        return await self._store(directory, f"{uuid.uuid4().hex}{self._suffix()}", disk)
+        """Store under a generated name: 40 random characters + the extension (T-43)."""
+        return await self._store(directory, f"{_random_name()}{self._suffix()}", disk)
 
     async def store_as(self, directory: str, name: str, *, disk: str | None = None) -> str:
-        """Store under an explicit name. Needs `fastogram.storage` (T-43)."""
+        """Store under an explicit name (T-43)."""
         return await self._store(directory, name, disk)
 
     def _suffix(self) -> str:
@@ -46,13 +53,8 @@ class UploadedFile:
         return suffix if suffix else ""
 
     async def _store(self, directory: str, name: str, disk: str | None) -> str:
-        try:
-            from fastogram.storage import storage  # type: ignore[import-not-found]
-        except ImportError as exc:
-            raise NotImplementedError(
-                "UploadedFile.store()/store_as() need fastogram.storage, which is not "
-                "implemented yet (see T-43)."
-            ) from exc
+        from fastogram.storage import storage
+
         path = f"{directory.strip('/')}/{name}"
         await storage(disk).put(path, await self.read())
         return path
