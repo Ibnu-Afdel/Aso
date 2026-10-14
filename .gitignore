@@ -1,50 +1,29 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.so
-*.egg-info/
-.eggs/
-
-# Virtual environments
 .venv/
-
-
-# Environment files
-.env
-
-
-# Build artifacts
-build/
+*.egg-info/
 dist/
-
-# Test/coverage caches
+build/
 .pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.mypy_cache/
 .ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
-# Logs
-*.log
+# Env / local
+.env
+*.sqlite
+*.sqlite-journal
 
-# SQLite
-*.sqlite3
+# Node
+node_modules/
+public/build/
+public/hot
 
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-
-# UV
-uv.lock
-
-# Docker
-*.pid
-
-# Local handoff notes
-abouteme.md
+# Spikes
+spikes/**/server.log
+spikes/**/server.pid
+spikes/**/version.txt
+spikes/**/package-lock.json
+spikes/uv.lock

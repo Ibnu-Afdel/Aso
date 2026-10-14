@@ -1,2 +1,72 @@
-[tool.uv.workspace]
-members = ["backend"]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fastogram"
+version = "0.1.0.dev0"
+description = "A Laravel-style web framework for Python: FastAPI + Inertia.js + an artisan-like CLI"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Abubeker Afdel", email = "ibnuafdel@gmail.com"}
+]
+dependencies = [
+    "fastapi>=0.143,<0.144",
+    "starlette>=1.7,<1.8",
+    "uvicorn[standard]>=0.54",
+    "pydantic[email]>=2.14,<2.15",
+    "sqlalchemy[asyncio]>=2.1.4,<2.2",
+    "aiosqlite>=0.22",
+    "alembic>=1.20",
+    "typer>=0.27,<0.28",
+    "jinja2>=3.1.6",
+    "itsdangerous>=2.2",
+    "cryptography>=50",
+    "pwdlib[argon2]>=0.3.1",
+    "python-dotenv>=1.2.4",
+    "python-multipart>=0.0.20",
+    "inflect>=7.5",
+    "faker>=40",
+    "aiosmtplib>=5.1",
+    "httpx2>=2.13",
+]
+
+[project.optional-dependencies]
+pgsql = ["asyncpg>=0.32"]
+mysql = ["asyncmy>=0.2.16"]
+redis = ["redis>=8.1", "taskiq>=0.13", "taskiq-redis>=1.2.4"]
+testing = ["pytest>=9.1", "pytest-asyncio>=1.4,<1.5"]
+
+[project.scripts]
+fastogram = "fastogram.console.cli:main"
+
+[project.entry-points.pytest11]
+fastogram = "fastogram.testing.plugin"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1",
+    "pytest-asyncio>=1.4,<1.5",
+    "asyncpg>=0.32",
+    "ruff>=0.14",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fastogram"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_test_loop_scope = "session"
+asyncio_default_fixture_loop_scope = "session"
+addopts = "-p no:fastogram"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]

@@ -1,0 +1,9 @@
+.venv/
+node_modules/
+public/build/
+*.sqlite
+server.log
+server.pid
+version.txt
+uv.lock
+package-lock.json
