@@ -1,6 +1,12 @@
 """Boot API (T-06): `Application.configure(base_path=__file__)...create()`."""
 
-from fastogram.foundation.application import Application, ApplicationBuilder, app, current_application, environment
+from fastogram.foundation.application import (
+    Application,
+    ApplicationBuilder,
+    app,
+    current_application,
+    environment,
+)
 from fastogram.foundation.exceptions_config import ExceptionsConfig
 from fastogram.foundation.middleware_config import MiddlewareConfig
 from fastogram.foundation.paths import (

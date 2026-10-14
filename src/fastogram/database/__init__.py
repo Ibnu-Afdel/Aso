@@ -12,7 +12,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from fastogram.database import scope as _scope
 from fastogram.database.model import Model, belongs_to, has_many, has_one
-from fastogram.exceptions.types import LazyLoadingViolation, MassAssignmentError, ModelNotFound, MultipleRecordsFound
+from fastogram.exceptions.types import (
+    LazyLoadingViolation,
+    MassAssignmentError,
+    ModelNotFound,
+    MultipleRecordsFound,
+)
 
 __all__ = [
     "DB",
