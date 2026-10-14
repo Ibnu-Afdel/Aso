@@ -27,3 +27,7 @@ spikes/**/server.pid
 spikes/**/version.txt
 spikes/**/package-lock.json
 spikes/uv.lock
+
+# Logs written by fixture apps
+storage/logs/
+**/storage/logs/

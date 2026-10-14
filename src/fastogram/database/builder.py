@@ -39,6 +39,19 @@ def _pk_column(model: type) -> Any:
     return sa_inspect(model).primary_key[0]
 
 
+def _pk_attr_name(model: type) -> str:
+    """The mapped Python attribute name of `model`'s primary key column.
+
+    Not `_pk_column(model).key` (the *database* column name): they only coincide by convention,
+    and using the column name with `getattr()`/`setattr()` raises `AttributeError` (or silently
+    reads the wrong thing) for any model whose primary key attribute is renamed away from its
+    column, e.g. `mapped_column("type", ...)` on an attribute called `type_`.
+    """
+    from sqlalchemy import inspect as sa_inspect
+
+    return sa_inspect(model).mapper.get_property_by_column(_pk_column(model)).key
+
+
 def _session() -> Any:
     from fastogram.database.scope import current_scope
 
@@ -66,6 +79,31 @@ class Builder(Generic[T]):
         self._only_trashed = False
         self._with_count_specs: list[tuple[str, Callable[[Builder], Builder] | None]] = []
         self._through: Callable[[Any], Any] | None = None
+
+    # ------------------------------------------------------------ query scopes (T-32)
+
+    def __getattr__(self, name: str) -> Any:
+        """`builder.published()`: continue chaining a `@scope` onto an existing builder.
+
+        `Post.published()` (starting a query from the model class) goes through
+        `ModelMeta.__getattr__`, which already works. This is the other half documented in
+        `model._Scope`'s docstring ("`builder.published()` ... continues the chain by calling the
+        raw function directly") but never implemented: there was no `__getattr__` on `Builder` at
+        all, so `Post.where(...).published()` raised `AttributeError` instead of applying the
+        scope to the existing `where(...)`.
+        """
+        if name.startswith("_"):
+            raise AttributeError(name)
+        from fastogram.database.model import _Scope
+
+        for klass in self.model.__mro__:
+            attr = klass.__dict__.get(name)
+            if isinstance(attr, _Scope):
+                def bound(*args: Any, _func: Any = attr.func, **kwargs: Any) -> Any:
+                    return _func(self.model, self, *args, **kwargs)
+
+                return bound
+        raise AttributeError(name)
 
     # ------------------------------------------------------------ cloning
 
@@ -111,8 +149,38 @@ class Builder(Generic[T]):
             stmt = stmt.options(*self._options)
         return stmt
 
+    def _soft_delete_clause(self) -> Any:
+        """The `deleted_at` predicate for the current trashed-scope, or `None` (T-31 SoftDeletes).
+
+        The model's default scope is also enforced by a `do_orm_execute` session event
+        (`model._filter_soft_deleted`), but that event only ever sees statements that are
+        themselves passed to `session.execute()`/`session.scalar()` with a recognisable ORM
+        entity. `count()`, `exists()`, `sum()`/`avg()`/`min()`/`max()`, `value()` and `pluck()`
+        all derive their executed statement from `self.statement` via `.subquery()` or
+        `.with_only_columns()`, which drops the ORM entity before execution, so the event never
+        fires for them and a soft-deleted row was silently counted/summed/etc. Baking the clause
+        into the statement itself (here) fixes every terminal method at once, independently of
+        whether the session event also runs.
+        """
+        if not getattr(self.model, "__soft_deletes__", False) or self._with_trashed:
+            return None
+        deleted_at = self.model.deleted_at
+        return deleted_at.is_not(None) if self._only_trashed else deleted_at.is_(None)
+
     def _final_statement(self) -> Select:
-        return self.statement.execution_options(with_trashed=self._with_trashed, only_trashed=self._only_trashed)
+        stmt = self.statement
+        extra = self._soft_delete_clause()
+        if extra is not None:
+            stmt = stmt.where(extra)
+        return stmt.execution_options(with_trashed=self._with_trashed, only_trashed=self._only_trashed)
+
+    def _where_with_soft_delete_scope(self) -> Any:
+        """`self._where` plus the soft-delete clause, for the bulk `update()`/`delete()` statements
+        (which build their own `sqlalchemy.update`/`delete`, not `self.statement`)."""
+        extra = self._soft_delete_clause()
+        if extra is None:
+            return self._where
+        return extra if self._where is None else and_(self._where, extra)
 
     def to_sql(self) -> str:
         return str(self.statement)
@@ -161,9 +229,29 @@ class Builder(Generic[T]):
         return self.where(column.between(low, high))
 
     def where_date(self, column: Any, value: Any) -> Builder[T]:
-        from sqlalchemy import Date, cast
+        """`WHERE <date part of column> = value` (T-32).
 
-        return self.where(cast(column, Date) == value)
+        Not `cast(column, Date) == value`: SQLite has no real `DATE` storage affinity, so
+        `CAST(x AS DATE)` falls back to `NUMERIC` affinity there and silently mangles a stored
+        UTC timestamp string into a number instead of truncating it (confirmed empirically --
+        the result comes back as something `date.fromisoformat()` rejects). A half-open
+        `[start_of_day, next_day)` range on the untouched column compiles to a plain comparison
+        and gives the same answer on SQLite, PostgreSQL and MySQL alike.
+        """
+        from datetime import UTC, timedelta
+        from datetime import date as _date
+        from datetime import datetime as _datetime
+
+        from sqlalchemy import Date
+
+        if isinstance(value, _datetime):
+            value = value.date()
+        elif isinstance(value, str):
+            value = _date.fromisoformat(value)
+        if isinstance(column.type, Date):
+            return self.where(column == value)
+        start = _datetime(value.year, value.month, value.day, tzinfo=UTC)
+        return self.where(column >= start, column < start + timedelta(days=1))
 
     def when(self, value: Any, fn: Callable[..., Any], default: Callable[..., Any] | None = None) -> Builder[T]:
         chosen = fn if value else default
@@ -249,7 +337,12 @@ class Builder(Generic[T]):
                         f"order_by= on the relationship helper, or query through relation(...)."
                     )
                 if sub._where is not None:
-                    step = selectinload(attr).and_(sub._where) if loader is None else loader.selectinload(attr).and_(sub._where)
+                    # `.and_()` belongs on the *relationship attribute* (SQLAlchemy's
+                    # `RelationshipProperty.Comparator.and_()`, e.g.
+                    # `selectinload(Parent.children.and_(criteria))`), not on the `Load` object
+                    # `selectinload()`/`.selectinload()` returns -- that object has no `.and_()`.
+                    constrained = attr.and_(sub._where)
+                    step = selectinload(constrained) if loader is None else loader.selectinload(constrained)
             loader = step
             model = attr.property.mapper.class_
         return loader
@@ -282,8 +375,8 @@ class Builder(Generic[T]):
     async def _apply_with_count(self, items: list[Any]) -> None:
         if not self._with_count_specs or not items:
             return
-        pk = _pk_column(self.model)
-        ids = [getattr(obj, pk.key) for obj in items]
+        pk_attr = _pk_attr_name(self.model)
+        ids = [getattr(obj, pk_attr) for obj in items]
         session = _session()
         for name, constraint in self._with_count_specs:
             rel_attr = getattr(self.model, name)
@@ -297,7 +390,7 @@ class Builder(Generic[T]):
             q = q.where(remote_col.in_(ids)).group_by(remote_col)
             counts = dict((await session.execute(q)).all())
             for obj in items:
-                setattr(obj, f"{name}_count", counts.get(getattr(obj, pk.key), 0))
+                setattr(obj, f"{name}_count", counts.get(getattr(obj, pk_attr), 0))
 
     async def first(self) -> T | None:
         builder = self if self._limit is not None else self.limit(1)
@@ -369,8 +462,9 @@ class Builder(Generic[T]):
         if getattr(model, "__timestamps__", True) and "updated_at" not in data:
             data["updated_at"] = datetime.now(UTC)
         stmt = sa_update(model).execution_options(synchronize_session="fetch")
-        if self._where is not None:
-            stmt = stmt.where(self._where)
+        where = self._where_with_soft_delete_scope()
+        if where is not None:
+            stmt = stmt.where(where)
         stmt = stmt.values(**data)
 
         async def run(session: Any) -> int:
@@ -383,8 +477,9 @@ class Builder(Generic[T]):
         if getattr(self.model, "__soft_deletes__", False):
             return await self.update(deleted_at=datetime.now(UTC))
         stmt = sa_delete(self.model).execution_options(synchronize_session="fetch")
-        if self._where is not None:
-            stmt = stmt.where(self._where)
+        where = self._where_with_soft_delete_scope()
+        if where is not None:
+            stmt = stmt.where(where)
 
         async def run(session: Any) -> int:
             result = await session.execute(stmt)
@@ -466,15 +561,21 @@ class RelationBuilder(Builder[T]):
         self._where = with_parent(owner, rel_attr)
 
     async def create(self, **data: Any) -> Any:
+        from sqlalchemy import inspect as sa_inspect
+
         payload = dict(data)
         prop = self._rel_attr.property
         if prop.secondary is None:
             local_col, remote_col = prop.local_remote_pairs[0]
-            payload[remote_col.key] = getattr(self.owner, local_col.key)
+            # `.key` on these `Column`s is the *database* column name, not necessarily the
+            # mapped attribute name on either side -- resolve each against its own model.
+            local_attr = sa_inspect(type(self.owner)).mapper.get_property_by_column(local_col).key
+            remote_attr = sa_inspect(self.model).mapper.get_property_by_column(remote_col).key
+            payload[remote_attr] = getattr(self.owner, local_attr)
             obj = await self.model.create(**payload)
         else:
             obj = await self.model.create(**payload)
-            await self.attach([getattr(obj, _pk_column(self.model).key)])
+            await self.attach([getattr(obj, _pk_attr_name(self.model))])
         return obj
 
     async def create_many(self, rows: list[dict[str, Any]]) -> list[Any]:
@@ -485,8 +586,7 @@ class RelationBuilder(Builder[T]):
     def _pivot(self) -> tuple[Any, Any, Any]:
         prop = self._rel_attr.property
         pivot = prop.secondary
-        owner_pk = _pk_column(type(self.owner))
-        owner_value = getattr(self.owner, owner_pk.key)
+        owner_value = getattr(self.owner, _pk_attr_name(type(self.owner)))
         local_pairs = {remote.name: local for local, remote in prop.synchronize_pairs}
         owner_col = None
         related_col = None

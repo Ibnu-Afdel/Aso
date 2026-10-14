@@ -215,7 +215,11 @@ class SimplePaginator(_BasePaginator):
     @classmethod
     async def create(cls, builder: Builder[Any], per_page: int, page: int | None, page_name: str) -> SimplePaginator:
         resolved_page = _read_page(page, page_name)
-        rows = await builder.for_page(resolved_page, per_page + 1).get()
+        # Not `builder.for_page(resolved_page, per_page + 1)`: `for_page()` derives the OFFSET from
+        # its *second* argument too, so passing `per_page + 1` there also inflates the offset
+        # (`(page - 1) * (per_page + 1)` instead of `(page - 1) * per_page`), skipping real rows
+        # on every page after the first. Only the LIMIT needs the "+1 to detect a next page" trick.
+        rows = await builder.limit(per_page + 1).offset((resolved_page - 1) * per_page).get()
         has_more = len(rows) > per_page
         paginator = cls(rows[:per_page], per_page, resolved_page, page_name)
         paginator._has_more = has_more

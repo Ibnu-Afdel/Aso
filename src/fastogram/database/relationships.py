@@ -30,9 +30,19 @@ def _snake(name: str) -> str:
 
 
 def _caller_class_name() -> str | None:
-    """The `__qualname__` of the class body that is calling the helper one frame up."""
+    """The simple class name of the class body that is calling the helper one frame up.
+
+    `__qualname__` includes enclosing scopes (`SomeTest.<locals>.User` for a class defined inside
+    a function, as FastoGram's own tests do because of the per-test registry reset). `register()`
+    and the pairing matcher key everything by the bare `cls.__name__`, so this must return that
+    same bare name, not the dotted qualname, or pairing silently never matches for a model that
+    is not defined at module level.
+    """
     frame = sys._getframe(2)
-    return frame.f_locals.get("__qualname__")
+    qualname = frame.f_locals.get("__qualname__")
+    if qualname is None:
+        return None
+    return qualname.rpartition(".")[-1]
 
 
 def _record(owner: str | None, kind: str, target: str, prop: Any, **meta: Any) -> Any:

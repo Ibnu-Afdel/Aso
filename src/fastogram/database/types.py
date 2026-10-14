@@ -87,6 +87,7 @@ def _security() -> Any:
 class Encrypted(TypeDecorator):
     """`Mapped[str] = mapped_column(Encrypted(String))` — encrypted at rest with `APP_KEY` (T-40)."""
 
+    impl = String  # class-level fallback TypeDecorator.__init__ requires; __init__ overrides it below.
     cache_ok = True
 
     def __init__(self, impl: Any = String, *args: Any, **kwargs: Any) -> None:

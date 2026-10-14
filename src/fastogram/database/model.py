@@ -16,7 +16,7 @@ from enum import Enum
 from typing import Any, ClassVar, Self
 
 import inflect
-from sqlalchemy import BigInteger, Integer, event, func, select
+from sqlalchemy import BigInteger, Integer, event, select
 from sqlalchemy import inspect as sa_inspect
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import (
@@ -147,21 +147,28 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
 
     @classmethod
     async def count(cls) -> int:
-        return int(await current_scope().session().scalar(select(func.count()).select_from(cls)) or 0)
+        # Routed through the Builder (not a bare `select(func.count()).select_from(cls)`), same
+        # reason as `find()`: a plain Core-style count selects no ORM entity, so SQLAlchemy never
+        # treats it as ORM-enabled and the SoftDeletes `do_orm_execute` default-scope hook (which
+        # only fires for statements carrying a mapper) never runs, silently counting trashed rows.
+        return await cls.query().count()
 
     @classmethod
     async def first_or_create(cls, attributes: dict[str, Any], values: dict[str, Any] | None = None) -> Self:
         existing = await cls.query().where(**attributes).first()
         if existing is not None:
             return existing
-        return await cls.create(**attributes, **(values or {}))
+        # `values` may repeat a key from `attributes` (Laravel allows this; values win), so merge
+        # into one dict instead of `cls.create(**attributes, **values)`, which raises
+        # "got multiple values for keyword argument" on any overlapping key.
+        return await cls.create(**{**attributes, **(values or {})})
 
     @classmethod
     async def update_or_create(cls, attributes: dict[str, Any], values: dict[str, Any] | None = None) -> Self:
         existing = await cls.query().where(**attributes).first()
         if existing is not None:
             return await existing.update(**(values or {}))
-        return await cls.create(**attributes, **(values or {}))
+        return await cls.create(**{**attributes, **(values or {})})
 
     # ------------------------------------------------------------ mass assignment (T-31)
 
@@ -171,7 +178,7 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
         if cls.__fillable__ is not None:
             return set(cls.__fillable__)
         if cls.__guarded__ is not None:
-            all_keys = {c.key for c in cls.__table__.columns} | set(cls.__mapper__.relationships.keys())
+            all_keys = set(_column_attr_names(cls)) | set(cls.__mapper__.relationships.keys())
             return all_keys - set(cls.__guarded__)
         return None
 
@@ -206,7 +213,7 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
 
     def fill(self, **data: Any) -> Self:
         allowed = type(self)._mass_assign(data)
-        valid = {c.key for c in self.__table__.columns} | set(type(self).__mapper__.relationships.keys())
+        valid = set(_column_attr_names(type(self))) | set(type(self).__mapper__.relationships.keys())
         for key, value in allowed.items():
             if key not in valid:
                 raise AttributeError(f"{type(self).__name__} has no column or relation {key!r}.")
@@ -220,7 +227,7 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
         is_new = state.transient or state.pending
         if not is_new and not self.is_dirty():
             return self
-        changed = {c.key for c in self.__table__.columns if self.is_dirty(c.key)}
+        changed = {name for name in _column_attr_names(type(self)) if self.is_dirty(name)}
         if type(self).__timestamps__:
             now = datetime.now(UTC)
             if is_new and getattr(self, "created_at", None) is None:
@@ -281,7 +288,7 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
 
     def is_dirty(self, *keys: str) -> bool:
         state = sa_inspect(self)
-        names = keys or tuple(c.key for c in self.__table__.columns)
+        names = keys or tuple(_column_attr_names(type(self)))
         for name in names:
             history = state.attrs[name].history
             if history.added or history.deleted:
@@ -297,7 +304,7 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
     def get_original(self, key: str | None = None) -> Any:
         state = sa_inspect(self)
         if key is None:
-            return {c.key: self._original(state, c.key) for c in self.__table__.columns}
+            return {name: self._original(state, name) for name in _column_attr_names(type(self))}
         return self._original(state, key)
 
     @staticmethod
@@ -314,7 +321,7 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
     def is_(self, other: Any) -> bool:
         if not isinstance(other, Model) or type(self) is not type(other):
             return False
-        pk = _pk_column(type(self)).key
+        pk = _pk_attr_name(type(self))
         return getattr(self, pk) == getattr(other, pk)
 
     def is_not(self, other: Any) -> bool:
@@ -338,9 +345,9 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
         hidden -= set(getattr(self, "_fastogram_visible_extra", ()))
         state = sa_inspect(self)
         data: dict[str, Any] = {}
-        for column in self.__table__.columns:
-            if column.key not in hidden:
-                data[column.key] = _jsonable(getattr(self, column.key))
+        for name in _column_attr_names(type(self)):
+            if name not in hidden:
+                data[name] = _jsonable(getattr(self, name))
         for name in self.__appends__:
             if name not in hidden:
                 data[name] = _jsonable(getattr(self, name))
@@ -386,6 +393,25 @@ class Model(AsyncAttrs, DeclarativeBase, metaclass=ModelMeta):
 
 def _pk_column(model: type) -> Any:
     return sa_inspect(model).primary_key[0]
+
+
+def _column_attr_names(model: type) -> list[str]:
+    """The mapped Python attribute names of every column, in declaration order.
+
+    Not `[c.key for c in model.__table__.columns]`: a `Column.key` is the *database* column
+    name, which only equals the mapped attribute name by convention. `mapped_column("type",
+    ...)` on an attribute named `type_` (common for columns that would otherwise shadow a Python
+    builtin) breaks that convention, and every one of `save()`'s dirty-set, `is_dirty()`'s
+    default keys, `get_original()` and `to_dict()` used to read/write the wrong name in that case
+    (`getattr(self, "type")` instead of `getattr(self, "type_")`), raising `AttributeError` or
+    silently producing an empty dirty-set. `Mapper.column_attrs[*].key` is the attribute name.
+    """
+    return [prop.key for prop in sa_inspect(model).mapper.column_attrs]
+
+
+def _pk_attr_name(model: type) -> str:
+    """The mapped Python attribute name of the primary key column (see `_column_attr_names`)."""
+    return sa_inspect(model).mapper.get_property_by_column(_pk_column(model)).key
 
 
 def _jsonable(value: Any) -> Any:
