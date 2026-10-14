@@ -1,8 +1,8 @@
 """The exception handler (T-20): report, then render, then `respond` callbacks.
 
-SEED (spine): correct structure and the core web rules. The errors package task completes it to
-the full T-20 spec (debug page, Inertia error page with shared data, `inertia_error_page`, JSON
-debug fields, context callbacks, log integration).
+Completes the SEED left by the spine: the debug page (`fastogram.exceptions.debug`), the Inertia
+error page with shared data even when the exception happened before `HandleInertiaRequests` ran,
+MRO-ordered `render()` callbacks, and routing `report()` through `fastogram.log` (T-22).
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from fastogram.exceptions.types import (
     AuthorizationException,
     HttpException,
     ModelNotFound,
+    PageNotFound,
     ThrottleRequestsException,
     TokenMismatchException,
     ValidationException,
@@ -79,27 +80,50 @@ class ExceptionHandler:
         return True
 
     def report(self, exc: BaseException) -> None:
+        """Log the exception (Laravel's `report($e)`), through `fastogram.log` (T-22).
+
+        Attaches the request id, URL, method, user id and traceback, plus anything from
+        `exceptions.context(...)` callbacks, before any registered `report(type, callback)`
+        callback runs. A callback returning `False` stops the default log (like `dont_report`).
+        """
         for exc_type, callback in self.config.report_callbacks:
             if isinstance(exc, exc_type):
                 if callback(exc) is False:
                     return
         extra: dict[str, Any] = {}
+        ctx = context.current()
+        if ctx is not None:
+            request = ctx.request
+            if request is not None:
+                extra["url"] = str(request.url)
+                extra["method"] = request.method
+            from fastogram.context import UNRESOLVED
+
+            if ctx.user is not None and ctx.user is not UNRESOLVED:
+                extra["user_id"] = getattr(ctx.user, "id", None)
+            scope = ctx.scope or {}
+            request_id = (scope.get("state") or {}).get("request_id")
+            if request_id:
+                extra["request_id"] = request_id
         for ctx_callback in self.config.context_callbacks:
             extra.update(ctx_callback() or {})
-        logger.error("%s: %s", type(exc).__name__, exc, exc_info=exc, extra={"context": extra})
+        extra["traceback"] = "".join(traceback.format_exception(exc))
+
+        from fastogram.log import log
+
+        log.error(f"{type(exc).__name__}: {exc}", exc_info=exc, **extra)
 
     async def render(self, request: Request, exc: BaseException) -> Response:
-        # 1. registered render callbacks (MRO order)
-        for exc_type, callback in self.config.render_callbacks:
-            if isinstance(exc, exc_type):
-                result = _call_render(callback, exc, request)
-                if inspect.isawaitable(result):
-                    result = await result
-                if result is not None:
-                    return result
+        # 1. registered render callbacks, most specific type first (MRO order); first non-None wins
+        for callback in _ordered_render_callbacks(self.config.render_callbacks, exc):
+            result = _call_render(callback, exc, request)
+            if inspect.isawaitable(result):
+                result = await result
+            if result is not None:
+                return result
         # 2. the exception's own render(request)
         own = getattr(exc, "render", None)
-        if callable(own) and not isinstance(exc, (HttpException,)):
+        if callable(own) and not isinstance(exc, HttpException):
             result = own(request)
             if inspect.isawaitable(result):
                 result = await result
@@ -127,18 +151,21 @@ class ExceptionHandler:
             return response
 
         if isinstance(exc, AuthenticationException):
+            target = exc.redirect_to or self._login_url()
             if wants_json:
-                return JSONResponse({"message": exc.message}, status_code=401)
+                body: dict[str, Any] = {"message": exc.message}
+                if target:
+                    body["redirect_to"] = target
+                return JSONResponse(body, status_code=401)
             from fastogram.http.responses import redirect
 
-            target = exc.redirect_to or self._login_url()
             response = redirect(target)
             response.status_code = redirect_status
             return response
 
         status, message, headers = self._status_for(exc)
         if wants_json:
-            body: dict[str, Any] = {"message": message if status < 500 else "Server Error."}
+            body = {"message": message if status < 500 else "Server Error."}
             if self.debug:
                 body["message"] = str(exc) or message
                 body.update(self._debug_fields(exc))
@@ -219,14 +246,51 @@ class ExceptionHandler:
             return None
         try:
             from fastogram.inertia import inertia
+            from fastogram.inertia.response import _ensure_page_exists
         except ImportError:
+            return None
+        try:
+            # A missing error page must not turn every error into a second, unhandled one.
+            _ensure_page_exists(self.config.error_page_component)
+        except PageNotFound:
+            logger.warning("Inertia error page [%s] is missing; using the plain HTML error page.", self.config.error_page_component)
             return None
         props: dict[str, Any] = {"status": status}
         if message:
             props["message"] = message
         response = inertia(self.config.error_page_component, props)
         response.status_code = status
-        return response
+        if ctx.inertia is not None:
+            return response
+        # The exception happened before `HandleInertiaRequests` ran (a global web layer or a
+        # route middleware raised before reaching it). Find the app's own middleware so the
+        # error page still gets share()/version()/root_view (Inertia-Laravel's withSharedData()).
+        standalone = self._standalone_inertia_middleware()
+        if standalone is None:
+            return response
+        previous = ctx.inertia
+        ctx.inertia = standalone
+        try:
+            return await response.build({})
+        finally:
+            ctx.inertia = previous
+
+    def _standalone_inertia_middleware(self) -> Any:
+        from fastogram.foundation.application import current_application
+        from fastogram.foundation.stack import resolve
+        from fastogram.inertia import InertiaMiddleware
+
+        app = current_application()
+        if app is None:
+            return None
+        found: type[InertiaMiddleware] | None = None
+        for layer in app.middleware_config.web_layers():
+            obj = resolve(layer)
+            if isinstance(obj, type) and issubclass(obj, InertiaMiddleware):
+                found = obj  # last one wins, matching how it is appended onto the web stack
+        if found is None:
+            return None
+        return found(_noop_asgi)
 
     def _debug_fields(self, exc: BaseException) -> dict[str, Any]:
         tb = traceback.extract_tb(exc.__traceback__)
@@ -239,16 +303,9 @@ class ExceptionHandler:
         }
 
     def _debug_html(self, request: Request, exc: BaseException) -> str:
-        import html
+        from fastogram.exceptions import debug
 
-        trace = "".join(traceback.format_exception(exc))
-        return (
-            "<!DOCTYPE html><html><head><meta charset='utf-8'><title>"
-            f"{html.escape(type(exc).__name__)}</title></head><body style='font-family:monospace'>"
-            f"<h1>{html.escape(type(exc).__name__)}</h1><p>{html.escape(str(exc))}</p>"
-            f"<p>{html.escape(request.method)} {html.escape(str(request.url))}</p>"
-            f"<pre>{html.escape(trace)}</pre></body></html>"
-        )
+        return debug.render(request, exc)
 
     def _plain_html(self, status: int, message: str) -> str:
         import html
@@ -259,6 +316,23 @@ class ExceptionHandler:
             f"<title>{status} {html.escape(title)}</title></head><body>"
             f"<h1>{status} | {html.escape(title)}</h1></body></html>"
         )
+
+
+async def _noop_asgi(scope: Any, receive: Any, send: Any) -> None:  # pragma: no cover
+    """Placeholder `app` for a standalone `InertiaMiddleware` instance we never actually call."""
+
+
+def _ordered_render_callbacks(
+    callbacks: list[tuple[type[BaseException], Callable[..., Any]]], exc: BaseException
+) -> list[Callable[..., Any]]:
+    """Callbacks that match `exc`, most specific registered type first (MRO order).
+
+    Ties (two callbacks registered for the same type) keep registration order.
+    """
+    mro = type(exc).__mro__
+    scored = [(mro.index(exc_type), i, cb) for i, (exc_type, cb) in enumerate(callbacks) if exc_type in mro]
+    scored.sort(key=lambda t: (t[0], t[1]))
+    return [cb for _, _, cb in scored]
 
 
 def _call_render(callback: Callable[..., Any], exc: BaseException, request: Request) -> Any:

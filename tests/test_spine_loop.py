@@ -79,7 +79,12 @@ async def test_validation_redirects_back_with_errors_then_flash(client):
 
 async def test_csrf_mismatch_on_inertia_redirects_back_with_flash(client):
     await client.get("/posts/create")
+    # CSRF is off while APP_ENV=testing (T-12); force it on for this request.
+    from fastogram.config import set_config
+
+    set_config("app.environment", "local")
     r = await client.post("/posts", json={"title": "x"}, headers={**INERTIA, "Referer": "http://testserver/posts/create"})
+    set_config("app.environment", "testing")
     assert r.status_code == 302
     r = await client.get("/posts/create", headers=INERTIA)
     assert r.json()["flash"] == {"error": "The page expired, please try again."}

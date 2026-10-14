@@ -69,7 +69,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
-ignore = ["E501"]
+ignore = ["E501", "UP046", "UP047"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["fastogram"]

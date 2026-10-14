@@ -1,4 +1,9 @@
-"""Pydantic v2 errors → Laravel rule keys and English messages (T-19), proven by spike S-3."""
+"""Pydantic v2 errors -> Laravel rule keys and English messages (T-19), proven by spike S-3.
+
+Also used by the async `Annotated` rules (`fastogram.validation.rules`): `render()` renders any
+rule key through the same custom-message / `:placeholder` machinery, given a synthetic `err`-like
+dict (`{"ctx": {...}}`) in place of a real Pydantic error.
+"""
 
 from __future__ import annotations
 
@@ -39,7 +44,7 @@ TYPE_MAP: dict[str, tuple[str, str | None]] = {
 }
 PREFIX_MAP = {"date_": "date", "datetime_": "date", "uuid_": "uuid", "decimal_": "numeric"}
 
-# Laravel lang/en/validation.php wording
+# Laravel lang/en/validation.php wording, plus the async-rule keys (confirmed/unique/exists/...).
 MESSAGES: dict[str, str | dict[str, str]] = {
     "required": "The :attribute field is required.",
     "min": {
@@ -51,6 +56,7 @@ MESSAGES: dict[str, str | dict[str, str]] = {
         "string": "The :attribute field must not be greater than :max characters.",
         "numeric": "The :attribute field must not be greater than :max.",
         "array": "The :attribute field must not have more than :max items.",
+        "file": "The :attribute field must not be greater than :max kilobytes.",
     },
     "gt": {"numeric": "The :attribute field must be greater than :value."},
     "lt": {"numeric": "The :attribute field must be less than :value."},
@@ -69,6 +75,15 @@ MESSAGES: dict[str, str | dict[str, str]] = {
     "confirmed": "The :attribute field confirmation does not match.",
     "unique": "The :attribute has already been taken.",
     "exists": "The selected :attribute is invalid.",
+    "accepted": "The :attribute field must be accepted.",
+    "current_password": "The :attribute field is incorrect.",
+    "file": "The :attribute field must be a file.",
+    "mimes": "The :attribute field must be a file of type: :values.",
+    "image": "The :attribute field must be an image.",
+    "password_letters": "The :attribute field must contain at least one letter.",
+    "password_mixed_case": "The :attribute field must contain at least one uppercase and one lowercase letter.",
+    "password_numbers": "The :attribute field must contain at least one number.",
+    "password_symbols": "The :attribute field must contain at least one symbol.",
     "invalid": "The :attribute field is invalid.",
 }
 
@@ -124,8 +139,20 @@ def attribute_name(key: str, attributes: dict[str, str]) -> str:
     return attributes.get(last, last.replace("_", " "))
 
 
-def render(rule: str, variant: str | None, err: dict[str, Any], key: str,
-           custom: dict[str, str], attributes: dict[str, str]) -> str:
+def render(
+    rule: str,
+    variant: str | None,
+    err: dict[str, Any],
+    key: str,
+    custom: dict[str, str],
+    attributes: dict[str, str],
+) -> str:
+    """Render one message: `messages()` override (`"<key>.<rule>"` then `"<key>"`), else the
+    built-in English table, with `:attribute`/`:min`/`:max`/`:value`/`:values` filled in.
+
+    `err` is either a real Pydantic error dict (with `loc`/`ctx`/`input`) or a synthetic one built
+    by an async rule (`{"ctx": {...}}`), so both call sites share this one renderer.
+    """
     template = custom.get(f"{key}.{rule}") or custom.get(key)
     if template is None:
         if rule == "__value_error__":
@@ -133,36 +160,58 @@ def render(rule: str, variant: str | None, err: dict[str, Any], key: str,
         entry = MESSAGES.get(rule, MESSAGES["invalid"])
         template = entry[variant or "numeric"] if isinstance(entry, dict) else entry
     ctx = err.get("ctx", {}) or {}
+    values = ctx.get("values")
     repl = {
         ":attribute": attribute_name(key, attributes),
-        ":min": ctx.get("min_length", ctx.get("ge", "")),
-        ":max": ctx.get("max_length", ctx.get("le", "")),
-        ":value": ctx.get("gt", ctx.get("lt", ctx.get("multiple_of", err.get("input", "")))),
+        ":min": str(ctx.get("min_length", ctx.get("ge", ctx.get("min", "")))),
+        ":max": str(ctx.get("max_length", ctx.get("le", ctx.get("max", "")))),
+        ":value": str(ctx.get("gt", ctx.get("lt", ctx.get("multiple_of", ctx.get("value", err.get("input", "")))))),
+        ":values": ", ".join(str(v) for v in values) if values else "",
     }
-    for k in (":attribute", ":min", ":max", ":value"):
-        template = template.replace(k, str(repl[k]))
+    for placeholder in sorted(repl, key=len, reverse=True):  # ":values" before ":value"
+        template = template.replace(placeholder, repl[placeholder])
     return template
 
 
-def validate(model: type[BaseModel], data: dict[str, Any], custom: dict[str, str] | None = None,
-             attributes: dict[str, str] | None = None) -> tuple[BaseModel | None, dict[str, list[str]]]:
+def required_errors(
+    model: type[BaseModel],
+    data: dict[str, Any],
+    custom: dict[str, str] | None = None,
+    attributes: dict[str, str] | None = None,
+) -> dict[str, list[str]]:
+    """Step 5: a `required` error for every field without a default whose value is missing/None
+    and whose type does not allow `None` (so an empty string behaves like Laravel's `required`)."""
     custom, attributes = custom or {}, attributes or {}
     errors: dict[str, list[str]] = {}
-    # step 5: required pre-check (missing or None, type does not allow None)
     for name, field in model.model_fields.items():
         if field.is_required() and data.get(name) is None:
-            ann = field.annotation
-            allows_none = type(None) in typing.get_args(ann)
+            allows_none = type(None) in typing.get_args(field.annotation)
             if not allows_none:
-                errors.setdefault(name, []).append(
-                    render("required", None, {}, name, custom, attributes))
+                errors.setdefault(name, []).append(render("required", None, {}, name, custom, attributes))
+    return errors
+
+
+def validate(
+    model: type[BaseModel],
+    data: dict[str, Any],
+    custom: dict[str, str] | None = None,
+    attributes: dict[str, str] | None = None,
+) -> tuple[BaseModel | None, dict[str, list[str]]]:
+    """Sync-only helper kept for the spike's own tests: required pre-check + Pydantic validation.
+
+    `FormRequest.resolve()` no longer calls this directly (it needs the required errors and the
+    Pydantic errors as separate steps so it can run the async rules in between); it is kept here
+    as the smallest piece other code or tests can reach for a plain model.
+    """
+    custom, attributes = custom or {}, attributes or {}
+    errors = required_errors(model, data, custom, attributes)
     try:
         obj = model.model_validate(data)
     except ValidationError as e:
         obj = None
         for err in e.errors():
             key = dot_key(err["loc"])
-            if key in errors:     # already 'required'
+            if key in errors:  # already 'required'
                 continue
             rule, variant = rule_for(err, model)
             errors.setdefault(key, []).append(render(rule, variant, err, key, custom, attributes))

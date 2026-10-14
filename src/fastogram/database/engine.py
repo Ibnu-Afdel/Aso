@@ -1,13 +1,16 @@
 """The async engine, built from `config("database")` (T-30).
 
-SEED (spine): URL building for sqlite/pgsql/mysql, the SQLite transaction recipe (S-2) and
-PRAGMAs. The database package task completes pool options, sslmode, the query listener.
+URL building for sqlite/pgsql/mysql (including `sslmode` → asyncpg `ssl`), the SQLite
+transaction recipe (S-2) and PRAGMAs, pool sizing, and the `before/after_cursor_execute` query
+listener that feeds `DB.listen()`.
 """
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from sqlalchemy import event
 from sqlalchemy.engine import make_url
@@ -16,6 +19,26 @@ from sqlalchemy.pool import StaticPool
 
 _engine: AsyncEngine | None = None
 _maker: async_sessionmaker[AsyncSession] | None = None
+
+_SSLMODE_TO_SSL = {
+    "disable": "false",
+    "allow": None,
+    "prefer": None,
+    "require": "true",
+    "verify-ca": "true",
+    "verify-full": "true",
+}
+
+
+def _rewrite_sslmode(url: str) -> str:
+    """`?sslmode=require` (libpq) → `?ssl=true` (asyncpg's connect kwarg)."""
+    parts = urlsplit(url)
+    params = dict(parse_qsl(parts.query))
+    sslmode = params.pop("sslmode", None)
+    ssl_value = _SSLMODE_TO_SSL.get(sslmode) if sslmode else None
+    if ssl_value is not None:
+        params["ssl"] = ssl_value
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(params), parts.fragment))
 
 ASYNC_DRIVERS = {
     "sqlite": "sqlite+aiosqlite",
@@ -28,12 +51,19 @@ ASYNC_DRIVERS = {
 
 
 def database_url(connection: dict[str, Any], base_path: Path | None = None) -> str:
-    """Build an async SQLAlchemy URL from one `config/database.py` connection."""
+    """Build an async SQLAlchemy URL from one `config/database.py` connection.
+
+    A plain `DB_URL` (`postgresql://`, `postgres://`, `mysql://`) is rewritten to the async
+    driver. `?sslmode=` is translated to asyncpg's `ssl` connect argument (T-30).
+    """
     url = connection.get("url")
     if url:
         scheme, _, rest = str(url).partition("://")
         driver = ASYNC_DRIVERS.get(scheme.split("+")[0], scheme)
-        return f"{driver}://{rest}"
+        rewritten = f"{driver}://{rest}"
+        if driver == "postgresql+asyncpg" and "sslmode=" in rewritten:
+            rewritten = _rewrite_sslmode(rewritten)
+        return rewritten
     driver = connection.get("driver", "sqlite")
     if driver == "sqlite":
         database = str(connection.get("database") or ":memory:")
@@ -50,7 +80,11 @@ def database_url(connection: dict[str, Any], base_path: Path | None = None) -> s
     host = connection.get("host", "127.0.0.1")
     port = connection.get("port")
     db = connection.get("database", "")
-    return f"{scheme}://{auth}{host}{f':{port}' if port else ''}/{db}"
+    url = f"{scheme}://{auth}{host}{f':{port}' if port else ''}/{db}"
+    sslmode = connection.get("sslmode")
+    if scheme == "postgresql+asyncpg" and sslmode:
+        url = _rewrite_sslmode(f"{url}?sslmode={sslmode}")
+    return url
 
 
 def install_sqlite_recipe(engine: AsyncEngine, pragmas: dict[str, Any] | None = None) -> None:
@@ -77,13 +111,33 @@ def install_sqlite_recipe(engine: AsyncEngine, pragmas: dict[str, Any] | None = 
         conn.exec_driver_sql("BEGIN")
 
 
-def make_engine(url: str, connection: dict[str, Any] | None = None, **kwargs: Any) -> AsyncEngine:
+def install_query_listener(engine: AsyncEngine, connection_name: str | None = None) -> None:
+    """`before/after_cursor_execute` on `engine.sync_engine` → `DB.listen()` (T-30)."""
+    from fastogram.database.db import QueryExecuted, notify
+
+    @event.listens_for(engine.sync_engine, "before_cursor_execute")
+    def _before(conn: Any, cursor: Any, statement: Any, parameters: Any, context: Any, executemany: bool) -> None:
+        conn.info.setdefault("fastogram_query_start", []).append(time.perf_counter())
+
+    @event.listens_for(engine.sync_engine, "after_cursor_execute")
+    def _after(conn: Any, cursor: Any, statement: Any, parameters: Any, context: Any, executemany: bool) -> None:
+        stack = conn.info.get("fastogram_query_start") or []
+        started = stack.pop() if stack else time.perf_counter()
+        elapsed_ms = (time.perf_counter() - started) * 1000
+        bindings = parameters if isinstance(parameters, dict) else {}
+        notify(QueryExecuted(sql=str(statement), bindings=dict(bindings), time_ms=elapsed_ms, connection_name=connection_name))
+
+
+def make_engine(url: str, connection: dict[str, Any] | None = None, *, name: str | None = None, **kwargs: Any) -> AsyncEngine:
     connection = connection or {}
     sa_url = make_url(url)
+    pool = _pool_kwargs(connection)
     if sa_url.get_backend_name() == "sqlite":
         if sa_url.database in (None, "", ":memory:"):
             kwargs.setdefault("poolclass", StaticPool)
             kwargs.setdefault("connect_args", {"check_same_thread": False})
+        else:
+            kwargs.update(pool)
         engine = create_async_engine(sa_url, **kwargs)
         install_sqlite_recipe(
             engine,
@@ -93,9 +147,25 @@ def make_engine(url: str, connection: dict[str, Any] | None = None, **kwargs: An
                 "journal_mode": connection.get("journal_mode") if sa_url.database not in (None, "", ":memory:") else None,
             },
         )
-        return engine
-    kwargs.setdefault("pool_pre_ping", True)
-    return create_async_engine(sa_url, **kwargs)
+    else:
+        kwargs.setdefault("pool_pre_ping", True)
+        kwargs.update(pool)
+        engine = create_async_engine(sa_url, **kwargs)
+    install_query_listener(engine, name)
+    return engine
+
+
+def _pool_kwargs(connection: dict[str, Any]) -> dict[str, Any]:
+    from fastogram.config import config
+
+    size = connection.get("pool_size", config("database.pool.size"))
+    overflow = connection.get("pool_max_overflow", config("database.pool.max_overflow"))
+    kwargs: dict[str, Any] = {}
+    if size is not None:
+        kwargs["pool_size"] = int(size)
+    if overflow is not None:
+        kwargs["max_overflow"] = int(overflow)
+    return kwargs
 
 
 def configure(engine: AsyncEngine) -> None:
@@ -112,9 +182,20 @@ def configure_from_config() -> AsyncEngine | None:
     if not name:
         return None
     connection = config(f"database.connections.{name}") or {}
-    engine = make_engine(database_url(connection, base_path()), connection)
+    engine = make_engine(database_url(connection, base_path()), connection, name=name)
     configure(engine)
+    if config("database.log_queries"):
+        _install_default_logger()
     return engine
+
+
+def _install_default_logger() -> None:
+    import logging
+
+    from fastogram.database.db import DB
+
+    logger = logging.getLogger("fastogram.database.query")
+    DB.listen(lambda q: logger.debug("sql=%s bindings=%s ms=%.2f", q.sql, q.bindings, q.time_ms))
 
 
 def engine() -> AsyncEngine:

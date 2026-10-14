@@ -88,7 +88,7 @@ async def open_scope(fresh: bool = False) -> AsyncIterator[Scope]:
 
 
 @asynccontextmanager
-async def transaction() -> AsyncIterator[None]:
+async def _transaction_once() -> AsyncIterator[None]:
     scope = current_scope()
     session = scope.session()
     scope.depth += 1
@@ -114,6 +114,50 @@ async def transaction() -> AsyncIterator[None]:
                 result = callback()
                 if inspect.isawaitable(result):
                     await result
+
+
+_RETRYABLE_SQLSTATES = {"40001", "40P01"}  # serialization_failure, deadlock_detected (PostgreSQL)
+
+
+def _is_retryable(exc: BaseException) -> bool:
+    """Deadlock or serialization failure (T-30 `DB.transaction(attempts=)`)."""
+    from sqlalchemy.exc import OperationalError
+
+    if not isinstance(exc, OperationalError):
+        return False
+    orig = getattr(exc, "orig", None)
+    sqlstate = getattr(orig, "sqlstate", None) or getattr(orig, "pgcode", None)
+    if sqlstate in _RETRYABLE_SQLSTATES:
+        return True
+    return "deadlock" in str(orig or exc).lower() or "database is locked" in str(orig or exc).lower()
+
+
+def transaction(fn: Callable[[], Any] | None = None, *, attempts: int = 1) -> Any:
+    """`async with DB.transaction():` (single attempt) or `await DB.transaction(fn, attempts=3)`.
+
+    A plain `async with` block cannot be re-run from the outside once it has raised (Python gives
+    a context manager no way to replay the caller's `with`-suite), so a real "retry the whole
+    block" only works for the **callback** form: each attempt opens a fresh savepoint and calls
+    `fn()` again from scratch. `attempts=` on the context-manager form is accepted for symmetry
+    with Laravel's signature but only ever makes one attempt; see the build report.
+    """
+    if fn is None:
+        return _transaction_once()
+    return _retrying_transaction(fn, attempts)
+
+
+async def _retrying_transaction(fn: Callable[[], Any], attempts: int) -> Any:
+    last_exc: BaseException | None = None
+    for attempt in range(1, max(1, attempts) + 1):
+        try:
+            async with _transaction_once():
+                result = fn()
+                return await result if inspect.isawaitable(result) else result
+        except BaseException as exc:  # noqa: BLE001 - re-raised below when not retryable/out of attempts
+            last_exc = exc
+            if attempt >= attempts or not _is_retryable(exc):
+                raise
+    raise last_exc  # pragma: no cover - unreachable (loop always returns or raises)
 
 
 async def write(fn: Callable[[AsyncSession], Any]) -> Any:

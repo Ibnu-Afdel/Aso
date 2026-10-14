@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ config("app.name") }} - {{ page.component }}</title>
+{{ vite_react_refresh() }}
+{{ vite("resources/js/app.tsx") }}
+{{ inertia_head("<title>fallback</title>") }}
+</head>
+<body>
+{{ inertia_app() }}
+</body>
+</html>
