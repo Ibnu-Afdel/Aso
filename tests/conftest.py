@@ -18,9 +18,8 @@ def reset_fixture_apps() -> None:
     for name in list(sys.modules):
         if name.split(".")[0] in FIXTURE_PACKAGES:
             del sys.modules[name]
-    from fastogram.database import Model
-
     from fastogram.cache import flush_all
+    from fastogram.database import Model
     from fastogram.storage import storage
 
     storage.reset_fakes()
