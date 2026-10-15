@@ -3,11 +3,27 @@
 A Laravel-style web framework for Python: **FastAPI** on the backend, **Inertia.js v3 + React**
 on the frontend, and an artisan-like CLI (`fastogram make:controller`, `fastogram migrate`, ...).
 
-> **Status: under construction (v0.1.0.dev).** The rewrite is in progress on `main`. The previous
-> Telegram bot template (FastAPI + aiogram) is kept under the tag `legacy-telegram-template` and
-> on the `release/public-ready` branch.
+> **Status: early (0.1.0).** It works end to end, but expect rough edges and breaking changes.
+> The previous Telegram bot template (0.0.x, FastAPI + aiogram) is kept under the tag
+> `legacy-telegram-template` and on the `release/public-ready` branch.
 
-## What it will look like
+## Try it
+
+You need [uv](https://docs.astral.sh/uv/), Node 22+ and npm.
+
+```bash
+uvx fastogram new myapp     # like `laravel new myapp`
+cd myapp
+uv run fastogram dev        # server + Vite + route watcher
+```
+
+Open http://127.0.0.1:8000, register, and you're in the React starter kit (dashboard, settings,
+password reset, email verification). In local mode mail goes to `storage/logs/`.
+
+Useful commands: `fastogram list`, `fastogram route:list`, `fastogram make:model Post -mcr`,
+`fastogram migrate`, `uv run pytest`.
+
+## What it looks like
 
 ```python
 # routes/web.py
