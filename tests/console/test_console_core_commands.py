@@ -34,16 +34,44 @@ def test_build_dev_commands_adds_a_queue_worker_when_enabled() -> None:
     assert "queue:work" in commands["queue"]
 
 
-def test_serve_refuses_a_port_already_in_use(cli_group, runner: CliRunner) -> None:
+def test_find_free_port_skips_a_port_already_in_use() -> None:
     import socket
+
+    from fastogram.console.commands.core import find_free_port
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind(("127.0.0.1", 0))
         sock.listen(1)
         port = sock.getsockname()[1]
+        chosen = find_free_port(port)
+        assert chosen is not None and chosen != port
+        assert find_free_port(port, taken={chosen}) not in (port, chosen)
+
+
+def test_serve_falls_back_to_the_next_free_port(cli_group, runner: CliRunner, monkeypatch) -> None:
+    import socket
+    import subprocess
+
+    calls: list[tuple[list[str], dict[str, str]]] = []
+    monkeypatch.setattr(subprocess, "call", lambda argv, cwd=None, env=None: calls.append((argv, env)) or 0)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        sock.listen(1)
+        port = sock.getsockname()[1]
         result = runner.invoke(cli_group, ["serve", "--port", str(port)])
-        assert result.exit_code == 1
-        assert "already in use" in result.output
+    assert result.exit_code == 0, result.output
+    assert "in use; using" in result.output
+    argv, env = calls[0]
+    chosen = argv[argv.index("--port") + 1]
+    assert chosen != str(port)
+    assert env["APP_URL"].endswith(f":{chosen}")
+
+
+def test_app_url_for_port_swaps_only_the_port() -> None:
+    from fastogram.console.commands.core import app_url_for_port
+
+    assert app_url_for_port("http://localhost:8000", 8001) == "http://localhost:8001"
+    assert app_url_for_port("https://myapp.test", 8443) == "https://myapp.test:8443"
 
 
 def test_route_list_shows_registered_routes(cli_group, runner: CliRunner) -> None:

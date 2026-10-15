@@ -36,9 +36,46 @@ def build_dev_commands(*, port: int = 8000, vite_port: int = 5173, queue_enabled
 
 
 def _port_in_use(port: int, host: str = "127.0.0.1") -> bool:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.settimeout(0.25)
-        return sock.connect_ex((host, port)) == 0
+    # "localhost" may be served on IPv4 or IPv6 (Node binds ::1 on some systems): check both.
+    hosts = [("127.0.0.1", socket.AF_INET), ("::1", socket.AF_INET6)] if host == "localhost" else [(host, socket.AF_INET)]
+    for address, family in hosts:
+        try:
+            with socket.socket(family, socket.SOCK_STREAM) as sock:
+                sock.settimeout(0.25)
+                if sock.connect_ex((address, port)) == 0:
+                    return True
+        except OSError:
+            continue
+    return False
+
+
+def find_free_port(port: int, host: str = "127.0.0.1", *, attempts: int = 10, taken: set[int] | None = None) -> int | None:
+    """`port` if it is free, else the next free one within `attempts` tries (like `artisan serve`)."""
+    for candidate in range(port, port + attempts):
+        if candidate in (taken or set()):
+            continue
+        if not _port_in_use(candidate, host):
+            return candidate
+    return None
+
+
+def app_url_for_port(url: str, port: int) -> str:
+    """`APP_URL` with its port swapped for the one the server actually listens on, so links in
+    emails and redirects keep working when `dev`/`serve` falls back to another port."""
+    from urllib.parse import urlsplit, urlunsplit
+
+    parts = urlsplit(url or "http://localhost")
+    host = parts.hostname or "localhost"
+    return urlunsplit((parts.scheme or "http", f"{host}:{port}", parts.path, parts.query, parts.fragment))
+
+
+def _pick_port(cmd: Command, label: str, port: int, host: str = "127.0.0.1", *, taken: set[int] | None = None) -> int | None:
+    chosen = find_free_port(port, host, taken=taken)
+    if chosen is None:
+        cmd.error(f"The {label} port {port} and the next 9 ports are all in use. Pass a free one with --{'vite-' if label == 'Vite' else ''}port.")
+    elif chosen != port:
+        cmd.warn(f"The {label} port {port} is in use; using {chosen} instead.")
+    return chosen
 
 
 class ServeCommand(Command):
@@ -47,15 +84,14 @@ class ServeCommand(Command):
 
     async def handle(self) -> int:
         host = str(self.option("host"))
-        port = int(self.option("port"))
-        if _port_in_use(port, host):
-            self.error(f"Port {port} is already in use.")
+        port = _pick_port(self, "application", int(self.option("port")), host)
+        if port is None:
             return 1
         argv = build_serve_argv(host, port)
         self.info(f"Starting server: http://{host}:{port}")
         import subprocess
 
-        return subprocess.call(argv, cwd=_base_path())
+        return subprocess.call(argv, cwd=_base_path(), env=_child_env(port))
 
 
 class DevCommand(Command):
@@ -63,21 +99,51 @@ class DevCommand(Command):
     description = "Start the Python server, Vite, and the queue worker together"
 
     async def handle(self) -> int:
-        port = int(self.option("port"))
-        vite_port = int(self.option("vite-port"))
-        for label, p in (("application", port), ("Vite", vite_port)):
-            if _port_in_use(p):
-                self.error(f"The {label} port {p} is already in use.")
-                return 1
+        port = _pick_port(self, "application", int(self.option("port")))
+        if port is None:
+            return 1
+        vite_port = _pick_port(self, "Vite", int(self.option("vite-port")), "localhost", taken={port})
+        if vite_port is None:
+            return 1
         from fastogram.queue import drivers
 
         queue_enabled = drivers.connection_spec(drivers.driver_name()).get("driver") != "sync"
         commands = build_dev_commands(port=port, vite_port=vite_port, queue_enabled=queue_enabled)
-        self.info("Starting dev servers. (Ctrl+C to stop)")
-        return await run_concurrently(commands, cwd=_base_path())
+
+        # Write the TypeScript route helpers *before* Vite starts: otherwise Vite's first
+        # pre-transform races the watcher and logs "Failed to resolve import @/routes" (T-28).
+        try:
+            from fastogram.routing.registry import current_registry
+            from fastogram.routing.ts_routes import generate
+
+            generate(_base_path(), current_registry(), with_form=True)
+        except Exception as exc:  # noqa: BLE001 - the watcher reports it again; still start the servers
+            self.warn(f"Could not generate the TypeScript route helpers: {exc}")
+
+        self.line("")
+        self.info(f"  App   http://127.0.0.1:{port}   <- open this one")
+        self.line(f"  Vite  http://localhost:{vite_port}   (assets + hot reload only)")
+        self.line("")
+        self.comment("Starting dev servers. (Ctrl+C to stop)")
+        return await run_concurrently(commands, cwd=_base_path(), env=_child_env(port))
 
 
-async def run_concurrently(commands: dict[str, list[str]], *, cwd: Path) -> int:
+def _child_env(port: int) -> dict[str, str]:
+    """The environment for child processes: unbuffered Python output (so `routes`/`queue` lines
+    show up as they happen), `APP_URL` pointing at the port actually in use, and the running
+    venv's `bin/` first on `PATH`, so `uvicorn` is found even without `uv run`/an activated venv."""
+    import os
+
+    from fastogram.config import config
+
+    env = dict(os.environ)
+    env["PATH"] = os.pathsep.join([str(Path(sys.executable).parent), env.get("PATH", "")])
+    env["PYTHONUNBUFFERED"] = "1"
+    env["APP_URL"] = app_url_for_port(str(config("app.url") or "http://localhost"), port)
+    return env
+
+
+async def run_concurrently(commands: dict[str, list[str]], *, cwd: Path, env: dict[str, str] | None = None) -> int:
     """`asyncio.create_subprocess_exec` per process, coloured prefixes, stop-all-on-exit (T-07)."""
     procs: dict[str, asyncio.subprocess.Process] = {}
     tasks: list[asyncio.Task[Any]] = []
@@ -91,12 +157,26 @@ async def run_concurrently(commands: dict[str, list[str]], *, cwd: Path) -> int:
         assert proc.stdout is not None
         async for raw in proc.stdout:
             line = raw.decode(errors="replace").rstrip()
-            stream_console.print(f"[{color}]{name}[/{color}] | {escape(line)}", highlight=False)
+            stream_console.print(f"[{color}]{name}[/{color}] | {escape(line)}", highlight=False, soft_wrap=True)
+
+    # SIGTERM/SIGHUP (closing the terminal, `kill`) must stop the children too, exactly like
+    # Ctrl+C does -- otherwise uvicorn and Vite keep the ports and `public/hot` stays behind.
+    import signal
+
+    loop = asyncio.get_running_loop()
+    main_task = asyncio.current_task()
+    handled: list[int] = []
+    for sig in (signal.SIGTERM, signal.SIGHUP):
+        try:
+            loop.add_signal_handler(sig, main_task.cancel)  # type: ignore[union-attr]
+            handled.append(sig)
+        except (NotImplementedError, RuntimeError, ValueError):  # Windows, or not the main thread
+            pass
 
     try:
         for i, (name, argv) in enumerate(commands.items()):
             proc = await asyncio.create_subprocess_exec(
-                *argv, cwd=cwd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
+                *argv, cwd=cwd, env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
             )
             procs[name] = proc
             tasks.append(asyncio.ensure_future(_stream(name, proc, _COLORS[i % len(_COLORS)])))
@@ -112,6 +192,8 @@ async def run_concurrently(commands: dict[str, list[str]], *, cwd: Path) -> int:
         await asyncio.gather(*(p.wait() for p in procs.values()), return_exceptions=True)
         for task in tasks:
             task.cancel()
+        for sig in handled:
+            loop.remove_signal_handler(sig)
 
 
 class TinkerCommand(Command):

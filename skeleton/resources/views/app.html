@@ -16,7 +16,7 @@
             }
         })();
     </script>
-    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     {{ vite_react_refresh() }}
     {{ vite("resources/css/app.css", "resources/js/app.tsx", "resources/js/pages/" ~ page.component ~ ".tsx") }}
     {{ inertia_head("<title>" ~ config("app.name") ~ "</title>") }}

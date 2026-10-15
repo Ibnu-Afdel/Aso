@@ -386,7 +386,7 @@ export function resolveArgs(
     return {};
 }
 
-/** Fills a Laravel-style path template (`"/posts/{post}"`, `"/archive/{year?}"`) in; a missing
+/** Fills a path template (`"/posts/{post}"`, `"/archive/{year?}"`) in; a missing
  * optional segment is dropped, matching `fastogram.routing.paths.build_url`. */
 export function buildPath(
     template: string,
