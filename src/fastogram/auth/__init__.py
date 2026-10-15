@@ -1,32 +1,33 @@
-"""Authentication and authorization (T-38, T-39). SEED (spine)."""
+"""Authentication and authorization (T-38, T-39, T-40).
+
+```python
+from fastogram.auth import auth, Gate, Authenticatable, MustVerifyEmail
+from fastogram.auth.events import Registered, Login, Logout, Failed, Lockout
+
+class User(MustVerifyEmail, Authenticatable, Model):
+    ...
+
+if await auth().attempt({"email": email, "password": password}):
+    ...
+```
+"""
 
 from __future__ import annotations
 
-from typing import Any
-
-from fastogram import context
+from fastogram.auth.authenticatable import Authenticatable, MustVerifyEmail
+from fastogram.auth.features import features
+from fastogram.auth.gate import Gate
+from fastogram.auth.guard import auth
+from fastogram.auth.password_broker import password_broker
 from fastogram.exceptions.types import AuthenticationException, AuthorizationException
 
-__all__ = ["AuthenticationException", "AuthorizationException", "auth"]
-
-
-class _Guard:
-    def user(self) -> Any:
-        ctx = context.current()
-        if ctx is None or ctx.user is context.UNRESOLVED:
-            return None
-        return ctx.user
-
-    def check(self) -> bool:
-        return self.user() is not None
-
-    def guest(self) -> bool:
-        return self.user() is None
-
-    def id(self) -> Any:
-        user = self.user()
-        return getattr(user, "id", None)
-
-
-def auth() -> _Guard:
-    return _Guard()
+__all__ = [
+    "Authenticatable",
+    "AuthenticationException",
+    "AuthorizationException",
+    "Gate",
+    "MustVerifyEmail",
+    "auth",
+    "features",
+    "password_broker",
+]

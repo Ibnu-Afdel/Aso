@@ -32,22 +32,25 @@ async def test_encrypted_column_round_trips_and_is_opaque_at_rest(db):
     assert raw_value != "top-secret"
 
 
-async def test_hashed_column_is_hashed_before_it_is_persisted(db):
-    # The transform runs in `process_bind_param` (T-31 "How it works"), i.e. at the SQL boundary,
-    # not as a Python `__set__` hook -- so it is the *stored* value that is hashed, not
-    # necessarily the in-memory attribute an unrefreshed instance still holds.
+async def test_hashed_column_hashes_on_assignment(db):
+    # The transform runs on attribute assignment (Laravel's `hashed` cast), so the in-memory
+    # attribute is already hashed, not just the value eventually written to the row.
     class Account(Model):
         password: Mapped[str] = mapped_column(Hashed())
 
     await db.run_sync(Model.metadata.create_all)
-    await Account.create(password="correct-horse")
-    row = (await db.execute(Account.__table__.select())).mappings().one()
-    assert row["password"] != "correct-horse"
-    assert row["password"].startswith("$")
+
+    account = Account(password="correct-horse")
+    assert account.password != "correct-horse"
+    assert account.password.startswith("$")
 
     from fastogram.security import hash
 
-    assert hash.check("correct-horse", row["password"]) is True
+    assert hash.check("correct-horse", account.password) is True
+
+    await account.save()
+    row = (await db.execute(Account.__table__.select())).mappings().one()
+    assert row["password"] == account.password
 
 
 async def test_hashed_column_does_not_double_hash_an_already_hashed_value(db):

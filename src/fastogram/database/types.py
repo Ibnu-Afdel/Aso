@@ -13,7 +13,8 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, String, event
+from sqlalchemy.orm import Mapper
 from sqlalchemy.types import TypeDecorator
 
 __all__ = ["Encrypted", "Hashed", "UtcDateTime", "uuid7", "ulid"]
@@ -105,18 +106,55 @@ class Encrypted(TypeDecorator):
         return _security().crypt.decrypt(value)
 
 
+def _hash_if_needed(value: Any) -> Any:
+    """Laravel's `hashed` cast: hash a plain value, pass an already-hashed one through unchanged."""
+    if value is None:
+        return None
+    security = _security()
+    is_hashed = getattr(security.hash, "is_hashed", None)
+    already_hashed = is_hashed(value) if callable(is_hashed) else bool(value) and str(value).startswith("$")
+    if already_hashed:
+        return value
+    return security.hash.make(value)
+
+
+def _hash_on_set(target: Any, value: Any, oldvalue: Any, initiator: Any) -> Any:
+    return _hash_if_needed(value)
+
+
+@event.listens_for(Mapper, "mapper_configured")
+def _wire_hashed_columns(mapper: Any, class_: Any) -> None:
+    """Hash `Hashed` columns on assignment, not just at the SQL boundary (T-40's `hashed` cast).
+
+    `mapper_configured` fires before a mapped class's own `__init__` runs its `setattr()` calls
+    (declarative's generated constructor), so both `Model(password=...)` and later
+    `instance.password = ...` go through `_hash_on_set` -- `user.password` is never plaintext in
+    memory after `create()`. `process_bind_param` below stays as a second line of defense for any
+    value that reaches the database without going through the instrumented attribute (e.g. a Core
+    statement).
+    """
+    for prop in mapper.column_attrs:
+        columns = getattr(prop, "columns", None)
+        if not columns or not isinstance(columns[0].type, Hashed):
+            continue
+        attr = getattr(class_, prop.key)
+        if not event.contains(attr, "set", _hash_on_set):
+            event.listen(attr, "set", _hash_on_set, retval=True)
+
+
 class Hashed(TypeDecorator):
-    """`Mapped[str] = mapped_column(Hashed())` — hashes on assignment unless already hashed (T-40)."""
+    """`Mapped[str] = mapped_column(Hashed())` — hashes on assignment unless already hashed (T-40).
+
+    See `_wire_hashed_columns` for the assignment-time hook; `process_bind_param` is a fallback.
+    """
 
     impl = String
     cache_ok = True
 
+    def __init__(self, impl: Any = String, *args: Any, **kwargs: Any) -> None:
+        # `Hashed(String(255))` (the T-38 example) must keep the length, not nest String in String.
+        super().__init__(*args, **kwargs)
+        self.impl = impl() if isinstance(impl, type) else impl
+
     def process_bind_param(self, value: Any, dialect: Any) -> str | None:
-        if value is None:
-            return None
-        security = _security()
-        is_hashed = getattr(security.hash, "is_hashed", None)
-        already_hashed = is_hashed(value) if callable(is_hashed) else bool(value) and str(value).startswith("$")
-        if already_hashed:
-            return value
-        return security.hash.make(value)
+        return _hash_if_needed(value)

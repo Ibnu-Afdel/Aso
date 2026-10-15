@@ -77,7 +77,8 @@ async def test_tampered_session_cookie_starts_a_new_session(make_client) -> None
         r1 = await client.get("/write")
         sid1 = r1.json()["id"]
         cookie_value = client.cookies.get("fg-session")
-        tampered = cookie_value[:-1] + ("a" if cookie_value[-1] != "a" else "b")
+        i = len(cookie_value) - 5  # the last base64 character may only carry padding bits
+        tampered = cookie_value[:i] + ("a" if cookie_value[i] != "a" else "b") + cookie_value[i + 1 :]
         # Set the raw header directly for this one request: httpx2's cookie jar can otherwise
         # keep both the original and the replacement around (keyed by differing default
         # domains) and send the still-valid one, masking the tamper.
