@@ -75,13 +75,15 @@ def vite_react_refresh() -> Markup:
     )
 
 
-def vite(*entries: str) -> Markup:
+def vite(*entries: str | list[str] | tuple[str, ...]) -> Markup:
     """`<script>`/`<link>` tags for each entry: the dev-server client in dev, hashed manifest
     tags (plus CSS and `modulepreload` of imported chunks) in production.
 
     A missing entry under `resources/js/pages/` (an Inertia page the client code-splits into,
     never a Vite build input) is skipped silently, like Laravel's optional `@vite` entries.
+    `vite("a", "b")` and Laravel's list form `vite(["a", "b"])` are both accepted.
     """
+    entries = tuple(e for item in entries for e in ((item,) if isinstance(item, str) else item))  # type: ignore[assignment]
     url = _hot_url()
     if url is not None:
         tags = [f'<script type="module" src="{url}/@vite/client"></script>']

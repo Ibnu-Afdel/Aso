@@ -18,7 +18,7 @@
     </script>
     <link rel="icon" href="/favicon.ico" sizes="any">
     {{ vite_react_refresh() }}
-    {{ vite(["resources/css/app.css", "resources/js/app.tsx", "resources/js/pages/" ~ page.component ~ ".tsx"]) }}
+    {{ vite("resources/css/app.css", "resources/js/app.tsx", "resources/js/pages/" ~ page.component ~ ".tsx") }}
     {{ inertia_head("<title>" ~ config("app.name") ~ "</title>") }}
 </head>
 <body class="font-sans antialiased">

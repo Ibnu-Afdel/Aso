@@ -29,6 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-Every ported file keeps a one-line header comment naming its origin (T-05). This notice is
-filled in by the frontend task as it ports files; this skeleton task only creates the
-placeholder.
+Every ported file keeps a one-line header comment naming its origin (T-05): layouts, components,
+hooks and pages ported from the kit say so directly; shadcn/ui primitives under
+`resources/js/components/ui/` (vendored inside the kit's repo, not authored by Laravel, but MIT
+either way) say "Ported from the Laravel React starter kit's shadcn/ui primitives".

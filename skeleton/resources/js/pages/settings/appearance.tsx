@@ -1,4 +1,34 @@
-// Placeholder page -- the frontend task overwrites this with the ported Laravel React kit page.
+// Ported from Laravel's React starter kit (github.com/laravel/react-starter-kit), MIT. See
+// LICENSES/laravel-react-starter-kit.md.
+import { Head } from "@inertiajs/react";
+import AppearanceTabs from "@/components/appearance-tabs";
+import Heading from "@/components/heading";
+import { edit as editAppearance } from "@/routes/appearance";
+
 export default function Appearance() {
-    return null;
+    return (
+        <>
+            <Head title="Appearance settings" />
+
+            <h1 className="sr-only">Appearance settings</h1>
+
+            <div className="space-y-6">
+                <Heading
+                    variant="small"
+                    title="Appearance settings"
+                    description="Update the appearance settings for your account"
+                />
+                <AppearanceTabs />
+            </div>
+        </>
+    );
 }
+
+Appearance.layout = {
+    breadcrumbs: [
+        {
+            title: "Appearance settings",
+            href: editAppearance(),
+        },
+    ],
+};

@@ -28,6 +28,7 @@ def build_dev_commands(*, port: int = 8000, vite_port: int = 5173, queue_enabled
     commands: dict[str, list[str]] = {
         "server": ["uvicorn", "bootstrap.app:create_app", "--factory", "--reload", "--host", "127.0.0.1", "--port", str(port)],
         "vite": ["npm", "run", "dev", "--", "--port", str(vite_port)],
+        "routes": [sys.argv[0] or "fastogram", "routes:generate", "--with-form", "--watch"],
     }
     if queue_enabled:
         commands["queue"] = [sys.argv[0] or "fastogram", "queue:work"]

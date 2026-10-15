@@ -660,6 +660,7 @@ dependencies = [
     { name = "starlette" },
     { name = "typer" },
     { name = "uvicorn", extra = ["standard"] },
+    { name = "watchfiles" },
 ]
 
 [package.optional-dependencies]
@@ -715,6 +716,7 @@ requires-dist = [
     { name = "taskiq-redis", marker = "extra == 'redis'", specifier = ">=1.2.4" },
     { name = "typer", specifier = ">=0.27,<0.28" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.54" },
+    { name = "watchfiles", specifier = ">=1.0" },
 ]
 provides-extras = ["pgsql", "mysql", "redis", "testing"]
 

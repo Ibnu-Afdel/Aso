@@ -24,9 +24,18 @@ import typer
 
 __all__ = ["NewAppOptions", "new"]
 
-_IGNORE = shutil.ignore_patterns(
+_IGNORE_NAMES = shutil.ignore_patterns(
     ".venv", "uv.lock", "node_modules", "__pycache__", "*.pyc", ".pytest_cache", ".ruff_cache", "database.sqlite"
 )
+# Build output and generated code from a local `npm run build` in the skeleton must never be copied.
+_IGNORE_PATHS = {("public", "build"), ("public", "hot"), ("js", "routes"), ("js", "actions"), ("js", "wayfinder")}
+
+
+def _IGNORE(directory: str, names: list[str]) -> set[str]:  # noqa: N802 - used like shutil.ignore_patterns
+    ignored = set(_IGNORE_NAMES(directory, names))
+    parent = Path(directory).name
+    ignored.update(n for n in names if (parent, n) in _IGNORE_PATHS)
+    return ignored
 
 # Must match `skeleton/pyproject.toml` verbatim -- see `_rewrite_pyproject()`.
 _DEV_SOURCES_BLOCK = (

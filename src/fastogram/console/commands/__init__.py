@@ -14,6 +14,7 @@ from fastogram.console.commands import (
     migrate,
     queue,
     route,
+    routes_generate,
     schedule,
     seed,
     session,
@@ -21,7 +22,9 @@ from fastogram.console.commands import (
     test,
 )
 
-_MODULES = (core, key, route, db, session, storage, queue, migrate, seed, schedule, make, doctor, test)
+_MODULES = (
+    core, key, route, routes_generate, db, session, storage, queue, migrate, seed, schedule, make, doctor, test,
+)
 
 
 def register_framework_commands() -> None:
