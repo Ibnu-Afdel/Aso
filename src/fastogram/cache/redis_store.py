@@ -30,6 +30,11 @@ class RedisDriver:
         else:
             await self._client.set(key, raw)
 
+    async def add_raw(self, key: str, raw: str, ttl: int | None) -> bool:
+        """`SET key value NX [EX ttl]`: Redis's own atomic check-and-set (T-44)."""
+        result = await self._client.set(key, raw, nx=True, ex=ttl)
+        return bool(result)
+
     async def forget(self, key: str) -> bool:
         deleted = await self._client.delete(key)
         return bool(deleted)

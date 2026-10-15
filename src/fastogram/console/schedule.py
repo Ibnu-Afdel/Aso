@@ -103,18 +103,11 @@ class ScheduleEvent:
         return 0
 
     async def _acquire_lock(self) -> bool:
-        """Best-effort mutual exclusion (T-45): `fastogram.cache` has no atomic `SET NX`
-        primitive exposed yet (see the build report), so this is a get-then-put check, not a
-        true atomic lock -- a race is possible between two schedulers ticking at the same instant.
-        Safe for the common case of one `schedule:work`/`schedule:run` process, which is all v1
-        supports anyway (T-45 "Several servers")."""
+        """Mutual exclusion (T-45) through `cache().add()`'s atomic check-and-set: safe even
+        across several `schedule:work`/`schedule:run` processes sharing one cache store."""
         from fastogram.cache import cache
 
-        store = cache()
-        if await store.get(self.lock_key()) is not None:
-            return False
-        await store.put(self.lock_key(), "1", ttl=(self.overlap_expires_after or 1440) * 60)
-        return True
+        return await cache().add(self.lock_key(), "1", ttl=(self.overlap_expires_after or 1440) * 60)
 
     async def _release_lock(self) -> None:
         from fastogram.cache import cache

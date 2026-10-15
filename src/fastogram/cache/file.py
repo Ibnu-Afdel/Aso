@@ -73,6 +73,34 @@ class FileDriver:
                 os.unlink(tmp_name)
             raise
 
+    async def add_raw(self, key: str, raw: str, ttl: int | None) -> bool:
+        import anyio
+
+        return await anyio.to_thread.run_sync(self._add, key, raw, ttl)
+
+    def _add(self, key: str, raw: str, ttl: int | None) -> bool:
+        """Set `key` only if absent/expired, under the same `flock` used by `_increment` so two
+        processes racing to add the same key never both "win" (T-44)."""
+        self.directory.mkdir(parents=True, exist_ok=True)
+        path = self._file_for(key)
+        lock_path = path.with_suffix(path.suffix + ".lock")
+        with open(lock_path, "w") as lock_fh:
+            fcntl.flock(lock_fh, fcntl.LOCK_EX)
+            try:
+                try:
+                    with path.open("r", encoding="utf-8") as fh:
+                        existing = json.load(fh)
+                    expires_at = existing.get("expires_at")
+                    if expires_at is None or expires_at > time.time():
+                        return False  # still present and not expired
+                except (FileNotFoundError, json.JSONDecodeError):
+                    pass
+                new_expires_at = time.time() + ttl if ttl is not None else None
+                self._write_payload(path, {"expires_at": new_expires_at, "value": raw})
+                return True
+            finally:
+                fcntl.flock(lock_fh, fcntl.LOCK_UN)
+
     async def forget(self, key: str) -> bool:
         import anyio
 

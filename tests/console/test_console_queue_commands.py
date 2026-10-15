@@ -74,6 +74,18 @@ def test_queue_restart_sets_a_cache_signal(cli_group, runner: CliRunner) -> None
     assert "restart" in result.output.lower()
 
 
+def test_queue_restart_signal_is_newer_than_a_worker_started_before_it(cli_group, runner: CliRunner) -> None:
+    import asyncio
+    from datetime import UTC, datetime
+
+    from fastogram.queue.worker import _restart_requested
+
+    started_at = datetime.now(UTC)
+    result = runner.invoke(cli_group, ["queue:restart"])
+    assert result.exit_code == 0
+    assert asyncio.run(_restart_requested(started_at)) is True
+
+
 def test_db_wipe_drops_every_table(cli_group, runner: CliRunner, console_app_dir: Path) -> None:
     runner.invoke(cli_group, ["make:migration", "create posts table"])
     runner.invoke(cli_group, ["migrate"])

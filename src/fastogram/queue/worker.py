@@ -12,14 +12,20 @@ signatures before wiring `queue:work` to it.
 from __future__ import annotations
 
 import asyncio
+from datetime import UTC, datetime
 from typing import Any
 
 from fastogram.queue import drivers
 from fastogram.queue.manager import run_job
 
+RESTART_SIGNAL_KEY = "fastogram:queue:restart"
+
 
 async def run_worker(queues: str | list[str] | None = None, *, concurrency: int = 1) -> None:
-    """Run the worker loop for the configured `redis` connection until cancelled.
+    """Run the worker loop for the configured `redis` connection until cancelled, or until
+    `queue:restart` writes a signal newer than this call's own start time (T-42): the loop stops
+    taking new messages after its current batch, like Laravel's worker noticing the restart
+    signal between jobs.
 
     `queues` is accepted for forward compatibility with `queue:work --queue=high,default`
     (priority order); this implementation listens to the connection's single configured stream.
@@ -30,12 +36,15 @@ async def run_worker(queues: str | list[str] | None = None, *, concurrency: int 
             'run_worker() only runs a loop for the "redis" queue driver; "sync" jobs run inline '
             "at dispatch time and need no worker."
         )
+    started_at = datetime.now(UTC)
     broker = drivers._redis_broker(spec)
     task = drivers._run_job_task(broker)
     await _startup(broker)
     try:
         semaphore = asyncio.Semaphore(max(1, concurrency))
         async for message in _listen(broker):
+            if await _restart_requested(started_at):
+                break
             await semaphore.acquire()
 
             async def _run(msg: Any) -> None:
@@ -49,6 +58,20 @@ async def run_worker(queues: str | list[str] | None = None, *, concurrency: int 
             asyncio.ensure_future(_run(message))
     finally:
         await _shutdown(broker)
+
+
+async def _restart_requested(started_at: datetime) -> bool:
+    """`True` once `queue:restart` has written a signal timestamp newer than `started_at`."""
+    from fastogram.cache import cache
+
+    raw = await cache().get(RESTART_SIGNAL_KEY)
+    if not raw:
+        return False
+    try:
+        signalled_at = datetime.fromisoformat(raw)
+    except ValueError:
+        return False
+    return signalled_at > started_at
 
 
 async def _startup(broker: Any) -> None:

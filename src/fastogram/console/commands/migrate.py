@@ -27,7 +27,10 @@ class MakeMigrationCommand(Command):
 
 
 class MigrateCommand(Command):
-    signature = "migrate {--force : Force the operation to run in production} {--pretend : Only output the SQL}"
+    signature = (
+        "migrate {--force : Force the operation to run in production} {--pretend : Only output the SQL} "
+        "{--seed : Seed the database after migrating}"
+    )
     description = "Run the database migrations"
 
     async def handle(self) -> int:
@@ -39,6 +42,10 @@ class MigrateCommand(Command):
                 self.line(line)
         else:
             self.info("Migration table migrated successfully.")
+        if self.option("seed") and not self.option("pretend"):
+            exit_code = await self.call("db:seed")
+            if exit_code != 0:
+                return exit_code
         return 0
 
 
@@ -96,7 +103,9 @@ class MigrateFreshCommand(Command):
         await migrations.fresh(base_path=_base_path())
         self.info("Database refreshed successfully.")
         if self.option("seed"):
-            self.warn("`--seed` has no seeders to run yet (seeders are a later task).")
+            exit_code = await self.call("db:seed")
+            if exit_code != 0:
+                return exit_code
         return 0
 
 

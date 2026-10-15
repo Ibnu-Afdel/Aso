@@ -32,6 +32,15 @@ class MemoryDriver:
         expires_at = time.monotonic() + ttl if ttl is not None else None
         self._data[key] = (expires_at, raw)
 
+    async def add_raw(self, key: str, raw: str, ttl: int | None) -> bool:
+        """Set `key` only if absent/expired. Atomic: nothing awaits between the check and the
+        write, so no other coroutine on this event loop can interleave (T-44)."""
+        if self._read(key) is not None:
+            return False
+        expires_at = time.monotonic() + ttl if ttl is not None else None
+        self._data[key] = (expires_at, raw)
+        return True
+
     async def forget(self, key: str) -> bool:
         return self._data.pop(key, None) is not None
 

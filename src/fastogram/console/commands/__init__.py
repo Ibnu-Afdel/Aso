@@ -5,9 +5,22 @@ as their own module with its own `register_all()` (the next task)."""
 
 from __future__ import annotations
 
-from fastogram.console.commands import core, db, key, migrate, queue, route, schedule, session, storage
+from fastogram.console.commands import (
+    core,
+    db,
+    doctor,
+    key,
+    make,
+    migrate,
+    queue,
+    route,
+    schedule,
+    seed,
+    session,
+    storage,
+)
 
-_MODULES = (core, key, route, db, session, storage, queue, migrate, schedule)
+_MODULES = (core, key, route, db, session, storage, queue, migrate, seed, schedule, make, doctor)
 
 
 def register_framework_commands() -> None:

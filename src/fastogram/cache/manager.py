@@ -102,6 +102,14 @@ class CacheStore:
         raw = _encode(value)
         await self._driver.put_raw(self._key(key), raw, _ttl_seconds(ttl))
 
+    async def add(self, key: str, value: Any, ttl: int | timedelta | None = None) -> bool:
+        """Atomically set `key` only if it is not already present (or has expired), returning
+        whether it was set (Laravel's `Cache::add()`). Unlike a `get()`-then-`put()` pair, each
+        driver's `add_raw` is check-and-set in one step, so this is safe for mutual exclusion
+        (the scheduler's `without_overlapping` lock, T-45)."""
+        raw = _encode(value)
+        return await self._driver.add_raw(self._key(key), raw, _ttl_seconds(ttl))
+
     async def forget(self, key: str) -> bool:
         return await self._driver.forget(self._key(key))
 

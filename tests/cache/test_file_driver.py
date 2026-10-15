@@ -60,6 +60,28 @@ async def test_increment_preserves_an_existing_ttl(tmp_path):
     del driver
 
 
+async def test_add_sets_the_key_only_when_absent(tmp_path):
+    store = _store(tmp_path)
+    assert await store.add("k", "first") is True
+    assert await store.add("k", "second") is False
+    assert await store.get("k") == "first"
+
+
+async def test_add_succeeds_again_once_the_ttl_has_expired(tmp_path):
+    store = _store(tmp_path)
+    await store.put("k", "v", ttl=1)
+    await asyncio.sleep(1.1)
+    assert await store.add("k", "fresh") is True
+    assert await store.get("k") == "fresh"
+
+
+async def test_add_is_atomic_under_concurrent_calls(tmp_path):
+    store = _store(tmp_path)
+    results = await asyncio.gather(*(store.add("lock", "winner") for _ in range(20)))
+    assert results.count(True) == 1
+    assert results.count(False) == 19
+
+
 async def test_flush_removes_every_cached_file(tmp_path):
     store = _store(tmp_path)
     await store.put("a", 1)

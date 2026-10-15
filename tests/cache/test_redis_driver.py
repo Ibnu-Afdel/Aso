@@ -56,6 +56,12 @@ async def test_increment_uses_incrby(store: CacheStore):
     assert await store.decrement("n", amount=2) == 3
 
 
+async def test_add_sets_the_key_only_when_absent(store: CacheStore):
+    assert await store.add("k", "first") is True
+    assert await store.add("k", "second") is False
+    assert await store.get("k") == "first"
+
+
 async def test_forget_deletes_the_key(store: CacheStore):
     await store.put("k", "v")
     assert await store.forget("k") is True

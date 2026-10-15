@@ -103,6 +103,28 @@ async def test_flush_clears_every_key_in_the_store():
     assert await store.get("b") is None
 
 
+async def test_add_sets_the_key_only_when_absent():
+    store = _store()
+    assert await store.add("k", "first") is True
+    assert await store.add("k", "second") is False
+    assert await store.get("k") == "first"
+
+
+async def test_add_succeeds_again_once_the_ttl_has_expired():
+    store = _store()
+    await store.put("k", "v", ttl=1)
+    await asyncio.sleep(1.1)
+    assert await store.add("k", "fresh") is True
+    assert await store.get("k") == "fresh"
+
+
+async def test_add_is_atomic_under_concurrent_calls():
+    store = _store()
+    results = await asyncio.gather(*(store.add("lock", "winner") for _ in range(20)))
+    assert results.count(True) == 1
+    assert results.count(False) == 19
+
+
 async def test_prefix_namespaces_keys_so_two_stores_do_not_collide():
     driver = MemoryDriver()
     one = CacheStore(driver, "one_")
