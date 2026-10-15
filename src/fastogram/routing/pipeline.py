@@ -122,8 +122,34 @@ def build_route_pipeline(application: Application, d: RouteDefinition, inner: AS
     items = resolve_items(application, d)
     app: ASGIApp = Boundary(inner, handler, reraise=reraise)
     for item in reversed(items):
-        app = Boundary(_build_layer(item, app), handler, reraise=reraise)
+        layer = _build_layer(item, app)
+        if item.key != "bindings":
+            layer = _SkippableInTests(layer, app, item.key)
+        app = Boundary(layer, handler, reraise=reraise)
     return app
+
+
+class _SkippableInTests:
+    """Lets `client.without_middleware("auth")` skip a route middleware (T-56).
+
+    The test client puts the aliases (or `"__all__"`) in `scope["state"]["fastogram.without_middleware"]`.
+    The flag is honoured only while `APP_ENV=testing`, so a forged request can never bypass `auth`.
+    """
+
+    def __init__(self, layer: ASGIApp, inner: ASGIApp, key: str) -> None:
+        self.layer = layer
+        self.inner = inner
+        self.key = key
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        skip = (scope.get("state") or {}).get("fastogram.without_middleware")
+        if skip and (self.key in skip or "__all__" in skip):
+            from fastogram.config import config
+
+            if config("app.environment") == "testing":
+                await self.inner(scope, receive, send)
+                return
+        await self.layer(scope, receive, send)
 
 
 class BindingsStep:
