@@ -96,7 +96,11 @@ def _module_values(module: types.ModuleType) -> dict[str, Any]:
     for name, value in vars(module).items():
         if name.startswith("_"):
             continue
-        if isinstance(value, types.ModuleType) or inspect.isfunction(value) or inspect.isclass(value):
+        if isinstance(value, types.ModuleType) or inspect.isclass(value):
+            continue
+        # Keep callables the config file defines itself (Laravel config may hold closures, e.g.
+        # `password_defaults`); drop imported helpers such as `env`.
+        if inspect.isfunction(value) and value.__module__ != module.__name__:
             continue
         if inspect.isbuiltin(value):
             continue

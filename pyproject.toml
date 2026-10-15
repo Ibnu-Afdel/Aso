@@ -54,8 +54,27 @@ dev = [
     "ruff>=0.14",
 ]
 
+[tool.hatch.build]
+exclude = [
+    "**/.venv",
+    "**/.venv/**",
+    "**/uv.lock",
+    "**/database.sqlite",
+    "**/database.sqlite-*",
+    "**/__pycache__",
+    "**/*.py[cod]",
+    "**/.pytest_cache",
+    "**/.ruff_cache",
+    "**/node_modules",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/fastogram"]
+
+# D-022: the app skeleton (`fastogram new` copies this) ships inside the wheel as
+# `fastogram/skeleton/`, not as a second top-level package.
+[tool.hatch.build.targets.wheel.force-include]
+"skeleton" = "fastogram/skeleton"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -63,6 +82,9 @@ asyncio_mode = "auto"
 asyncio_default_test_loop_scope = "session"
 asyncio_default_fixture_loop_scope = "session"
 addopts = "-p no:fastogram"
+markers = [
+    "skeleton: exercises `fastogram new` end-to-end in a subprocess (slow, but still <3 min; part of the default run)",
+]
 
 [tool.ruff]
 line-length = 110

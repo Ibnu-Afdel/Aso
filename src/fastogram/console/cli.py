@@ -123,9 +123,35 @@ def build_cli(project_root: Path | None) -> click.BaseCommand:
         pass
 
     @app.command("new", rich_help_panel="Available commands")
-    def _new(name: str = typer.Argument(None, help="The application directory to create.")) -> None:
+    def _new(
+        name: str = typer.Argument(..., help="The application directory to create."),
+        kit: str = typer.Option("react", "--kit", help="Frontend starter kit (only 'react' in v1)."),
+        database: str = typer.Option("sqlite", "--database", help="Database dialect: sqlite, pgsql or mysql."),
+        no_install: bool = typer.Option(False, "--no-install", help="Skip `uv sync`."),
+        no_npm: bool = typer.Option(False, "--no-npm", help="Skip `npm install`."),
+        no_migrate: bool = typer.Option(False, "--no-migrate", help="Skip the initial `fastogram migrate`."),
+        git: bool = typer.Option(False, "--git", help="Initialise a git repository."),
+        dev: bool = typer.Option(
+            False, "--dev", help="Keep `fastogram` as an editable path dependency on this dev checkout, instead of pinning a released version."
+        ),
+        force: bool = typer.Option(False, "--force", help="Overwrite the target directory if it already exists."),
+    ) -> None:
         """Create a new FastoGram application."""
-        typer.echo("`fastogram new` is coming in a later release.")
+        from fastogram.console.commands.new import NewAppOptions
+        from fastogram.console.commands.new import new as new_command
+
+        options = NewAppOptions(
+            kit=kit,
+            database=database,
+            no_install=no_install,
+            no_npm=no_npm,
+            no_migrate=no_migrate,
+            git=git,
+            dev=dev,
+            force=force,
+        )
+        exit_code = asyncio.run(new_command(name, options))
+        raise SystemExit(exit_code)
 
     @app.command("list", rich_help_panel="Available commands")
     def _list() -> None:

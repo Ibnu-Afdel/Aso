@@ -1,0 +1,7 @@
+"""Validates a password-confirmation submission (T-38, auth/confirm-password)."""
+
+from fastogram.http import FormRequest
+
+
+class ConfirmPasswordRequest(FormRequest):
+    password: str

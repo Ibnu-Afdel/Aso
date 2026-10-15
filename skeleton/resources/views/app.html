@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        (function () {
+            function readCookie(name) {
+                var match = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+                return match ? decodeURIComponent(match.pop()) : null;
+            }
+            var appearance = readCookie("appearance") || "system";
+            var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            if (appearance === "dark" || (appearance === "system" && prefersDark)) {
+                document.documentElement.classList.add("dark");
+            }
+        })();
+    </script>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    {{ vite_react_refresh() }}
+    {{ vite(["resources/css/app.css", "resources/js/app.tsx", "resources/js/pages/" ~ page.component ~ ".tsx"]) }}
+    {{ inertia_head("<title>" ~ config("app.name") ~ "</title>") }}
+</head>
+<body class="font-sans antialiased">
+    {{ inertia_app() }}
+</body>
+</html>

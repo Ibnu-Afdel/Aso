@@ -3,12 +3,14 @@ the outside-a-project surface."""
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from click.testing import CliRunner
 
 from fastogram.console.cli import build_cli
 
 
-def test_outside_a_project_only_new_list_and_version_work(runner: CliRunner) -> None:
+def test_outside_a_project_only_new_list_and_version_work(runner: CliRunner, tmp_path: Path) -> None:
     group = build_cli(None)
 
     help_result = runner.invoke(group, ["--help"])
@@ -20,9 +22,14 @@ def test_outside_a_project_only_new_list_and_version_work(runner: CliRunner) -> 
     assert version_result.exit_code == 0
     assert "FastoGram" in version_result.output
 
-    new_result = runner.invoke(group, ["new", "my-app"])
-    assert new_result.exit_code == 0
-    assert "coming" in new_result.output.lower()
+    # `--no-install` (so no `uv sync`/`npm install`/`fastogram migrate`) keeps this instant and
+    # offline; the skeleton-copying logic itself is exercised here, the install/migrate steps by
+    # `tests/skeleton/test_new_command.py`.
+    target = tmp_path / "my-app"
+    new_result = runner.invoke(group, ["new", str(target), "--no-install", "--no-npm", "--no-migrate"])
+    assert new_result.exit_code == 0, new_result.output
+    assert (target / "bootstrap" / "app.py").is_file()
+    assert (target / "pyproject.toml").is_file()
 
 
 def test_outside_a_project_other_commands_get_a_clear_message(runner: CliRunner) -> None:
