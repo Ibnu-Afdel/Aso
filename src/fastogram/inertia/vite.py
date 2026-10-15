@@ -125,9 +125,12 @@ def vite(*entries: str | list[str] | tuple[str, ...]) -> Markup:
             raise ViteManifestNotFound(entry)
         for css in chunk.get("css", []):
             tags.append(f'<link rel="stylesheet" href="/build/{css}">')
-        tags.append(f'<script type="module" src="/build/{chunk["file"]}"></script>')
+        if chunk["file"].endswith(STYLE_EXTENSIONS):  # a CSS entry builds to a .css file, not a script
+            tags.append(f'<link rel="stylesheet" href="/build/{chunk["file"]}">')
+        else:
+            tags.append(f'<script type="module" src="/build/{chunk["file"]}"></script>')
         emit_preloads(entry)
-    return Markup("\n".join(tags))
+    return Markup("\n".join(dict.fromkeys(tags)))
 
 
 def vite_asset(path: str) -> str:

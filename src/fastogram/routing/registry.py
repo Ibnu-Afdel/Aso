@@ -139,7 +139,15 @@ def _add_fallback(application: Application, fastapi_app: FastAPI, path: str, gro
         path, _not_found, methods=["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], include_in_schema=False
     )
     route = fastapi_app.router.routes[-1]
-    route.app = application.group_stack(group, route.app)  # type: ignore[attr-defined]
+    route.app = _public_first(group, application.group_stack(group, route.app))  # type: ignore[attr-defined]
+
+
+def _public_first(group: str, app: Any) -> Any:
+    if group != "web":
+        return app
+    from fastogram.routing.static import PublicFilesFirst
+
+    return PublicFilesFirst(app)
 
 
 def _compile_fallback(application: Application, fastapi_app: FastAPI, fb: RouteDefinition, path: str, group: str) -> None:
@@ -153,7 +161,7 @@ def _compile_fallback(application: Application, fastapi_app: FastAPI, fb: RouteD
     from fastogram.routing.pipeline import build_route_pipeline
 
     pipeline_app = build_route_pipeline(application, fb, route.app)
-    route.app = application.group_stack(group, pipeline_app)  # type: ignore[attr-defined]
+    route.app = _public_first(group, application.group_stack(group, pipeline_app))  # type: ignore[attr-defined]
 
 
 # ---------------------------------------------------------------- recording

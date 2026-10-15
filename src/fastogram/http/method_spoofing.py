@@ -19,6 +19,15 @@ def _header_override(scope: Scope) -> str | None:
     return None
 
 
+def _query_override(scope: Scope) -> str | None:
+    """`?_method=PATCH`, as Wayfinder-style `.form()` helpers emit (Laravel reads `_method` from
+    all input, query string included)."""
+    from urllib.parse import parse_qs
+
+    values = parse_qs(scope.get("query_string", b"").decode("latin-1")).get("_method")
+    return values[0].upper() if values else None
+
+
 def _content_type(scope: Scope) -> str:
     for name, value in scope.get("headers", []):
         if name == b"content-type":
@@ -40,7 +49,7 @@ class MethodSpoofing:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] == "http" and scope["method"] == "POST" and not _is_api_path(scope):
-            method = _header_override(scope)
+            method = _header_override(scope) or _query_override(scope)
             if method is None:
                 method = await self._form_override(scope, receive)
             if method in ALLOWED:

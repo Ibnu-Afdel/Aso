@@ -4,7 +4,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "prebuild": "fastogram routes:generate --with-form",
+        "prebuild": "uv run fastogram routes:generate --with-form",
         "build": "vite build",
         "types:check": "tsc --noEmit"
     },

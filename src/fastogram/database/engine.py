@@ -142,9 +142,11 @@ def make_engine(url: str, connection: dict[str, Any] | None = None, *, name: str
         install_sqlite_recipe(
             engine,
             {
+                # T-30: foreign keys, a 5 s busy timeout and WAL are on by default. Without WAL, the
+                # request's open read transaction blocks the session driver's own write connection.
                 "foreign_keys": connection.get("foreign_key_constraints", True),
-                "busy_timeout": connection.get("busy_timeout"),
-                "journal_mode": connection.get("journal_mode") if sa_url.database not in (None, "", ":memory:") else None,
+                "busy_timeout": connection.get("busy_timeout", 5000),
+                "journal_mode": connection.get("journal_mode", "wal") if sa_url.database not in (None, "", ":memory:") else None,
             },
         )
     else:

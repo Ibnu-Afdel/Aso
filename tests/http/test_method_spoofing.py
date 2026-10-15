@@ -35,3 +35,10 @@ async def test_method_spoofing_is_not_applied_under_the_api_prefix(client: httpx
     this POST to PUT, it would succeed; instead it must 404 as a plain, un-spoofed POST."""
     r = await client.post("/api/misc/echo", data={"_method": "PUT"})
     assert r.status_code == 404
+
+
+def test_query_string_method_override_is_read() -> None:
+    from fastogram.http.method_spoofing import _query_override
+
+    assert _query_override({"query_string": b"_method=patch&x=1"}) == "PATCH"
+    assert _query_override({"query_string": b"x=1"}) is None
