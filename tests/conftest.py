@@ -20,10 +20,22 @@ def reset_fixture_apps() -> None:
             del sys.modules[name]
     from fastogram.cache import flush_all
     from fastogram.database import Model
+    from fastogram.events import reset_events
+    from fastogram.mail import reset_mail
+    from fastogram.queue import reset_queue
     from fastogram.storage import storage
 
     storage.reset_fakes()
     flush_all()
+    # Event._listeners/Mail._fake/Queue._fake are process-global (T-46, T-41, T-42): a fixture
+    # app's `create_app()` in `bootstrap/app.py` calls `Event.listen()` every time it runs, and a
+    # test that leaves `Event.fake()`/`Mail.fake()`/`Queue.fake()` on would silently swallow the
+    # next test's real dispatch/send. The listener registry itself is also cleared, not just the
+    # fakes, since fixture modules are purged and reimported above (see `reset_events()`'s
+    # docstring for why stale class-keyed entries would otherwise accumulate).
+    reset_events()
+    reset_mail()
+    reset_queue()
     Model.registry.dispose()
     Model.metadata.clear()
     with_registry = getattr(Model.registry, "_class_registry", None)

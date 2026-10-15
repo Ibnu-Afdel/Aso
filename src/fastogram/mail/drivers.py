@@ -97,7 +97,9 @@ async def _deliver_smtp(message: dict[str, Any], spec: dict[str, Any]) -> None:
         username=spec.get("username") or None,
         password=spec.get("password") or None,
         use_tls=use_tls,
-        start_tls=None if use_tls else True,
+        # `None`: "STARTTLS when offered" (T-41) is aiosmtplib's negotiated upgrade; forcing
+        # `True` would raise against a server that does not advertise STARTTLS.
+        start_tls=None,
     )
 
 
