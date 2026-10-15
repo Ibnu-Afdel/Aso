@@ -98,3 +98,6 @@ ignore = ["E501", "UP046", "UP047"]
 [tool.ruff.lint.isort]
 known-first-party = ["fastogram"]
 known-local-folder = ["app", "bootstrap", "config", "routes", "database"]
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/spikes", "/storage", "/dist", "**/node_modules", "**/.venv"]
