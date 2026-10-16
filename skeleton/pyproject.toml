@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "app"
 version = "0.1.0"
-description = "A Aso application"
+description = "An Aso application"
 requires-python = ">=3.12"
 dependencies = [
     "aso",

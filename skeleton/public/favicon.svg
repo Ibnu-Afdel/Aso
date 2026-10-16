@@ -6,11 +6,8 @@
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <g fill="#fff" transform="translate(11 12) scale(1) translate(7 0) skewX(-14)">
-    <rect x="13" y="4" width="7" height="32" rx="1.5"/>
-    <rect x="13" y="4" width="22" height="7" rx="1.5"/>
-    <rect x="13" y="17" width="16" height="6.5" rx="1.5"/>
-    <rect x="1" y="17" width="8" height="2.5" rx="1.25"/>
-    <rect x="4" y="21" width="5" height="2.5" rx="1.25"/>
+  <g fill="#fff" transform="translate(8 8) scale(1.2)">
+    <path d="M16.5 4h7L38 36h-7.5L20 13.5 9.5 36H2L16.5 4Z"/>
+    <path d="M20 22.5l4.5 4.5-4.5 4.5-4.5-4.5Z"/>
   </g>
 </svg>

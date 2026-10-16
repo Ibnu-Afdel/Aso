@@ -119,7 +119,7 @@ def _rewrite_pyproject(path: Path, *, app_name: str, options: NewAppOptions) -> 
     if options.dev:
         root = dev_repo_root()
         if root is None:
-            raise NewAppError("`--dev` needs a Aso dev checkout (no `src/aso` was found near the running `aso`).")
+            raise NewAppError("`--dev` needs an Aso dev checkout (no `src/aso` was found near the running `aso`).")
         dev_block = _DEV_SOURCES_BLOCK.replace('path = ".."', f'path = "{root.as_posix()}"')
         text = text.replace(_DEV_SOURCES_BLOCK, dev_block)
     else:

@@ -157,7 +157,7 @@ class DoctorCommand(Command):
 
 _AGENTS_BODY = """# Instructions for AI Agents
 
-You are developing on a Aso project (FastAPI + Inertia.js v3 + React 19).
+You are developing on an Aso project (FastAPI + Inertia.js v3 + React 19).
 Follow these conventions strictly.
 
 ## 1. Generator First

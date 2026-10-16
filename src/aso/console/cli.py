@@ -183,7 +183,7 @@ def _disable_everything_but_new_and_list(group: click.Group) -> None:
 
         def _unavailable(**_kwargs: Any) -> None:
             click.echo(
-                f'"{cmd_name}" needs a Aso project (a directory with bootstrap/app.py). '
+                f'"{cmd_name}" needs an Aso project (a directory with bootstrap/app.py). '
                 "Run this inside a project, or create one with `aso new`.",
                 err=True,
             )

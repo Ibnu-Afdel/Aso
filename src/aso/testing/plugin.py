@@ -1,4 +1,4 @@
-"""`aso.testing.plugin` (T-55): the pytest plugin a Aso app's `tests/conftest.py`
+"""`aso.testing.plugin` (T-55): the pytest plugin an Aso app's `tests/conftest.py`
 loads with `pytest_plugins = ["aso.testing.plugin"]` (and the entry point in
 `pyproject.toml`, which this library's own suite disables with `-p no:aso`).
 
