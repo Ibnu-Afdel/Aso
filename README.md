@@ -5,6 +5,7 @@ The Aso framework is a Laravel-style web framework for Python: **FastAPI** on th
 `aso migrate`, ...).
 
 > **Status: early (0.2.0).** It works end to end, but expect rough edges and breaking changes.
+> Versions up to 0.1.1 were published as `fastogram`; that package is retired.
 > The previous Telegram bot template (0.0.x, FastAPI + aiogram) is kept under the tag
 > `legacy-telegram-template` and on the `release/public-ready` branch.
 
