@@ -3,6 +3,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowUpRight } from 'lucide-react';
 import AppLogoIcon from '@/components/app-logo-icon';
+import AsoWordmark from '@/components/aso-wordmark';
 import { dashboard, login, register } from '@/routes';
 
 const steps = [
@@ -61,7 +62,10 @@ export default function Welcome() {
 
                 <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-6 pt-8 pb-20 text-center">
                     <AppLogoIcon className="size-20 fill-current text-[#213231] dark:text-[#ece6da]" />
-                    <h1 className="mt-8 text-6xl font-semibold tracking-tight sm:text-7xl">aso</h1>
+                    <h1 className="mt-9">
+                        <span className="sr-only">aso</span>
+                        <AsoWordmark aria-hidden className="h-12 w-auto fill-current sm:h-14" />
+                    </h1>
                     <p className="mt-5 max-w-lg text-lg leading-relaxed text-[#213231]/70 dark:text-[#ece6da]/65">
                         The batteries-included Python web framework. FastAPI on the server, React on the client, Inertia in between.
                     </p>
