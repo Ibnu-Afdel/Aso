@@ -1,12 +1,16 @@
-// The Aso mark: an open "A" with a diamond in place of the crossbar. Single colour, so it
-// follows `fill-current`/`text-*` like any icon.
+// The Aso mark: a faceted crystal. The three dark facets follow `fill-current`/`text-*` like
+// any icon; the sage facet keeps the brand accent in every theme.
 import type { SVGAttributes } from 'react';
 
 export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
     return (
-        <svg {...props} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16.5 4h7L38 36h-7.5L20 13.5 9.5 36H2L16.5 4Z" />
-            <path d="M20 22.5l4.5 4.5-4.5 4.5-4.5-4.5Z" />
+        <svg {...props} viewBox="-62 0 440 440" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="currentColor" strokeWidth={12} strokeLinejoin="round">
+                <polygon points="71,94 75,98 111,265 114,310 104,395 12,306 10,157" />
+                <polygon points="157,10 218,80 220,98 159,268 143,271 98,85 100,75" />
+                <polygon points="151,305 240,360 239,364 154,429 144,430 129,419 141,308" />
+                <polygon points="245,119 305,171 305,265 263,331 252,334 183,287 182,279" fill="#6d8b71" stroke="#6d8b71" />
+            </g>
         </svg>
     );
 }

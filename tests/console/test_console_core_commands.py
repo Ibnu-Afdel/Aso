@@ -65,6 +65,7 @@ def test_serve_falls_back_to_the_next_free_port(cli_group, runner: CliRunner, mo
     chosen = argv[argv.index("--port") + 1]
     assert chosen != str(port)
     assert env["APP_URL"].endswith(f":{chosen}")
+    assert env["ASO_DEV_URL"] == f"http://127.0.0.1:{chosen}"
 
 
 def test_app_url_for_port_swaps_only_the_port() -> None:

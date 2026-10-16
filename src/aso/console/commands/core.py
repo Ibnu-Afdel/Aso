@@ -140,6 +140,8 @@ def _child_env(port: int) -> dict[str, str]:
     env["PATH"] = os.pathsep.join([str(Path(sys.executable).parent), env.get("PATH", "")])
     env["PYTHONUNBUFFERED"] = "1"
     env["APP_URL"] = app_url_for_port(str(config("app.url") or "http://localhost"), port)
+    # The URL `dev` tells you to open; the Vite plugin prints the same one.
+    env["ASO_DEV_URL"] = f"http://127.0.0.1:{port}"
     return env
 
 

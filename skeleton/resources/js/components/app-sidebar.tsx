@@ -28,7 +28,7 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/Ibnu-Afdel/FastGram',
+        href: 'https://github.com/Ibnu-Afdel/Aso',
         icon: FolderGit2,
     },
     {

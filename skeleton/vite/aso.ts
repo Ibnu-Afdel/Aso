@@ -66,7 +66,7 @@ export default function aso(options: AsoOptions): Plugin {
         },
 
         configureServer(server: ViteDevServer) {
-            const appUrl = process.env.APP_URL || loadEnv(resolved.mode, resolved.envDir || process.cwd(), "").APP_URL || "http://127.0.0.1:8000";
+            const appUrl = process.env.ASO_DEV_URL || process.env.APP_URL || loadEnv(resolved.mode, resolved.envDir || process.cwd(), "").APP_URL || "http://127.0.0.1:8000";
 
             server.httpServer?.once("listening", () => {
                 fs.mkdirSync(path.dirname(hotFile), { recursive: true });
@@ -108,9 +108,9 @@ export default function aso(options: AsoOptions): Plugin {
                 res.setHeader("Content-Type", "text/html; charset=utf-8");
                 res.end(
                     `<!doctype html><meta charset="utf-8"><title>Aso · Vite</title>` +
-                        `<body style="font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#0b1020;color:#e2e8f0">` +
+                        `<body style="font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#121917;color:#ece6da">` +
                         `<div style="text-align:center;max-width:32rem;padding:1rem"><p style="opacity:.7">This is the Vite dev server. It only serves assets.</p>` +
-                        `<p>Your app is at <a style="color:#38bdf8" href="${appUrl}">${appUrl}</a></p></div></body>`,
+                        `<p>Your app is at <a style="color:#8fae93" href="${appUrl}">${appUrl}</a></p></div></body>`,
                 );
             });
         },

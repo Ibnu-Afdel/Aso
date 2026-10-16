@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "aso"
 version = "0.2.0"
-description = "A Laravel-style web framework for Python: FastAPI + Inertia.js + an artisan-like CLI"
+description = "The Aso framework: a Laravel-style web framework for Python (FastAPI + Inertia.js + an artisan-like CLI)"
 readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "MIT"}
@@ -34,6 +34,11 @@ dependencies = [
     "watchfiles>=1.0",
     "croniter>=6.2,<7",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Ibnu-Afdel/Aso"
+Source = "https://github.com/Ibnu-Afdel/Aso"
+Issues = "https://github.com/Ibnu-Afdel/Aso/issues"
 
 [project.optional-dependencies]
 pgsql = ["asyncpg>=0.32"]

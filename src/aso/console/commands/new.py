@@ -76,7 +76,7 @@ def _is_dev_repo_root(path: Path) -> bool:
 
 
 def dev_repo_root() -> Path | None:
-    """The `FastGram` repo root, if `aso` is running from a dev checkout (editable install
+    """The Aso repo root, if `aso` is running from a dev checkout (editable install
     or `uv run` inside the repo), used both to find the skeleton and to resolve `--dev`'s path
     source."""
     for candidate in (_package_root(), *_package_root().parents):

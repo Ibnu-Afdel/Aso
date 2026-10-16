@@ -1,13 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0ea5e9"/>
-      <stop offset="1" stop-color="#6366f1"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <g fill="#fff" transform="translate(8 8) scale(1.2)">
-    <path d="M16.5 4h7L38 36h-7.5L20 13.5 9.5 36H2L16.5 4Z"/>
-    <path d="M20 22.5l4.5 4.5-4.5 4.5-4.5-4.5Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-62 0 440 440">
+  <style>
+    .ink { fill: #213231; stroke: #213231; }
+    @media (prefers-color-scheme: dark) { .ink { fill: #f6f1e8; stroke: #f6f1e8; } }
+  </style>
+  <g stroke-width="12" stroke-linejoin="round">
+    <polygon class="ink" points="71,94 75,98 111,265 114,310 104,395 12,306 10,157"/>
+    <polygon class="ink" points="157,10 218,80 220,98 159,268 143,271 98,85 100,75"/>
+    <polygon class="ink" points="151,305 240,360 239,364 154,429 144,430 129,419 141,308"/>
+    <polygon fill="#6d8b71" stroke="#6d8b71" points="245,119 305,171 305,265 263,331 252,334 183,287 182,279"/>
   </g>
 </svg>
