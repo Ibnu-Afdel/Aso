@@ -195,6 +195,11 @@ def _disable_everything_but_new_and_list(group: click.Group) -> None:
 
 
 def main() -> None:
+    if not os.environ.get(boot.HANDED_OVER_ENV):
+        sys.stderr.write(
+            "Note: FastoGram is now Aso. This package is retired; use `uvx aso new myapp` "
+            "(https://pypi.org/project/aso/).\n"
+        )
     project_root = boot.find_project_root()
     if project_root is not None:
         target = boot.hand_over_target(project_root)

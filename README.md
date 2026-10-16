@@ -1,3 +1,6 @@
+> **FastoGram is now [Aso](https://pypi.org/project/aso/).** This package is retired and gets no
+> further updates. Start a new app with `uvx aso new myapp`; see https://github.com/Ibnu-Afdel/Aso.
+
 # FastoGram
 
 A Laravel-style web framework for Python: **FastAPI** on the backend, **Inertia.js v3 + React**
