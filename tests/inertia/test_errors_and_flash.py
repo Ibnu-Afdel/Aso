@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from conftest import INERTIA
 
-from fastogram.config import set_config
+from aso.config import set_config
 
 
 async def _post_invalid_title(client, xsrf):

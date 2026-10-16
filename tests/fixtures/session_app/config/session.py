@@ -1,4 +1,4 @@
-from fastogram.config import env
+from aso.config import env
 
 driver = env("SESSION_DRIVER", "array")
 lifetime = int(env("SESSION_LIFETIME", 120))

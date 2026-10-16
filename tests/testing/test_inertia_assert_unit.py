@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.testing.inertia_assert import AssertableInertia
+from aso.testing.inertia_assert import AssertableInertia
 
 
 def _page(**props: object) -> dict[str, object]:

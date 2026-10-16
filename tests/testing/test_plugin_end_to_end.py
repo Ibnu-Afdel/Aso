@@ -1,8 +1,8 @@
-"""T-55: end-to-end test of `fastogram.testing.plugin` itself, run the way a real app's test
+"""T-55: end-to-end test of `aso.testing.plugin` itself, run the way a real app's test
 suite would run it -- a separate `pytest` subprocess, inside a tiny fixture project
 (`tests/fixtures/plugin_project/`) that has no `database/migrations/` directory (exercising the
 `Model.metadata.create_all` fallback) and relies on the `pytest11` entry point to autoload the
-plugin (nothing in that project disables it with `-p no:fastogram`, unlike this repo's own
+plugin (nothing in that project disables it with `-p no:aso`, unlike this repo's own
 `pyproject.toml`).
 
 These are `async def` tests only so `tests/testing/conftest.py`'s autouse `db` fixture (async)

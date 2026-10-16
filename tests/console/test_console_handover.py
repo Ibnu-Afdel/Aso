@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from fastogram.console import boot
+from aso.console import boot
 
 
 @pytest.fixture
@@ -38,17 +38,17 @@ def test_hand_over_target_is_none_without_a_project_venv(project: Path) -> None:
 def test_hand_over_target_points_at_the_projects_own_copy(project: Path) -> None:
     venv_bin = project / ".venv" / "bin"
     venv_bin.mkdir(parents=True)
-    fastogram_bin = venv_bin / "fastogram"
-    fastogram_bin.write_text("#!/bin/sh\n")
-    fastogram_bin.chmod(0o755)
+    aso_bin = venv_bin / "aso"
+    aso_bin.write_text("#!/bin/sh\n")
+    aso_bin.chmod(0o755)
 
-    assert boot.hand_over_target(project) == fastogram_bin
+    assert boot.hand_over_target(project) == aso_bin
 
 
 def test_hand_over_target_respects_the_opt_out_env_var(project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     venv_bin = project / ".venv" / "bin"
     venv_bin.mkdir(parents=True)
-    (venv_bin / "fastogram").write_text("#!/bin/sh\n")
+    (venv_bin / "aso").write_text("#!/bin/sh\n")
 
     monkeypatch.setenv(boot.NO_HANDOVER_ENV, "1")
     assert boot.hand_over_target(project) is None
@@ -57,7 +57,7 @@ def test_hand_over_target_respects_the_opt_out_env_var(project: Path, monkeypatc
 def test_hand_over_target_is_none_once_already_handed_over(project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     venv_bin = project / ".venv" / "bin"
     venv_bin.mkdir(parents=True)
-    (venv_bin / "fastogram").write_text("#!/bin/sh\n")
+    (venv_bin / "aso").write_text("#!/bin/sh\n")
 
     monkeypatch.setenv(boot.HANDED_OVER_ENV, "1")
     assert boot.hand_over_target(project) is None
@@ -66,8 +66,8 @@ def test_hand_over_target_is_none_once_already_handed_over(project: Path, monkey
 def test_hand_over_target_is_none_when_we_are_already_that_copy(project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     venv_bin = project / ".venv" / "bin"
     venv_bin.mkdir(parents=True)
-    fastogram_bin = venv_bin / "fastogram"
-    fastogram_bin.write_text("#!/bin/sh\n")
+    aso_bin = venv_bin / "aso"
+    aso_bin.write_text("#!/bin/sh\n")
 
-    monkeypatch.setattr(sys, "argv", [str(fastogram_bin), "migrate"])
+    monkeypatch.setattr(sys, "argv", [str(aso_bin), "migrate"])
     assert boot.hand_over_target(project) is None

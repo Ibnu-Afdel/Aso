@@ -10,7 +10,7 @@ from __future__ import annotations
 import _jobs
 import pytest
 
-from fastogram.queue.manager import _backoff_for, run_job
+from aso.queue.manager import _backoff_for, run_job
 
 
 async def test_backoff_uses_the_last_value_past_the_end_of_the_list():
@@ -26,7 +26,7 @@ async def test_flaky_job_succeeds_after_enough_retries(db):
     payload = _jobs.make_payload(_jobs.FlakyJob, {"key": "a", "fail_times": 2}, tries=3, backoff=0)
     await run_job(payload)
     assert _jobs.attempts["a"] == 3
-    from fastogram.queue.failed import list_failed
+    from aso.queue.failed import list_failed
 
     assert await list_failed() == []
 
@@ -35,7 +35,7 @@ async def test_job_exhausting_tries_is_recorded_failed(db):
     payload = _jobs.make_payload(_jobs.FlakyJob, {"key": "b", "fail_times": 5}, tries=2, backoff=0)
     await run_job(payload)
     assert _jobs.attempts["b"] == 2
-    from fastogram.queue.failed import list_failed
+    from aso.queue.failed import list_failed
 
     rows = await list_failed()
     assert len(rows) == 1
@@ -59,13 +59,13 @@ async def test_release_past_tries_is_dropped_without_failing(db):
     payload = _jobs.make_payload(_jobs.ReleasingJob, {"key": "r2"}, tries=1)
     await run_job(payload)
     assert _jobs.attempts["r2"] == 1
-    from fastogram.queue.failed import list_failed
+    from aso.queue.failed import list_failed
 
     assert await list_failed() == []  # dropped silently: release() is not a failure
 
 
 async def test_run_job_opens_a_fresh_scope_not_the_callers(db):
-    from fastogram.database.scope import current_scope
+    from aso.database.scope import current_scope
 
     outer_session_id = id(current_scope().session())
     payload = _jobs.make_payload(_jobs.EchoJob, {"value": "worker"}, connection="redis")

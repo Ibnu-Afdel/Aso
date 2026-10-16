@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx2 as httpx
 from starlette.responses import PlainTextResponse
 
-from fastogram.routing.static import PublicFilesFirst
+from aso.routing.static import PublicFilesFirst
 
 
 async def _fallback(scope, receive, send):

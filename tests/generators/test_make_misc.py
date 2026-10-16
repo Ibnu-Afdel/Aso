@@ -22,7 +22,7 @@ def test_make_request(cli_group, runner: CliRunner, console_app_dir: Path) -> No
     assert "Created:" in result.output
     content = path.read_text()
     assert "class StorePostRequest(FormRequest):" in content
-    assert "from fastogram.http import FormRequest" in content
+    assert "from aso.http import FormRequest" in content
     _ruff_check(path)
 
 
@@ -96,7 +96,7 @@ def test_make_job(cli_group, runner: CliRunner, console_app_dir: Path) -> None:
     path = console_app_dir / "app" / "jobs" / "send_welcome_email.py"
     content = path.read_text()
     assert "class SendWelcomeEmail(Job):" in content
-    assert "from fastogram.queue import Job" in content
+    assert "from aso.queue import Job" in content
     _ruff_check(path)
 
 

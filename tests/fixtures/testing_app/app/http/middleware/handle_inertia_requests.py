@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from fastogram.auth import auth
-from fastogram.config import config
-from fastogram.inertia import InertiaMiddleware
+from aso.auth import auth
+from aso.config import config
+from aso.inertia import InertiaMiddleware
 
 
 class HandleInertiaRequests(InertiaMiddleware):

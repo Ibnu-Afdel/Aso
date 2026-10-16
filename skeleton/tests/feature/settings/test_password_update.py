@@ -1,5 +1,5 @@
-from fastogram.security import hash as hash_
-from fastogram.testing import TestClient
+from aso.security import hash as hash_
+from aso.testing import TestClient
 
 
 async def test_password_screen_is_displayed(client: TestClient, user) -> None:

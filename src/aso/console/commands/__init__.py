@@ -1,0 +1,35 @@
+"""Framework commands, one module per group (T-50). `register_framework_commands()` registers
+every one of them into `aso.console.registry` -- generators (`make:controller`,
+`make:model`, ...), factories/seeders and `aso new`/`doctor` plug in here the same way,
+as their own module with its own `register_all()` (the next task)."""
+
+from __future__ import annotations
+
+from aso.console.commands import (
+    core,
+    db,
+    doctor,
+    key,
+    make,
+    migrate,
+    queue,
+    route,
+    routes_generate,
+    schedule,
+    seed,
+    session,
+    storage,
+    test,
+)
+
+_MODULES = (
+    core, key, route, routes_generate, db, session, storage, queue, migrate, seed, schedule, make, doctor, test,
+)
+
+
+def register_framework_commands() -> None:
+    """Idempotent: each module's `register_all()` just overwrites its own dict entries, so
+    calling this on every `boot_console()` is cheap and safe even after a test's
+    `reset_registry(keep="none")` has cleared everything, including framework commands."""
+    for module in _MODULES:
+        module.register_all()

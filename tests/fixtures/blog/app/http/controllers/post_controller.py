@@ -1,5 +1,5 @@
-from fastogram.http import Controller, redirect
-from fastogram.inertia import defer, inertia
+from aso.http import Controller, redirect
+from aso.inertia import defer, inertia
 
 from app.http.requests.store_post_request import StorePostRequest
 from app.models.post import Post

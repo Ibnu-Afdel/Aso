@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram import context
-from fastogram.log import log
-from fastogram.log.testing import LogCapture
+from aso import context
+from aso.log import log
+from aso.log.testing import LogCapture
 
 
 def test_context_kwargs_are_attached_to_the_record():
@@ -53,7 +53,7 @@ def test_redaction_is_case_insensitive_on_the_key():
 
 
 def test_redact_list_is_configurable(monkeypatch: pytest.MonkeyPatch):
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     set_config("logging.redact", ["ssn"])
     try:

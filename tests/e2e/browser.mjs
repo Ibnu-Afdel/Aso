@@ -1,4 +1,4 @@
-// End-to-end run of a freshly generated FastoGram app (fastogram new) in a real browser.
+// End-to-end run of a freshly generated Aso app (aso new) in a real browser.
 import { chromium } from "playwright";
 import { execSync } from "node:child_process";
 

@@ -1,7 +1,7 @@
 """`redis` cache driver tests (T-44).
 
 Skips when the `redis` package is not installed (it is an optional dependency,
-`fastogram[redis]`) and again when no Redis server answers at `REDIS_URL` (default
+`aso[redis]`) and again when no Redis server answers at `REDIS_URL` (default
 `redis://127.0.0.1:6379/1`), so this file is always safe to run in CI without a live Redis.
 """
 
@@ -13,8 +13,8 @@ import pytest
 
 redis_asyncio = pytest.importorskip("redis.asyncio", reason="the `redis` package is not installed")
 
-from fastogram.cache.manager import CacheStore  # noqa: E402
-from fastogram.cache.redis_store import RedisDriver  # noqa: E402
+from aso.cache.manager import CacheStore  # noqa: E402
+from aso.cache.redis_store import RedisDriver  # noqa: E402
 
 REDIS_URL = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/1")
 
@@ -34,7 +34,7 @@ async def _server_available() -> bool:
 async def store():
     if not await _server_available():
         pytest.skip(f"no Redis server answering at {REDIS_URL}")
-    cache_store = CacheStore(RedisDriver(REDIS_URL), "fastogram_cache_test_")
+    cache_store = CacheStore(RedisDriver(REDIS_URL), "aso_cache_test_")
     await cache_store.flush()
     yield cache_store
     await cache_store.flush()

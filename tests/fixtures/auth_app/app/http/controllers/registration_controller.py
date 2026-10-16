@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from fastogram.auth import auth
-from fastogram.auth.events import Registered
-from fastogram.http import Controller, Request
-from fastogram.http.responses import redirect
-from fastogram.routing import route
-from fastogram.session import session
-from fastogram.validation import ValidationException
+from aso.auth import auth
+from aso.auth.events import Registered
+from aso.http import Controller, Request
+from aso.http.responses import redirect
+from aso.routing import route
+from aso.session import session
+from aso.validation import ValidationException
 
 from app.models.user import User
 

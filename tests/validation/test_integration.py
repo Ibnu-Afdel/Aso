@@ -92,7 +92,7 @@ async def test_error_bag_is_flashed_under_its_own_key(client, csrf_headers):
 
 async def test_unique_rule_against_sqlite_with_ignore(client, csrf_headers):
     # Seed a user directly through the DB, inside the same app.
-    from fastogram.database.scope import open_scope
+    from aso.database.scope import open_scope
 
     async with open_scope():
         from app.models.user import User
@@ -121,7 +121,7 @@ async def test_unique_rule_against_sqlite_with_ignore(client, csrf_headers):
 
 
 async def test_exists_rule_against_sqlite(client, csrf_headers):
-    from fastogram.database.scope import open_scope
+    from aso.database.scope import open_scope
 
     async with open_scope():
         from app.models.team import Team
@@ -197,7 +197,7 @@ async def test_file_rule_rejects_bad_mime_and_accepts_good_one(client, csrf_head
 
 
 async def test_image_rule_with_fake_upload(client, csrf_headers):
-    from fastogram.validation.uploaded_file import UploadedFile
+    from aso.validation.uploaded_file import UploadedFile
 
     image = UploadedFile.fake().image("photo.png", width=4, height=4)
     headers = csrf_headers

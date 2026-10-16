@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import asyncio
 
-from fastogram.cache.manager import CacheStore
-from fastogram.cache.memory import MemoryDriver
+from aso.cache.manager import CacheStore
+from aso.cache.memory import MemoryDriver
 
 
 def _store() -> CacheStore:

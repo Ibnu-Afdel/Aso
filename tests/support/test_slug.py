@@ -1,4 +1,4 @@
-from fastogram.support import slug
+from aso.support import slug
 
 
 def test_basic_slug() -> None:
@@ -30,4 +30,4 @@ def test_strips_leading_and_trailing_separators() -> None:
 
 
 def test_app_name_slug_used_by_session_config() -> None:
-    assert slug("FastoGram") + "-session" == "fastogram-session"
+    assert slug("Aso") + "-session" == "aso-session"

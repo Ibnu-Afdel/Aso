@@ -1,10 +1,10 @@
 """Shows the "verify your email" notice, or skips straight to the dashboard (T-38)."""
 
-from fastogram.auth import auth
-from fastogram.http import Controller, redirect
-from fastogram.inertia import inertia
-from fastogram.routing import route
-from fastogram.session import session
+from aso.auth import auth
+from aso.http import Controller, redirect
+from aso.inertia import inertia
+from aso.routing import route
+from aso.session import session
 
 
 class EmailVerificationPromptController(Controller):

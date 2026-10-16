@@ -1,10 +1,10 @@
-"""`fastogram.inertia.props` — the modifier chaining rules (T-16). Pure unit tests."""
+"""`aso.inertia.props` — the modifier chaining rules (T-16). Pure unit tests."""
 
 from __future__ import annotations
 
 from datetime import timedelta
 
-from fastogram.inertia.props import Prop, always, deep_merge, defer, merge, once, optional, scroll
+from aso.inertia.props import Prop, always, deep_merge, defer, merge, once, optional, scroll
 
 
 def test_optional_sets_only_the_optional_flag():

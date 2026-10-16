@@ -32,7 +32,7 @@ def test_db_seed_runs_the_database_seeder(cli_group, runner: CliRunner, console_
     _write_database_seeder(
         seeders_dir,
         "from app.models.post import Post\n"
-        "from fastogram.database import Seeder\n\n"
+        "from aso.database import Seeder\n\n"
         "class DatabaseSeeder(Seeder):\n"
         "    async def run(self) -> None:\n"
         "        await Post.create(title='Seeded', body='x')\n",
@@ -52,7 +52,7 @@ def test_db_seed_class_option_runs_a_specific_seeder(cli_group, runner: CliRunne
 
     (seeders_dir / "post_seeder.py").write_text(
         "from app.models.post import Post\n"
-        "from fastogram.database import Seeder\n\n"
+        "from aso.database import Seeder\n\n"
         "class PostSeeder(Seeder):\n"
         "    async def run(self) -> None:\n"
         "        await Post.create(title='FromClassOption', body='x')\n"
@@ -76,7 +76,7 @@ def test_migrate_fresh_seed_runs_the_seeder(cli_group, runner: CliRunner, consol
     _write_database_seeder(
         seeders_dir,
         "from app.models.post import Post\n"
-        "from fastogram.database import Seeder\n\n"
+        "from aso.database import Seeder\n\n"
         "class DatabaseSeeder(Seeder):\n"
         "    async def run(self) -> None:\n"
         "        await Post.create(title='FreshSeeded', body='x')\n",
@@ -95,7 +95,7 @@ def test_migrate_seed_runs_the_seeder(cli_group, runner: CliRunner, console_app_
     _write_database_seeder(
         seeders_dir,
         "from app.models.post import Post\n"
-        "from fastogram.database import Seeder\n\n"
+        "from aso.database import Seeder\n\n"
         "class DatabaseSeeder(Seeder):\n"
         "    async def run(self) -> None:\n"
         "        await Post.create(title='MigrateSeeded', body='x')\n",

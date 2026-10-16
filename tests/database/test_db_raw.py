@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from sqlalchemy import String
 
-from fastogram.database import DB, Mapped, Model, QueryExecuted, mapped_column
+from aso.database import DB, Mapped, Model, QueryExecuted, mapped_column
 
 
 def _post_model():
@@ -75,7 +75,7 @@ async def test_listen_receives_query_executed_events(db):
         await Post.create(title="A")
         await Post.all()
     finally:
-        from fastogram.database.db import _listeners
+        from aso.database.db import _listeners
 
         _listeners.remove(events.append)
     assert events, "expected at least one QueryExecuted notification"

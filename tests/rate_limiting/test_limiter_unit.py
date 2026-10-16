@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from fastogram.config import set_config
-from fastogram.rate_limiting import Limit, RateLimiter
+from aso.config import set_config
+from aso.rate_limiting import Limit, RateLimiter
 
 
 async def test_hit_increments_and_too_many_attempts_trips_at_the_limit():

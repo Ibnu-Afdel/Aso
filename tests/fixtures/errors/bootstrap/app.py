@@ -1,6 +1,6 @@
 from starlette.responses import PlainTextResponse
 
-from fastogram.foundation import Application, ExceptionsConfig, MiddlewareConfig
+from aso.foundation import Application, ExceptionsConfig, MiddlewareConfig
 
 from app.exceptions.app_error import AppError, SpecificError
 from app.exceptions.orders import DontReportMe, InvalidOrder, QuietOrder

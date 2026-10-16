@@ -1,4 +1,4 @@
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.confirm_password_controller import ConfirmPasswordController
 from app.http.controllers.dashboard_controller import DashboardController

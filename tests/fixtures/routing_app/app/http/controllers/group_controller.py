@@ -1,5 +1,5 @@
-from fastogram import context
-from fastogram.http import Controller
+from aso import context
+from aso.http import Controller
 
 
 class GroupController(Controller):

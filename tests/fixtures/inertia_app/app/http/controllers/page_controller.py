@@ -1,7 +1,7 @@
 from datetime import timedelta
 
-from fastogram.http import Controller
-from fastogram.inertia import (
+from aso.http import Controller
+from aso.inertia import (
     always,
     clear_history,
     deep_merge,
@@ -51,7 +51,7 @@ class PageController(Controller):
         return inertia("shared", {"amount": 42}).encrypt_history()
 
     async def logout(self):
-        from fastogram.http import redirect
+        from aso.http import redirect
 
         clear_history()
         return redirect("/")

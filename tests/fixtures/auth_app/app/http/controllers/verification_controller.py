@@ -3,12 +3,12 @@ from __future__ import annotations
 import hashlib
 import hmac
 
-from fastogram.auth import auth
-from fastogram.auth.events import Verified
-from fastogram.exceptions.types import AuthorizationException
-from fastogram.http import Controller
-from fastogram.http.responses import redirect
-from fastogram.routing import route
+from aso.auth import auth
+from aso.auth.events import Verified
+from aso.exceptions.types import AuthorizationException
+from aso.http import Controller
+from aso.http.responses import redirect
+from aso.routing import route
 
 
 class VerificationController(Controller):

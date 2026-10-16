@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from fastogram.database import Model, mapped_column
-from fastogram.http import Request  # noqa: F401
+from aso.database import Model, mapped_column
+from aso.http import Request  # noqa: F401
 
 
 class Post(Model):

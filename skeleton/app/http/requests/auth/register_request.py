@@ -4,8 +4,8 @@ from typing import Annotated
 
 from pydantic import EmailStr, Field
 
-from fastogram.http import FormRequest
-from fastogram.validation import Confirmed, Unique
+from aso.http import FormRequest
+from aso.validation import Confirmed, Unique
 
 from app.actions.auth.password_validation_rules import PasswordValidationRules
 

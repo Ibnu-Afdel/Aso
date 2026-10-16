@@ -1,6 +1,6 @@
 from sqlalchemy import String
 
-from fastogram.database import Mapped, Model, mapped_column
+from aso.database import Mapped, Model, mapped_column
 
 
 class Team(Model):

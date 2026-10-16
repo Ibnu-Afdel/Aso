@@ -1,5 +1,5 @@
-from fastogram.config import config
-from fastogram.inertia import InertiaMiddleware
+from aso.config import config
+from aso.inertia import InertiaMiddleware
 
 
 class HandleInertiaRequests(InertiaMiddleware):

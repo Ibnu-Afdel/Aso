@@ -1,4 +1,4 @@
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.ping_controller import PingController
 

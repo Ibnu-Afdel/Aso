@@ -1,4 +1,4 @@
-from fastogram.foundation import Application
+from aso.foundation import Application
 
 
 def create_app():

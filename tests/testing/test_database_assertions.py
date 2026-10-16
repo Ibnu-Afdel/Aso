@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.testing import (
+from aso.testing import (
     assert_database_count,
     assert_database_has,
     assert_database_missing,
     assert_model_exists,
     assert_model_missing,
 )
-from fastogram.testing.client import TestClient
+from aso.testing.client import TestClient
 
 
 async def test_assert_database_has_and_missing_after_a_request(client: TestClient, user) -> None:

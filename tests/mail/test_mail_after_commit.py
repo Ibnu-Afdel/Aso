@@ -3,8 +3,8 @@
 
 from __future__ import annotations
 
-from fastogram.database.db import DB
-from fastogram.mail import Content, Envelope, Mail, Mailable
+from aso.database.db import DB
+from aso.mail import Content, Envelope, Mail, Mailable
 
 
 class _Greeting(Mailable):
@@ -24,7 +24,7 @@ async def test_queued_mail_waits_for_the_enclosing_transaction_to_commit(db, mon
     async def fake_deliver(message, mailer=None):
         delivered.append(message)
 
-    monkeypatch.setattr("fastogram.mail.drivers.deliver_message", fake_deliver)
+    monkeypatch.setattr("aso.mail.drivers.deliver_message", fake_deliver)
 
     async with DB.transaction():
         await Mail.to("ada@example.com").queue(_Greeting("Ada"))
@@ -40,7 +40,7 @@ async def test_queued_mail_never_delivered_if_the_transaction_rolls_back(db, mon
     async def fake_deliver(message, mailer=None):
         delivered.append(message)
 
-    monkeypatch.setattr("fastogram.mail.drivers.deliver_message", fake_deliver)
+    monkeypatch.setattr("aso.mail.drivers.deliver_message", fake_deliver)
 
     class Boom(Exception):
         pass

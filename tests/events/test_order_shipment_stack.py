@@ -20,8 +20,8 @@ async def client():
         from bootstrap.app import create_app
 
         app = create_app()
-        from fastogram.database import Model
-        from fastogram.database.engine import engine
+        from aso.database import Model
+        from aso.database.engine import engine
 
         async with engine().begin() as conn:
             await conn.run_sync(Model.metadata.create_all)
@@ -37,7 +37,7 @@ async def _create_order(client: httpx.AsyncClient) -> int:
 
 
 async def test_shipping_an_order_runs_both_listeners_after_the_commit(client):
-    from fastogram.mail.drivers import array_messages
+    from aso.mail.drivers import array_messages
 
     from app.listeners import log_shipment, send_shipment_notification
 
@@ -62,7 +62,7 @@ async def test_shipping_an_order_runs_both_listeners_after_the_commit(client):
 
 
 async def test_rolled_back_transaction_discards_both_listeners_effects(client):
-    from fastogram.mail.drivers import array_messages
+    from aso.mail.drivers import array_messages
 
     from app.listeners import log_shipment, send_shipment_notification
 

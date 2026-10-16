@@ -6,7 +6,7 @@ from datetime import UTC, date, datetime
 
 from sqlalchemy import String
 
-from fastogram.database import Mapped, Model, mapped_column
+from aso.database import Mapped, Model, mapped_column
 
 
 def _post_model():

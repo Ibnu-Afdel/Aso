@@ -5,7 +5,7 @@ from __future__ import annotations
 import _jobs
 import pytest
 
-from fastogram.queue import Queue
+from aso.queue import Queue
 
 
 async def test_fake_records_instead_of_running():
@@ -53,7 +53,7 @@ async def test_assert_dispatched_times_fails_on_mismatch():
 
 
 async def test_fake_still_validates_serializability():
-    from fastogram.queue import JobNotSerializable
+    from aso.queue import JobNotSerializable
 
     Queue.fake()
     with pytest.raises(JobNotSerializable):

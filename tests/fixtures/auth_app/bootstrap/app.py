@@ -1,6 +1,6 @@
-from fastogram.auth.events import Registered
-from fastogram.events import Event
-from fastogram.foundation import Application
+from aso.auth.events import Registered
+from aso.events import Event
+from aso.foundation import Application
 
 from app.listeners.send_email_verification_notification import SendEmailVerificationNotification
 

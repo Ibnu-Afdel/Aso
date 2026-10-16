@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import time
 
-from fastogram.auth import auth
-from fastogram.http import Controller, Request
-from fastogram.http.responses import redirect
-from fastogram.security import hash as hash_
-from fastogram.session import session
-from fastogram.validation import ValidationException
+from aso.auth import auth
+from aso.http import Controller, Request
+from aso.http.responses import redirect
+from aso.security import hash as hash_
+from aso.session import session
+from aso.validation import ValidationException
 
 
 class ConfirmPasswordController(Controller):

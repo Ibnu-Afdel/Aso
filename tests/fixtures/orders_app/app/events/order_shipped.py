@@ -1,4 +1,4 @@
-from fastogram.events import Event
+from aso.events import Event
 
 
 class OrderShipped(Event):

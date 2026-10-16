@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from starlette.requests import Request
 
-from fastogram.exceptions import debug
+from aso.exceptions import debug
 
 
 def _request() -> Request:

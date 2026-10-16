@@ -1,4 +1,4 @@
-from fastogram.http import Controller, Request
+from aso.http import Controller, Request
 
 from app.models.comment import Comment
 from app.models.post import Post

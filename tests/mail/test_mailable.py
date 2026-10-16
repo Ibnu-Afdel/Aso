@@ -6,7 +6,7 @@ import base64
 
 import pytest
 
-from fastogram.mail import Attachment, Content, Envelope, Mailable
+from aso.mail import Attachment, Content, Envelope, Mailable
 
 
 def test_mailable_without_envelope_or_content_raises_not_implemented():
@@ -53,7 +53,7 @@ def test_render_with_no_view_and_no_text_is_empty_string():
 
 
 def test_render_compiles_the_jinja_view_with_with_data(tmp_path):
-    from fastogram.foundation import paths
+    from aso.foundation import paths
 
     views = tmp_path / "resources" / "views"
     (views / "mail").mkdir(parents=True)
@@ -73,7 +73,7 @@ def test_render_compiles_the_jinja_view_with_with_data(tmp_path):
 def test_render_falls_back_to_the_built_in_layout_when_the_app_has_none(tmp_path):
     """"falling back to this package's own `resources/views/mail/layout.html` when the app has
     not supplied one" (mail/rendering.py)."""
-    from fastogram.foundation import paths
+    from aso.foundation import paths
 
     views = tmp_path / "resources" / "views"
     (views / "mail").mkdir(parents=True)
@@ -95,7 +95,7 @@ def test_render_falls_back_to_the_built_in_layout_when_the_app_has_none(tmp_path
 
 
 def test_render_prefers_the_apps_own_layout_over_the_built_in_one(tmp_path):
-    from fastogram.foundation import paths
+    from aso.foundation import paths
 
     views = tmp_path / "resources" / "views"
     (views / "mail").mkdir(parents=True)

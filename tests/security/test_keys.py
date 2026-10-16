@@ -2,7 +2,7 @@ import base64
 
 import pytest
 
-from fastogram.security.keys import derive_key, fernet_key, generate_key, parse_app_key
+from aso.security.keys import derive_key, fernet_key, generate_key, parse_app_key
 
 
 def test_generate_key_format() -> None:

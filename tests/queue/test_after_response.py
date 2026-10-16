@@ -6,8 +6,8 @@ from __future__ import annotations
 import _jobs
 import pytest
 
-from fastogram import context
-from fastogram.queue.manager import drain_after_response
+from aso import context
+from aso.queue.manager import drain_after_response
 
 
 def _enter_context():

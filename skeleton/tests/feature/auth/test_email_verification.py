@@ -1,10 +1,10 @@
 import hashlib
 from datetime import timedelta
 
-from fastogram.auth.events import Verified
-from fastogram.events import Event
-from fastogram.routing import url
-from fastogram.testing import TestClient
+from aso.auth.events import Verified
+from aso.events import Event
+from aso.routing import url
+from aso.testing import TestClient
 
 from database.factories.user_factory import UserFactory
 

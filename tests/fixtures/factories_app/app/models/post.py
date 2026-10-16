@@ -1,6 +1,6 @@
 from sqlalchemy import ForeignKey, String, Text
 
-from fastogram.database import Mapped, Model, belongs_to, mapped_column
+from aso.database import Mapped, Model, belongs_to, mapped_column
 
 
 class Post(Model):

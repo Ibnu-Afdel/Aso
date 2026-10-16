@@ -1,4 +1,4 @@
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.api_post_controller import ApiPostController
 

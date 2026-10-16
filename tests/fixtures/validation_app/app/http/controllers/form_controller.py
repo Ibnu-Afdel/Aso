@@ -1,7 +1,7 @@
-from fastogram.http import Controller, Request, redirect
-from fastogram.inertia import inertia
-from fastogram.validation import validate
-from fastogram.validation.form_request import old
+from aso.http import Controller, Request, redirect
+from aso.inertia import inertia
+from aso.validation import validate
+from aso.validation.form_request import old
 
 from app.http.requests.order_request import StoreOrderRequest
 from app.http.requests.profile_requests import (

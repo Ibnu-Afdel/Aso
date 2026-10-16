@@ -1,5 +1,5 @@
-from fastogram.http import Controller
-from fastogram.session import session
+from aso.http import Controller
+from aso.session import session
 
 
 class DebugController(Controller):

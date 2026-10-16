@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.queue import Job
+from aso.queue import Job
 
 
 class SendWelcomeEmail(Job):

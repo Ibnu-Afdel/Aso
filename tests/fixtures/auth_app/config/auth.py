@@ -1,4 +1,4 @@
-from fastogram.config import env
+from aso.config import env
 
 defaults = {"guard": "web", "passwords": "users"}
 

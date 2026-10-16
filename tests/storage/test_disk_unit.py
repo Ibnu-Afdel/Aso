@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from fastogram.config import set_config
-from fastogram.storage import storage
-from fastogram.storage.manager import Disk, _disk_spec
+from aso.config import set_config
+from aso.storage import storage
+from aso.storage.manager import Disk, _disk_spec
 
 
 def test_local_disk_defaults_when_config_filesystems_is_missing():

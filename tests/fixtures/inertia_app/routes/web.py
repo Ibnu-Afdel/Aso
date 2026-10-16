@@ -1,4 +1,4 @@
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.errors_controller import ErrorsController
 from app.http.controllers.page_controller import PageController

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import _jobs
 
-from fastogram.database.db import DB
-from fastogram.database.scope import current_scope
+from aso.database.db import DB
+from aso.database.scope import current_scope
 
 
 class _AfterCommitJob(_jobs.EchoJob):

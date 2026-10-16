@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from fastogram.console.schedule import Schedule
+from aso.console.schedule import Schedule
 
 
 def test_frequency_helpers_set_the_expected_cron_expression() -> None:
@@ -38,8 +38,8 @@ def test_events_returns_every_registered_event_and_clear_empties_it() -> None:
 
 
 async def test_command_event_runs_through_call() -> None:
-    from fastogram.console import Command, call_output
-    from fastogram.console.registry import register, reset_registry
+    from aso.console import Command, call_output
+    from aso.console.registry import register, reset_registry
 
     class PingCommand(Command):
         signature = "ping:sched"
@@ -61,8 +61,8 @@ async def test_command_event_runs_through_call() -> None:
 
 
 async def test_command_event_with_laravel_string_arguments() -> None:
-    from fastogram.console import Command
-    from fastogram.console.registry import register, reset_registry
+    from aso.console import Command
+    from aso.console.registry import register, reset_registry
 
     seen: dict[str, object] = {}
 
@@ -113,7 +113,7 @@ async def test_call_event_awaits_an_async_callable() -> None:
 
 
 async def test_without_overlapping_skips_a_second_concurrent_run() -> None:
-    from fastogram.cache import flush_all
+    from aso.cache import flush_all
 
     runs = []
 
@@ -134,7 +134,7 @@ async def test_without_overlapping_skips_a_second_concurrent_run() -> None:
 def test_schedule_list_command_shows_defined_tasks(cli_group, runner, console_app_dir) -> None:
     console_route = console_app_dir / "routes" / "console.py"
     console_route.write_text(
-        "from fastogram.console import schedule\nschedule.command('session:prune').daily()\n"
+        "from aso.console import schedule\nschedule.command('session:prune').daily()\n"
     )
     try:
         result = runner.invoke(cli_group, ["schedule:list"])

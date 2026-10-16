@@ -4,14 +4,14 @@ code -- this fixture app exists only to drive the auth *library* through the rea
 
 from __future__ import annotations
 
-from fastogram.auth import auth, features
-from fastogram.auth.events import Lockout
-from fastogram.http import Controller, Request
-from fastogram.http.responses import redirect
-from fastogram.rate_limiting import RateLimiter
-from fastogram.routing import route
-from fastogram.session import session
-from fastogram.validation import ValidationException
+from aso.auth import auth, features
+from aso.auth.events import Lockout
+from aso.http import Controller, Request
+from aso.http.responses import redirect
+from aso.rate_limiting import RateLimiter
+from aso.routing import route
+from aso.session import session
+from aso.validation import ValidationException
 
 
 def _throttle_key(email: str, request: Request) -> str:

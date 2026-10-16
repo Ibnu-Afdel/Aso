@@ -1,4 +1,4 @@
-"""Hashing configuration (T-40). `fastogram.security.hash` reads this for Argon2 tuning."""
+"""Hashing configuration (T-40). `aso.security.hash` reads this for Argon2 tuning."""
 
 driver = "argon2"
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.database import Model, mapped_column
+from aso.database import Model, mapped_column
 
 
 class Post(Model):

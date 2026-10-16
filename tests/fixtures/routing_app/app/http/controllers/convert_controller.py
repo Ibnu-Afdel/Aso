@@ -10,7 +10,7 @@ from enum import StrEnum
 from pydantic import BaseModel
 from starlette.responses import PlainTextResponse
 
-from fastogram.http import Controller
+from aso.http import Controller
 
 from app.models.post import Post
 

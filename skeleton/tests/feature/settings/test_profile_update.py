@@ -1,4 +1,4 @@
-from fastogram.testing import TestClient
+from aso.testing import TestClient
 
 from app.models.user import User
 

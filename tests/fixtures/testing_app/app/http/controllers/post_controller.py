@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from fastogram.auth import auth
-from fastogram.http import Controller, redirect
-from fastogram.inertia import defer, inertia, merge, once
+from aso.auth import auth
+from aso.http import Controller, redirect
+from aso.inertia import defer, inertia, merge, once
 
 from app.http.requests.store_post_request import StorePostRequest
 from app.models.post import Post

@@ -6,8 +6,8 @@ from __future__ import annotations
 import _event_fixtures as _fixtures
 import pytest
 
-from fastogram.events import CallQueuedListener, Event
-from fastogram.queue import JobNotSerializable, Queue
+from aso.events import CallQueuedListener, Event
+from aso.queue import JobNotSerializable, Queue
 
 
 async def test_queued_listener_dispatches_a_call_queued_listener_job():

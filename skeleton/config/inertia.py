@@ -1,6 +1,6 @@
 """Inertia configuration (T-16, T-17)."""
 
-from fastogram.config import env
+from aso.config import env
 
 # Flash the *first* error per field (Laravel's default). Set True to flash every message.
 all_errors = env("INERTIA_ALL_ERRORS", False)

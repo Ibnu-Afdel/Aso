@@ -1,4 +1,4 @@
-"""T-55: `fastogram test --filter --parallel --coverage --bail` flag translation.
+"""T-55: `aso test --filter --parallel --coverage --bail` flag translation.
 
 Inspects the argv `build_pytest_argv()` would hand to `pytest`, never starts a real subprocess
 (BUILD.md: `serve`/`dev` are tested the same way in `tests/console/test_console_core_commands.py`).
@@ -6,8 +6,8 @@ Inspects the argv `build_pytest_argv()` would hand to `pytest`, never starts a r
 
 from __future__ import annotations
 
-from fastogram.console.commands.test import TestCommand, build_pytest_argv
-from fastogram.console.registry import reset_registry
+from aso.console.commands.test import TestCommand, build_pytest_argv
+from aso.console.registry import reset_registry
 
 
 def test_no_flags_passes_through_bare_args() -> None:
@@ -36,9 +36,9 @@ def test_all_flags_combine_in_order() -> None:
 
 
 def test_register_all_registers_the_test_command() -> None:
-    import fastogram.console.commands.test as test_module
-    from fastogram.console.io import CommandIO
-    from fastogram.console.registry import get
+    import aso.console.commands.test as test_module
+    from aso.console.io import CommandIO
+    from aso.console.registry import get
 
     reset_registry(keep="none")
     try:

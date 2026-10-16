@@ -1,8 +1,8 @@
-from fastogram.auth import AuthenticationException, AuthorizationException
-from fastogram.database import ModelNotFound
-from fastogram.exceptions import ThrottleRequestsException
-from fastogram.http import Controller
-from fastogram.inertia import inertia
+from aso.auth import AuthenticationException, AuthorizationException
+from aso.database import ModelNotFound
+from aso.exceptions import ThrottleRequestsException
+from aso.http import Controller
+from aso.inertia import inertia
 
 from app.exceptions.app_error import AppError, SpecificError
 from app.exceptions.orders import DontReportMe, InvalidOrder, QuietOrder

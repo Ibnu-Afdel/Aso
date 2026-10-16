@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.comment_controller import CommentController
 from app.http.controllers.convert_controller import ConvertController

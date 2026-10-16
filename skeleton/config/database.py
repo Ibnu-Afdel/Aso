@@ -1,7 +1,7 @@
 """Database configuration (T-30). SQLite by default (D-019); switch by changing `.env`."""
 
-from fastogram.config import env
-from fastogram.foundation import database_path
+from aso.config import env
+from aso.foundation import database_path
 
 default = env("DB_CONNECTION", "sqlite")
 
@@ -14,7 +14,7 @@ connections = {
         "driver": "pgsql",
         "host": env("DB_HOST", "127.0.0.1"),
         "port": int(env("DB_PORT", 5432)),
-        "database": env("DB_DATABASE", "fastogram"),
+        "database": env("DB_DATABASE", "aso"),
         "username": env("DB_USERNAME", "postgres"),
         "password": env("DB_PASSWORD", ""),
         "sslmode": env("DB_SSLMODE", None),
@@ -23,7 +23,7 @@ connections = {
         "driver": "mysql",
         "host": env("DB_HOST", "127.0.0.1"),
         "port": int(env("DB_PORT", 3306)),
-        "database": env("DB_DATABASE", "fastogram"),
+        "database": env("DB_DATABASE", "aso"),
         "username": env("DB_USERNAME", "root"),
         "password": env("DB_PASSWORD", ""),
     },

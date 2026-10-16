@@ -18,16 +18,16 @@ def reset_fixture_apps() -> None:
     for name in list(sys.modules):
         if name.split(".")[0] in FIXTURE_PACKAGES:
             del sys.modules[name]
-    from fastogram.auth.gate import Gate
-    from fastogram.auth.password_broker import _reset_for_tests as reset_password_brokers
-    from fastogram.cache import flush_all
-    from fastogram.console.registry import reset_registry as reset_console_registry
-    from fastogram.console.schedule import schedule as console_schedule
-    from fastogram.database import Model
-    from fastogram.events import reset_events
-    from fastogram.mail import reset_mail
-    from fastogram.queue import reset_queue
-    from fastogram.storage import storage
+    from aso.auth.gate import Gate
+    from aso.auth.password_broker import _reset_for_tests as reset_password_brokers
+    from aso.cache import flush_all
+    from aso.console.registry import reset_registry as reset_console_registry
+    from aso.console.schedule import schedule as console_schedule
+    from aso.database import Model
+    from aso.events import reset_events
+    from aso.mail import reset_mail
+    from aso.queue import reset_queue
+    from aso.storage import storage
 
     # User/closure commands and schedule events are registered by a fixture app's
     # `app/console/commands/*.py` / `routes/console.py` (T-50, T-45), not tied to module

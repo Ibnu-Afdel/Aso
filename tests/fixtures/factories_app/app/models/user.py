@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import String
 
-from fastogram.database import Hashed, Mapped, Model, has_many, mapped_column
+from aso.database import Hashed, Mapped, Model, has_many, mapped_column
 
 
 class User(Model):

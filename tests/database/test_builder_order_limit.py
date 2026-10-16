@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from sqlalchemy import String, select
 
-from fastogram.database import Builder, Mapped, Model, mapped_column, scope
+from aso.database import Builder, Mapped, Model, mapped_column, scope
 
 
 def _post_model():

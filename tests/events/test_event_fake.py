@@ -5,7 +5,7 @@ from __future__ import annotations
 import _event_fixtures as _fixtures
 import pytest
 
-from fastogram.events import Event
+from aso.events import Event
 
 
 async def test_fake_records_instead_of_running_listeners():

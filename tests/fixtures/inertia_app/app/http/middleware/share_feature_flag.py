@@ -1,7 +1,7 @@
 from starlette.responses import Response
 
-from fastogram.http import Middleware, Next, Request
-from fastogram.inertia import share
+from aso.http import Middleware, Next, Request
+from aso.inertia import share
 
 
 class ShareFeatureFlag(Middleware):

@@ -12,7 +12,7 @@ from uuid import UUID
 import pytest
 from pydantic import BaseModel, EmailStr, Field, HttpUrl, field_validator
 
-from fastogram.validation.messages import render, required_errors, rule_for, validate
+from aso.validation.messages import render, required_errors, rule_for, validate
 
 
 class Line(BaseModel):

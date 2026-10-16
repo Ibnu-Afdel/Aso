@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 
-from fastogram.foundation import paths
-from fastogram.inertia import vite as vite_mod
+from aso.foundation import paths
+from aso.inertia import vite as vite_mod
 
 
 def test_css_entry_is_a_stylesheet(tmp_path, monkeypatch) -> None:

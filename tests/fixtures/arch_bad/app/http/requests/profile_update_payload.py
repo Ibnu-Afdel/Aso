@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.http import FormRequest
+from aso.http import FormRequest
 
 
 class ProfileUpdatePayload(FormRequest):

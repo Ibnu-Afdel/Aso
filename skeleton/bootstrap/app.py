@@ -1,8 +1,8 @@
 """Builds the ASGI application (T-06). Uvicorn calls `create_app()` once per worker process."""
 
-from fastogram.auth.events import Registered
-from fastogram.events import Event
-from fastogram.foundation import Application, ExceptionsConfig, MiddlewareConfig
+from aso.auth.events import Registered
+from aso.events import Event
+from aso.foundation import Application, ExceptionsConfig, MiddlewareConfig
 
 from app.http.middleware.handle_appearance import HandleAppearance
 from app.http.middleware.handle_inertia_requests import HandleInertiaRequests

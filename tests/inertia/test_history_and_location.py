@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from conftest import INERTIA
 
-from fastogram.config import set_config
+from aso.config import set_config
 
 
 async def test_encrypt_history_on_the_response_sets_the_flag(client):

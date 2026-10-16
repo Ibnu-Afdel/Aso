@@ -2,8 +2,8 @@
 
 Other packages' fixture apps (and this one) reuse the top-level module names `app`, `bootstrap`,
 `routes`, `config`: real Python imports, cached in `sys.modules`. `config.*` and route files are
-reloaded fresh by the framework itself (see `fastogram.config.load` and
-`fastogram.routing.registry.load_routes`), but `app`/`bootstrap` are plain imports, so we purge
+reloaded fresh by the framework itself (see `aso.config.load` and
+`aso.routing.registry.load_routes`), but `app`/`bootstrap` are plain imports, so we purge
 them from `sys.modules` before and after each test to avoid picking up another fixture app's
 cached package of the same name.
 """

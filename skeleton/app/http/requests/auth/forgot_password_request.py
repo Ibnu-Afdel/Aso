@@ -2,7 +2,7 @@
 
 from pydantic import EmailStr
 
-from fastogram.http import FormRequest
+from aso.http import FormRequest
 
 
 class ForgotPasswordRequest(FormRequest):

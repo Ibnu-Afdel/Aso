@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from fastogram.http import Middleware, Next, Request, Response
-from fastogram.http import response as response_builder
+from aso.http import Middleware, Next, Request, Response
+from aso.http import response as response_builder
 
 
 class ShortCircuit(Middleware):

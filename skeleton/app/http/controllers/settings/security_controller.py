@@ -2,8 +2,8 @@
 named `settings/security` rather than `settings/password`).
 """
 
-from fastogram.http import Controller, redirect
-from fastogram.inertia import inertia
+from aso.http import Controller, redirect
+from aso.inertia import inertia
 
 from app.actions.auth.password_validation_rules import PasswordValidationRules
 from app.http.requests.settings.password_update_request import PasswordUpdateRequest

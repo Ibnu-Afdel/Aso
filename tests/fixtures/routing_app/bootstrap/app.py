@@ -1,4 +1,4 @@
-from fastogram.foundation import Application, MiddlewareConfig
+from aso.foundation import Application, MiddlewareConfig
 
 from app.http.middleware.bodypeek import BodyPeek
 from app.http.middleware.handle_inertia_requests import HandleInertiaRequests
@@ -22,7 +22,7 @@ def middleware(m: MiddlewareConfig) -> None:
             "headermutate": HeaderMutator,
             "raiser": Raiser,
             "bodypeek": BodyPeek,
-            "streamingpass": "fastogram.http.middleware:Middleware",
+            "streamingpass": "aso.http.middleware:Middleware",
         }
     )
     m.group("adminmw", ["mw_c", "mw_d"])

@@ -1,7 +1,7 @@
 """Unit tests for the async `Annotated` rules, against a tiny stub `form` (no HTTP/DB needed).
 
-`Unique`/`Exists` (which need `fastogram.database.DB`) and `CurrentPassword` (which needs
-`fastogram.auth`/`fastogram.security.hash`) are exercised through the real stack in
+`Unique`/`Exists` (which need `aso.database.DB`) and `CurrentPassword` (which needs
+`aso.auth`/`aso.security.hash`) are exercised through the real stack in
 `test_integration.py` instead.
 """
 
@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.validation.rules import (
+from aso.validation.rules import (
     Accepted,
     Confirmed,
     CurrentPassword,
@@ -19,7 +19,7 @@ from fastogram.validation.rules import (
     Password,
     Unique,
 )
-from fastogram.validation.uploaded_file import UploadedFile
+from aso.validation.uploaded_file import UploadedFile
 
 
 class StubForm:

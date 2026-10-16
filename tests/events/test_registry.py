@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import _event_fixtures as _fixtures
 
-from fastogram.events import Event
+from aso.events import Event
 
 
 def test_listen_registers_in_order():

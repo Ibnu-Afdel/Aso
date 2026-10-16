@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from fastogram.auth import auth
-from fastogram.http import Controller
-from fastogram.inertia import inertia
+from aso.auth import auth
+from aso.http import Controller
+from aso.inertia import inertia
 
 from app.models.post import Post
 

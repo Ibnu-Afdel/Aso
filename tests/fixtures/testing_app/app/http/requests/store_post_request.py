@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import Field
 
-from fastogram.http import FormRequest
+from aso.http import FormRequest
 
 
 class StorePostRequest(FormRequest):

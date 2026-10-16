@@ -1,5 +1,5 @@
-from fastogram.routing import Route
-from fastogram.session import session
+from aso.routing import Route
+from aso.session import session
 
 
 async def home():

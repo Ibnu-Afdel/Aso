@@ -1,9 +1,9 @@
 """Module-level `Job` classes for `tests/queue/` (T-42): importable by dotted path, as the
-worker rebuilds them (`fastogram.queue.manager._rebuild_job`)."""
+worker rebuilds them (`aso.queue.manager._rebuild_job`)."""
 
 from __future__ import annotations
 
-from fastogram.queue import Job
+from aso.queue import Job
 
 calls: list[dict] = []
 attempts: dict[str, int] = {}
@@ -71,7 +71,7 @@ class BadJob(Job):
 
 
 def _current_session_id() -> int | None:
-    from fastogram.database.scope import current_scope
+    from aso.database.scope import current_scope
 
     try:
         return id(current_scope().session())

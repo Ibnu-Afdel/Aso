@@ -1,4 +1,4 @@
-// The FastoGram welcome page. Replace it with your own landing page; it is served by
+// The Aso welcome page. Replace it with your own landing page; it is served by
 // `Route.inertia("/", "welcome")` in routes/web.py.
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowUpRight, FileCode2, Route as RouteIcon, Terminal } from 'lucide-react';
@@ -21,7 +21,7 @@ const steps = [
     {
         icon: Terminal,
         title: 'Use the CLI',
-        file: 'uv run fastogram list',
+        file: 'uv run aso list',
         body: 'Generators, migrations, queues, and more.',
     },
 ];
@@ -72,8 +72,7 @@ export default function Welcome() {
                         <AppLogoIcon className="size-11 fill-current text-white" />
                     </div>
                     <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-                        Fasto
-                        <span className="bg-gradient-to-r from-sky-500 to-indigo-500 bg-clip-text text-transparent">Gram</span>
+                        <span className="bg-gradient-to-r from-sky-500 to-indigo-500 bg-clip-text text-transparent">Aso</span>
                     </h1>
                     <p className="mt-4 max-w-xl text-lg text-neutral-600 dark:text-neutral-400">
                         The batteries-included Python web framework. FastAPI on the server, React on the client, Inertia in between.

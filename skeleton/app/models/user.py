@@ -4,8 +4,8 @@ from datetime import datetime
 
 from sqlalchemy import String
 
-from fastogram.auth import Authenticatable, MustVerifyEmail
-from fastogram.database import Hashed, Mapped, Model, mapped_column
+from aso.auth import Authenticatable, MustVerifyEmail
+from aso.database import Hashed, Mapped, Model, mapped_column
 
 
 class User(MustVerifyEmail, Authenticatable, Model):

@@ -1,6 +1,6 @@
 """Driver-level tests (T-18): `array`, `database`, `cookie`, and the signed/encrypted cookie values.
 
-Database tests use `fastogram.database.engine.make_engine` against SQLite (in-memory for the
+Database tests use `aso.database.engine.make_engine` against SQLite (in-memory for the
 default run, or `DB_URL` for PostgreSQL -- see `BUILD.md`), creating the `sessions` table
 ourselves since the skeleton migration that normally does this is not part of this package.
 """
@@ -13,10 +13,10 @@ import time
 import pytest
 from sqlalchemy import text
 
-from fastogram.database import engine as engine_module
-from fastogram.exceptions.types import SessionTooLarge
-from fastogram.security.keys import generate_key
-from fastogram.session.drivers import (
+from aso.database import engine as engine_module
+from aso.exceptions.types import SessionTooLarge
+from aso.security.keys import generate_key
+from aso.session.drivers import (
     DatabaseDriver,
     SessionRecord,
     array_driver,
@@ -31,7 +31,7 @@ from fastogram.session.drivers import (
 @pytest.fixture(autouse=True)
 def _app_key(monkeypatch):
     key = generate_key()
-    monkeypatch.setattr("fastogram.config.config", lambda k, default=None: key if k == "app.key" else default)
+    monkeypatch.setattr("aso.config.config", lambda k, default=None: key if k == "app.key" else default)
     monkeypatch.delenv("APP_PREVIOUS_KEYS", raising=False)
     yield key
 
@@ -60,7 +60,7 @@ def test_unsign_missing_value_is_none() -> None:
 def test_different_app_key_cannot_unsign(monkeypatch) -> None:
     signed = sign_id("abc123")
     other_key = generate_key()
-    monkeypatch.setattr("fastogram.config.config", lambda k, default=None: other_key if k == "app.key" else default)
+    monkeypatch.setattr("aso.config.config", lambda k, default=None: other_key if k == "app.key" else default)
     assert unsign_id(signed) is None
 
 
@@ -223,5 +223,5 @@ def test_cookie_payload_wrong_app_key_cannot_decrypt(monkeypatch) -> None:
     record = SessionRecord("sid-1", {"a": 1}, int(time.time()))
     token = encode_cookie_payload(record)
     other_key = generate_key()
-    monkeypatch.setattr("fastogram.config.config", lambda k, default=None: other_key if k == "app.key" else default)
+    monkeypatch.setattr("aso.config.config", lambda k, default=None: other_key if k == "app.key" else default)
     assert decode_cookie_payload(token) is None

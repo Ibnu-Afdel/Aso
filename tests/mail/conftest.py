@@ -11,8 +11,8 @@ import pytest
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.pool import StaticPool
 
-from fastogram.database.engine import configure, install_sqlite_recipe
-from fastogram.database.scope import open_scope, reset_test_binding, set_test_binding
+from aso.database.engine import configure, install_sqlite_recipe
+from aso.database.scope import open_scope, reset_test_binding, set_test_binding
 
 
 @pytest.fixture

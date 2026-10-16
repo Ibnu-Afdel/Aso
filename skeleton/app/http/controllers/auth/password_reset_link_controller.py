@@ -1,10 +1,10 @@
 """Sends a password-reset link (T-38). The response never reveals whether the email exists."""
 
-from fastogram.auth import password_broker
-from fastogram.http import Controller, back
-from fastogram.inertia import inertia
-from fastogram.session import session
-from fastogram.validation import ValidationException
+from aso.auth import password_broker
+from aso.http import Controller, back
+from aso.inertia import inertia
+from aso.session import session
+from aso.validation import ValidationException
 
 from app.http.requests.auth.forgot_password_request import ForgotPasswordRequest
 

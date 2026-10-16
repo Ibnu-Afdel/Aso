@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.config import set_config
-from fastogram.queue import drivers
+from aso.config import set_config
+from aso.queue import drivers
 
 
 def test_default_connection_is_sync_without_config():
@@ -47,5 +47,5 @@ def test_redis_driver_without_taskiq_redis_raises_a_clear_error(monkeypatch):
         return real_import(name, *args, **kwargs)
 
     monkeypatch.setattr(builtins, "__import__", _fake_import)
-    with pytest.raises(RuntimeError, match="fastogram\\[redis\\]"):
+    with pytest.raises(RuntimeError, match="aso\\[redis\\]"):
         drivers._redis_broker({"url": "redis://127.0.0.1:6379/0", "queue": "default"})

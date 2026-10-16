@@ -8,8 +8,8 @@ import types
 
 import pytest
 
-from fastogram.auth import Gate
-from fastogram.auth.gate import AuthorizationException
+from aso.auth import Gate
+from aso.auth.gate import AuthorizationException
 
 
 class _User:
@@ -171,7 +171,7 @@ async def test_authorize_class_argument_for_create_style_checks():
 
 
 async def test_authenticatable_can_and_cannot_delegate_to_gate():
-    from fastogram.auth import Authenticatable
+    from aso.auth import Authenticatable
 
     class Post:
         def __init__(self, user_id: int) -> None:
@@ -193,6 +193,6 @@ async def test_authenticatable_can_and_cannot_delegate_to_gate():
 
 
 def test_authenticatable_hides_password_and_remember_token_by_default():
-    from fastogram.auth import Authenticatable
+    from aso.auth import Authenticatable
 
     assert Authenticatable.__hidden__ == ("password", "remember_token")

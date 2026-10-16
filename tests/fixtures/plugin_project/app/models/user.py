@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from sqlalchemy import String
 
-from fastogram.auth import Authenticatable
-from fastogram.database import Hashed, Mapped, Model, mapped_column
+from aso.auth import Authenticatable
+from aso.database import Hashed, Mapped, Model, mapped_column
 
 
 class User(Authenticatable, Model):

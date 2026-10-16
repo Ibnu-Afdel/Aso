@@ -60,12 +60,12 @@ async def test_limit_none_never_throttles(client: httpx.AsyncClient):
 
 
 async def test_unregistered_named_limiter_raises_clear_error(client: httpx.AsyncClient):
-    from fastogram.rate_limiting import Limit, RateLimiter
+    from aso.rate_limiting import Limit, RateLimiter
 
     RateLimiter.for_("ghost-undefined", lambda request: Limit.per_minute(1))
     # The route under test never references "ghost-undefined"; this test instead exercises the
     # middleware's own resolution function directly against a name that truly is not registered.
-    from fastogram.rate_limiting.middleware import _resolve_limit
+    from aso.rate_limiting.middleware import _resolve_limit
 
     class _FakeRequest:
         pass

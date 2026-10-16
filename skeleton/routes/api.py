@@ -4,4 +4,4 @@ No routes ship by default (v1 has no API token guard, D-026). Add your own state
 endpoints and webhooks here.
 """
 
-from fastogram.routing import Route  # noqa: F401
+from aso.routing import Route  # noqa: F401

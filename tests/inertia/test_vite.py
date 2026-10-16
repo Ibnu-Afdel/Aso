@@ -6,9 +6,9 @@ import json
 
 import pytest
 
-from fastogram.foundation import paths
-from fastogram.inertia import vite as vite_module
-from fastogram.inertia.vite import (
+from aso.foundation import paths
+from aso.inertia import vite as vite_module
+from aso.inertia.vite import (
     ViteManifestNotFound,
     inertia_head,
     manifest_hash,

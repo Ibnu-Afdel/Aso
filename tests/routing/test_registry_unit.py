@@ -1,4 +1,4 @@
-"""White-box unit tests for `fastogram.routing.registry` (T-10): recording routes, groups and
+"""White-box unit tests for `aso.routing.registry` (T-10): recording routes, groups and
 resource expansion, without compiling a full FastAPI app.
 
 These push a fresh `RouteRegistry` onto the module's contextvar directly (the same one
@@ -15,8 +15,8 @@ from contextlib import contextmanager
 
 import pytest
 
-from fastogram.routing import registry as reg_mod
-from fastogram.routing.registry import Route, RouteRegistry, route, route_list
+from aso.routing import registry as reg_mod
+from aso.routing.registry import Route, RouteRegistry, route, route_list
 
 
 class FakeController:
@@ -255,7 +255,7 @@ def test_route_fn_unknown_name_raises_keyerror():
 
 
 def test_route_fn_absolute_prefixes_app_url(monkeypatch: pytest.MonkeyPatch):
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     set_config("app.url", "https://example.com")
     with fresh_registry():

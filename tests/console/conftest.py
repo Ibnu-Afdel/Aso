@@ -18,7 +18,7 @@ def console_app_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     `database/migrations/` (removed again afterwards -- migration files are test output, not
     fixture content)."""
     monkeypatch.setenv("DB_DATABASE", str(tmp_path / "db.sqlite"))
-    monkeypatch.setenv("FASTOGRAM_NO_HANDOVER", "1")
+    monkeypatch.setenv("ASO_NO_HANDOVER", "1")
     migrations_dir = CONSOLE_APP / "database" / "migrations"
     shutil.rmtree(migrations_dir, ignore_errors=True)
     try:
@@ -33,7 +33,7 @@ def console_app_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture
 def cli_group(console_app_dir: Path):
     """A fully built CLI (`build_cli`) booted against `console_app_dir`."""
-    from fastogram.console.cli import build_cli
+    from aso.console.cli import build_cli
 
     return build_cli(console_app_dir)
 
@@ -46,5 +46,5 @@ def runner() -> CliRunner:
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch: pytest.MonkeyPatch):
     # Never let one test's hand-over marker leak into the next.
-    monkeypatch.delenv("FASTOGRAM_HANDED_OVER", raising=False)
+    monkeypatch.delenv("ASO_HANDED_OVER", raising=False)
     yield

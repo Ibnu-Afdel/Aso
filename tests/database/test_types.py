@@ -1,18 +1,18 @@
-"""T-31 column types: `Encrypted`, `Hashed` (over `fastogram.security`)."""
+"""T-31 column types: `Encrypted`, `Hashed` (over `aso.security`)."""
 
 from __future__ import annotations
 
 import pytest
 from sqlalchemy import String
 
-from fastogram.database import Encrypted, Hashed, Mapped, Model, mapped_column
-from fastogram.security.keys import generate_key
+from aso.database import Encrypted, Hashed, Mapped, Model, mapped_column
+from aso.security.keys import generate_key
 
 
 @pytest.fixture(autouse=True)
 def _app_key(monkeypatch):
     key = generate_key()
-    monkeypatch.setattr("fastogram.config.config", lambda k, default=None: key if k == "app.key" else default)
+    monkeypatch.setattr("aso.config.config", lambda k, default=None: key if k == "app.key" else default)
     yield key
 
 
@@ -44,7 +44,7 @@ async def test_hashed_column_hashes_on_assignment(db):
     assert account.password != "correct-horse"
     assert account.password.startswith("$")
 
-    from fastogram.security import hash
+    from aso.security import hash
 
     assert hash.check("correct-horse", account.password) is True
 

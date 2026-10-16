@@ -20,8 +20,8 @@ async def client():
         from bootstrap.app import create_app
 
         app = create_app()
-        from fastogram.database import Model
-        from fastogram.database.engine import engine
+        from aso.database import Model
+        from aso.database.engine import engine
 
         async with engine().begin() as conn:
             await conn.run_sync(Model.metadata.create_all)
@@ -80,7 +80,7 @@ async def test_validation_redirects_back_with_errors_then_flash(client):
 async def test_csrf_mismatch_on_inertia_redirects_back_with_flash(client):
     await client.get("/posts/create")
     # CSRF is off while APP_ENV=testing (T-12); force it on for this request.
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     set_config("app.environment", "local")
     r = await client.post("/posts", json={"title": "x"}, headers={**INERTIA, "Referer": "http://testserver/posts/create"})

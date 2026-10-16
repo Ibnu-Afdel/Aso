@@ -1,5 +1,5 @@
-from fastogram.testing import TestClient
-from fastogram.testing.database import assert_database_has
+from aso.testing import TestClient
+from aso.testing.database import assert_database_has
 
 
 async def test_registration_screen_can_be_rendered(client: TestClient) -> None:

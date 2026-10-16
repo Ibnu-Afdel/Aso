@@ -1,8 +1,8 @@
 """Shares data available on (almost) every page (T-17)."""
 
-from fastogram.config import config
-from fastogram.http import Request
-from fastogram.inertia import InertiaMiddleware
+from aso.config import config
+from aso.http import Request
+from aso.inertia import InertiaMiddleware
 
 
 class HandleInertiaRequests(InertiaMiddleware):

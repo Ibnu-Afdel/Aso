@@ -1,7 +1,7 @@
 """Filesystem disks (T-43). `storage(disk)` reads this to resolve the default disk."""
 
-from fastogram.config import env
-from fastogram.foundation import base_path
+from aso.config import env
+from aso.foundation import base_path
 
 default = env("FILESYSTEM_DISK", "local")
 

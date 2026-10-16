@@ -1,5 +1,5 @@
 // Adapted from Laravel's React starter kit (github.com/laravel/react-starter-kit), MIT. See
-// LICENSES/laravel-react-starter-kit.md. FastoGram's backend flashes plain string values under
+// LICENSES/laravel-react-starter-kit.md. Aso's backend flashes plain string values under
 // `success`/`error` (D-024, T-05 "How it works"), not the kit's `{ type, message }` toast
 // object, so this hook shows a toast for those two keys directly instead of reading a `toast`
 // sub-object.

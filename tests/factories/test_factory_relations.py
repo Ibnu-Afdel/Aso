@@ -3,8 +3,8 @@ the `tests/fixtures/factories_app` fixture (`User`/`Post`, `UserFactory`/`PostFa
 
 from __future__ import annotations
 
-from fastogram.database import Factory, Model
-from fastogram.database.factory import factory_for
+from aso.database import Factory, Model
+from aso.database.factory import factory_for
 
 
 async def test_for_relation_sets_the_foreign_key(db, factories_app):

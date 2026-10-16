@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import os
 
-from fastogram.config import set_config
-from fastogram.foundation import paths
-from fastogram.storage import link_public_storage
+from aso.config import set_config
+from aso.foundation import paths
+from aso.storage import link_public_storage
 
 
 def test_creates_a_relative_symlink_to_the_public_disk(tmp_path):

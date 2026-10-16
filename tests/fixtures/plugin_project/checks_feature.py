@@ -1,13 +1,13 @@
-"""Exercises `fastogram.testing.plugin`'s own fixtures end-to-end, as a real app's test suite
+"""Exercises `aso.testing.plugin`'s own fixtures end-to-end, as a real app's test suite
 would use them (T-55). Run via a subprocess from `tests/testing/test_plugin_end_to_end.py`, not
-collected by the main FastoGram suite (filename does not match its `python_files`).
+collected by the main Aso suite (filename does not match its `python_files`).
 """
 
 from __future__ import annotations
 
 import pytest
 
-from fastogram.testing import TestClient, assert_database_count
+from aso.testing import TestClient, assert_database_count
 
 
 async def test_create_a_post(client: TestClient) -> None:

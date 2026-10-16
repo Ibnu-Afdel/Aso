@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy import Integer, String
 
-from fastogram.database import Mapped, Model, mapped_column
+from aso.database import Mapped, Model, mapped_column
 
 
 class Post(Model):

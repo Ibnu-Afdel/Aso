@@ -9,7 +9,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from fastogram.inertia.json_encode import to_jsonable
+from aso.inertia.json_encode import to_jsonable
 
 
 class Color(Enum):

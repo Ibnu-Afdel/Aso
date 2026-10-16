@@ -1,6 +1,6 @@
 import pytest
 
-from fastogram.security import hash
+from aso.security import hash
 
 
 @pytest.fixture(autouse=True)
@@ -33,6 +33,6 @@ def test_needs_rehash_false_for_current_settings() -> None:
 
 def test_needs_rehash_true_after_cost_change(monkeypatch) -> None:
     hashed = hash.make("secret-value")
-    monkeypatch.setattr("fastogram.config.config", lambda *a, **kw: {"memory_cost": 8, "time_cost": 1, "parallelism": 1})
+    monkeypatch.setattr("aso.config.config", lambda *a, **kw: {"memory_cost": 8, "time_cost": 1, "parallelism": 1})
     hash._reset_cache()
     assert hash.needs_rehash(hashed) is True

@@ -1,5 +1,5 @@
-from fastogram.database.db import DB
-from fastogram.http import Controller
+from aso.database.db import DB
+from aso.http import Controller
 
 from app.events.order_shipped import OrderShipped
 from app.models.order import Order

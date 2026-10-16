@@ -1,4 +1,4 @@
-from fastogram.http import Controller
+from aso.http import Controller
 
 
 class PingInvokable(Controller):

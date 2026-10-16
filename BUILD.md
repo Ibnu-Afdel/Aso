@@ -1,4 +1,4 @@
-# Building FastoGram (for contributors and coding agents)
+# Building Aso (for contributors and coding agents)
 
 The framework is built **spec-first**: every feature has a reviewed guide page in the separate
 docs repo (`../docs/guide/T-xx-*.md`). The code must match the page. When the page and your idea
@@ -11,7 +11,7 @@ Spec precedence: `docs/plan/DECISIONS.md` > `docs/plan/LARAVEL-MAP.md` (names an
 ## Layout
 
 ```
-src/fastogram/
+src/aso/
   context.py          per-request context (ContextVar). Read its docstring first.
   config/             env(), config()
   foundation/         Application.configure()...create(), MiddlewareConfig, ExceptionsConfig,
@@ -31,19 +31,19 @@ Global layers: `RequestContextMiddleware` → `MethodSpoofing` → `DatabaseScop
 router. Each matched route's ASGI app is wrapped with its group's stack: for `web`,
 `Boundary(StartSession(Boundary(AuthenticateSession(Boundary(PreventRequestForgery(Boundary(
 HandleInertiaRequests(Boundary(endpoint))))))))`. Exceptions are rendered by the nearest
-boundary through `fastogram.exceptions.handler`. Unknown URLs hit catch-all fallback routes
+boundary through `aso.exceptions.handler`. Unknown URLs hit catch-all fallback routes
 registered last, so they still pass through the group stack.
 
 ## Contracts between packages
 
-- **Request context** (`fastogram.context`): `current()` / `require()`; fields `request`,
+- **Request context** (`aso.context`): `current()` / `require()`; fields `request`,
   `group`, `session`, `user`, `inertia`, `shared`, `route`, `route_params`, `extras`. The table in
   its docstring says which package writes which field. Only write your own fields.
-- **Exceptions**: raise the classes in `fastogram.exceptions.types`; re-export them from your
+- **Exceptions**: raise the classes in `aso.exceptions.types`; re-export them from your
   package at the LARAVEL-MAP §3 path. Never define a second class with the same meaning.
-- **Session**: other packages use `fastogram.session.session()` and the `Session` methods named in
+- **Session**: other packages use `aso.session.session()` and the `Session` methods named in
   T-18 only.
-- **Database**: other packages use `Model`, `DB` and `fastogram.database.scope` only.
+- **Database**: other packages use `Model`, `DB` and `aso.database.scope` only.
 - **Framework middleware is pure ASGI** (D-025). Never use `BaseHTTPMiddleware`.
 - **Lazy imports across packages** inside functions, to avoid import cycles at package import time.
 
@@ -71,5 +71,5 @@ registered last, so they still pass through the group stack.
 uv sync                      # install
 uv run pytest -q             # all tests
 uv run ruff check src tests  # lint
-DB_URL=postgresql+asyncpg://postgres:secret@127.0.0.1:55432/fastogram uv run pytest -q tests/database
+DB_URL=postgresql+asyncpg://postgres:secret@127.0.0.1:55432/aso uv run pytest -q tests/database
 ```

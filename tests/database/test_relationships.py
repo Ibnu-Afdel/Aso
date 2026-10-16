@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import ForeignKey, String
 
-from fastogram.database import (
+from aso.database import (
     LazyLoadingViolation,
     Mapped,
     Model,

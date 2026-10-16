@@ -6,7 +6,7 @@ import uuid
 
 from sqlalchemy import String
 
-from fastogram.database import HasUlids, HasUuids, Mapped, Model, mapped_column
+from aso.database import HasUlids, HasUuids, Mapped, Model, mapped_column
 
 
 async def test_has_uuids_generates_a_uuid7_primary_key(db):

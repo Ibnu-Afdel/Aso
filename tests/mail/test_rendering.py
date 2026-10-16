@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastogram.mail.rendering import html_to_text
+from aso.mail.rendering import html_to_text
 
 
 def test_strips_tags():

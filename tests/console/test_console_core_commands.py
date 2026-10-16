@@ -9,7 +9,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from fastogram.console.commands.core import build_dev_commands, build_serve_argv
+from aso.console.commands.core import build_dev_commands, build_serve_argv
 
 
 def test_build_serve_argv_uses_uvicorn_factory() -> None:
@@ -37,7 +37,7 @@ def test_build_dev_commands_adds_a_queue_worker_when_enabled() -> None:
 def test_find_free_port_skips_a_port_already_in_use() -> None:
     import socket
 
-    from fastogram.console.commands.core import find_free_port
+    from aso.console.commands.core import find_free_port
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.bind(("127.0.0.1", 0))
@@ -68,7 +68,7 @@ def test_serve_falls_back_to_the_next_free_port(cli_group, runner: CliRunner, mo
 
 
 def test_app_url_for_port_swaps_only_the_port() -> None:
-    from fastogram.console.commands.core import app_url_for_port
+    from aso.console.commands.core import app_url_for_port
 
     assert app_url_for_port("http://localhost:8000", 8001) == "http://localhost:8001"
     assert app_url_for_port("https://myapp.test", 8443) == "https://myapp.test:8443"

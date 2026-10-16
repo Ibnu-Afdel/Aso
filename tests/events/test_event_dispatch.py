@@ -5,7 +5,7 @@ from __future__ import annotations
 import _event_fixtures as _fixtures
 import pytest
 
-from fastogram.events import Event
+from aso.events import Event
 
 
 async def test_dispatch_with_no_listeners_is_a_noop():

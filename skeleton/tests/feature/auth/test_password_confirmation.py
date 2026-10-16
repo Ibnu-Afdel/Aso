@@ -1,4 +1,4 @@
-from fastogram.testing import TestClient
+from aso.testing import TestClient
 
 
 async def test_confirm_password_screen_can_be_rendered(client: TestClient, user) -> None:

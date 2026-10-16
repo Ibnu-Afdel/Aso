@@ -1,4 +1,4 @@
-from fastogram.http import Controller, redirect
+from aso.http import Controller, redirect
 
 from app.http.requests.store_post_request import StorePostRequest
 from app.http.requests.update_post_request import UpdatePostRequest

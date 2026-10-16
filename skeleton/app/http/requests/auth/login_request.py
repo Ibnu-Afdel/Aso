@@ -4,11 +4,11 @@ Laravel Fortify's default.
 
 from pydantic import EmailStr
 
-from fastogram.auth import auth
-from fastogram.auth.events import Lockout
-from fastogram.http import FormRequest
-from fastogram.rate_limiting import RateLimiter
-from fastogram.validation import ValidationException
+from aso.auth import auth
+from aso.auth.events import Lockout
+from aso.http import FormRequest
+from aso.rate_limiting import RateLimiter
+from aso.validation import ValidationException
 
 MAX_ATTEMPTS = 5
 DECAY_SECONDS = 60

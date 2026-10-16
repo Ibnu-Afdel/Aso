@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.testing.client import TestClient
+from aso.testing.client import TestClient
 
 
 async def test_first_visit_html_and_inertia_visit_parse_the_same_page(client: TestClient) -> None:

@@ -1,4 +1,4 @@
-"""Unit tests for `fastogram.http.encoding.jsonable()` / `to_response()` (T-13, T-15)."""
+"""Unit tests for `aso.http.encoding.jsonable()` / `to_response()` (T-13, T-15)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from enum import Enum
 
 from starlette.responses import PlainTextResponse, Response
 
-from fastogram.http.encoding import jsonable, to_response
+from aso.http.encoding import jsonable, to_response
 
 
 class Color(Enum):

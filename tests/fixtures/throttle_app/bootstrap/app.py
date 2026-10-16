@@ -1,5 +1,5 @@
-from fastogram.foundation import Application
-from fastogram.rate_limiting import Limit, RateLimiter
+from aso.foundation import Application
+from aso.rate_limiting import Limit, RateLimiter
 
 
 def register_limiters() -> None:

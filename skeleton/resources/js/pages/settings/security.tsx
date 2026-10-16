@@ -1,6 +1,6 @@
 // Adapted from Laravel's React starter kit (github.com/laravel/react-starter-kit), MIT. See
 // LICENSES/laravel-react-starter-kit.md. The kit's `security.tsx` also manages two-factor auth
-// and passkeys; FastoGram ships neither in v1 (Phase 5, D-009), so this page only renders the
+// and passkeys; Aso ships neither in v1 (Phase 5, D-009), so this page only renders the
 // password-update form, per routes/settings.py's note on this page.
 import { Form, Head } from "@inertiajs/react";
 import { useRef } from "react";

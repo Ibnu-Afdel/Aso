@@ -1,14 +1,14 @@
 import pytest
 
-from fastogram.security import DecryptException, crypt
-from fastogram.security.keys import generate_key
+from aso.security import DecryptException, crypt
+from aso.security.keys import generate_key
 
 
 @pytest.fixture(autouse=True)
 def _app_key(monkeypatch):
     key = generate_key()
     monkeypatch.setenv("APP_KEY", key)
-    monkeypatch.setattr("fastogram.config.config", lambda k, default=None: key if k == "app.key" else default)
+    monkeypatch.setattr("aso.config.config", lambda k, default=None: key if k == "app.key" else default)
     monkeypatch.delenv("APP_PREVIOUS_KEYS", raising=False)
     yield key
 
@@ -42,7 +42,7 @@ def test_rotate_reencrypts_with_primary_key(monkeypatch, _app_key) -> None:
 
     new_key = generate_key()
     monkeypatch.setenv("APP_PREVIOUS_KEYS", old_key)
-    monkeypatch.setattr("fastogram.config.config", lambda k, default=None: new_key if k == "app.key" else default)
+    monkeypatch.setattr("aso.config.config", lambda k, default=None: new_key if k == "app.key" else default)
 
     rotated = crypt.rotate(token)
     assert crypt.decrypt(rotated) == "secret"
@@ -58,7 +58,7 @@ def test_decrypt_with_previous_key_after_rotation(monkeypatch, _app_key) -> None
 
     new_key = generate_key()
     monkeypatch.setenv("APP_PREVIOUS_KEYS", old_key)
-    monkeypatch.setattr("fastogram.config.config", lambda k, default=None: new_key if k == "app.key" else default)
+    monkeypatch.setattr("aso.config.config", lambda k, default=None: new_key if k == "app.key" else default)
 
     # the old token was encrypted with the now-previous key; decrypt must still succeed.
     assert crypt.decrypt(token) == "secret"

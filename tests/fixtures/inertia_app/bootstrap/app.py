@@ -1,4 +1,4 @@
-from fastogram.foundation import Application, MiddlewareConfig
+from aso.foundation import Application, MiddlewareConfig
 
 from app.http.middleware.handle_inertia_requests import HandleInertiaRequests
 from app.http.middleware.share_feature_flag import ShareFeatureFlag

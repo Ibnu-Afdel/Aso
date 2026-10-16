@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fastogram"
-version = "0.1.1"
+name = "aso"
+version = "0.2.0"
 description = "A Laravel-style web framework for Python: FastAPI + Inertia.js + an artisan-like CLI"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -42,10 +42,10 @@ redis = ["redis>=8.1", "taskiq>=0.13", "taskiq-redis>=1.2.4"]
 testing = ["pytest>=9.1", "pytest-asyncio>=1.4,<1.5"]
 
 [project.scripts]
-fastogram = "fastogram.console.cli:main"
+aso = "aso.console.cli:main"
 
 [project.entry-points.pytest11]
-fastogram = "fastogram.testing.plugin"
+aso = "aso.testing.plugin"
 
 [dependency-groups]
 dev = [
@@ -70,21 +70,21 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/fastogram"]
+packages = ["src/aso"]
 
-# D-022: the app skeleton (`fastogram new` copies this) ships inside the wheel as
-# `fastogram/skeleton/`, not as a second top-level package.
+# D-022: the app skeleton (`aso new` copies this) ships inside the wheel as
+# `aso/skeleton/`, not as a second top-level package.
 [tool.hatch.build.targets.wheel.force-include]
-"skeleton" = "fastogram/skeleton"
+"skeleton" = "aso/skeleton"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_test_loop_scope = "session"
 asyncio_default_fixture_loop_scope = "session"
-addopts = "-p no:fastogram"
+addopts = "-p no:aso"
 markers = [
-    "skeleton: exercises `fastogram new` end-to-end in a subprocess (slow, but still <3 min; part of the default run)",
+    "skeleton: exercises `aso new` end-to-end in a subprocess (slow, but still <3 min; part of the default run)",
 ]
 
 [tool.ruff]
@@ -96,7 +96,7 @@ select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501", "UP046", "UP047"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["fastogram"]
+known-first-party = ["aso"]
 known-local-folder = ["app", "bootstrap", "config", "routes", "database"]
 
 [tool.hatch.build.targets.sdist]

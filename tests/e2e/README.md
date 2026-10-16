@@ -4,8 +4,8 @@ Drives a freshly generated app through register → verify email → dashboard �
 validation errors → logout → wrong password → login, with Playwright. Not part of `pytest`.
 
 ```bash
-uv run fastogram new /tmp/e2eapp --dev          # from this repo
-cd /tmp/e2eapp && npm run build && uv run fastogram serve --port 8766 &
+uv run aso new /tmp/e2eapp --dev          # from this repo
+cd /tmp/e2eapp && npm run build && uv run aso serve --port 8766 &
 cd tests/e2e && npm i playwright
 APP_URL=http://127.0.0.1:8766 APP_DB=/tmp/e2eapp/database/database.sqlite node browser.mjs
 ```

@@ -2,7 +2,7 @@ from datetime import date
 
 from pydantic import Field
 
-from fastogram.validation import FormRequest
+from aso.validation import FormRequest
 
 
 class StorePostRequest(FormRequest):

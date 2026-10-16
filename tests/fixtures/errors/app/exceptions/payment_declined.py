@@ -14,6 +14,6 @@ class PaymentDeclined(Exception):
         return False  # never logged, like `dont_report`
 
     def render(self, request: Any) -> Any:
-        from fastogram.http import back
+        from aso.http import back
 
         return back().with_flash("error", self.user_message)

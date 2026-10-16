@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import _event_fixtures as _fixtures
 
-from fastogram.database.db import DB
-from fastogram.events import Event
+from aso.database.db import DB
+from aso.events import Event
 
 
 async def test_queued_listener_waits_for_the_enclosing_transaction_to_commit(db):

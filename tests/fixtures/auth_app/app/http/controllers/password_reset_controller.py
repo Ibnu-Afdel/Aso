@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from fastogram.auth import password_broker
-from fastogram.http import Controller, Request
-from fastogram.validation import ValidationException
+from aso.auth import password_broker
+from aso.http import Controller, Request
+from aso.validation import ValidationException
 
 
 class PasswordResetController(Controller):

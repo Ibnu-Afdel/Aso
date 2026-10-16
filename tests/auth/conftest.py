@@ -13,10 +13,10 @@ import pytest
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.pool import StaticPool
 
-from fastogram import context
-from fastogram.database.engine import configure, install_sqlite_recipe
-from fastogram.database.scope import open_scope, reset_test_binding, set_test_binding
-from fastogram.session.store import Session
+from aso import context
+from aso.database.engine import configure, install_sqlite_recipe
+from aso.database.scope import open_scope, reset_test_binding, set_test_binding
+from aso.session.store import Session
 
 
 @pytest.fixture(scope="session")
@@ -71,7 +71,7 @@ def request_context():
 def _auth_config() -> None:
     """A minimal `config/auth.py`-equivalent for unit tests (most override the model, see
     `user_model` below -- `tests/conftest.py` resets all config between tests)."""
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     set_config("auth.defaults", {"guard": "web", "passwords": "users"})
     set_config("auth.guards", {"web": {"driver": "session", "provider": "users"}})
@@ -82,11 +82,11 @@ def _auth_config() -> None:
 
 @pytest.fixture
 def user_model(monkeypatch: pytest.MonkeyPatch):
-    """`user_model(SomeLocalUserClass)`: point `fastogram.auth.guard._user_model()` at a class
+    """`user_model(SomeLocalUserClass)`: point `aso.auth.guard._user_model()` at a class
     defined inside the test itself (never at module level, see this file's docstring)."""
 
     def _set(model_cls: type) -> type:
-        monkeypatch.setattr("fastogram.auth.guard._user_model", lambda: model_cls)
+        monkeypatch.setattr("aso.auth.guard._user_model", lambda: model_cls)
         return model_cls
 
     return _set

@@ -2,7 +2,7 @@
 
 Mirrors the `tests/test_spine_loop.py` fixture-app pattern: `sys.path` gets the fixture's root so
 `bootstrap.app` and its sibling `config`/`routes` packages import, then `create_app()` builds a
-real FastAPI app wired through `fastogram.foundation.stack`.
+real FastAPI app wired through `aso.foundation.stack`.
 """
 
 from __future__ import annotations
@@ -38,7 +38,7 @@ async def make_client(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def _clear_array_store():
-    from fastogram.session import clear_array_store
+    from aso.session import clear_array_store
 
     clear_array_store()
     yield

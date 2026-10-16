@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.inertia import InertiaMiddleware
+from aso.inertia import InertiaMiddleware
 
 
 class HandleInertiaRequests(InertiaMiddleware):

@@ -3,7 +3,7 @@ class's own `report()`/`render()` (T-20)."""
 
 from __future__ import annotations
 
-from fastogram.log.testing import LogCapture
+from aso.log.testing import LogCapture
 
 INERTIA = {"X-Inertia": "true", "X-Inertia-Version": ""}
 

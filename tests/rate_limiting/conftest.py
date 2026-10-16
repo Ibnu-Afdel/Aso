@@ -27,8 +27,8 @@ def _purge_fixture_modules() -> None:
 @pytest.fixture(autouse=True)
 def _reset_rate_limiting_state():
     """Cache stores and named limiters are process-global; isolate every test from the last."""
-    from fastogram.cache.manager import flush_all
-    from fastogram.rate_limiting.limiter import _reset_for_tests
+    from aso.cache.manager import flush_all
+    from aso.rate_limiting.limiter import _reset_for_tests
 
     flush_all()
     _reset_for_tests()

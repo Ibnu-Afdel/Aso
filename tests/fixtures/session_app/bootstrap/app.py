@@ -1,5 +1,5 @@
-from fastogram.config import env
-from fastogram.foundation import Application, MiddlewareConfig
+from aso.config import env
+from aso.foundation import Application, MiddlewareConfig
 
 
 def middleware(m: MiddlewareConfig) -> None:

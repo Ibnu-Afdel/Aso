@@ -4,7 +4,7 @@ ran inline (`tests/conftest.py` purges this module between tests)."""
 
 from __future__ import annotations
 
-from fastogram.auth.events import Registered
+from aso.auth.events import Registered
 
 calls: list[int] = []
 

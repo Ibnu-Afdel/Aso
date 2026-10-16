@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.mail import Content, Envelope, Mail, Mailable
+from aso.mail import Content, Envelope, Mail, Mailable
 
 
 class _Greeting(Mailable):

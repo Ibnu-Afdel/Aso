@@ -7,7 +7,7 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import String, Text
 
-from fastogram.database import Factory, Mapped, Model, mapped_column
+from aso.database import Factory, Mapped, Model, mapped_column
 
 
 def _make_post_model():
@@ -21,7 +21,7 @@ def _make_post_model():
 
 
 async def test_create_persists_and_returns_a_single_model(db):
-    from fastogram.database import Model
+    from aso.database import Model
 
     Post = _make_post_model()
     await db.run_sync(Model.metadata.create_all)
@@ -41,7 +41,7 @@ async def test_create_persists_and_returns_a_single_model(db):
 
 
 async def test_make_does_not_persist(db):
-    from fastogram.database import Model
+    from aso.database import Model
 
     Post = _make_post_model()
     await db.run_sync(Model.metadata.create_all)
@@ -58,7 +58,7 @@ async def test_make_does_not_persist(db):
 
 
 async def test_count_returns_a_list_of_the_requested_size(db):
-    from fastogram.database import Model
+    from aso.database import Model
 
     Post = _make_post_model()
     await db.run_sync(Model.metadata.create_all)
@@ -79,7 +79,7 @@ async def test_count_returns_a_list_of_the_requested_size(db):
 
 
 async def test_state_overrides_the_definition(db):
-    from fastogram.database import Model
+    from aso.database import Model
 
     Post = _make_post_model()
     await db.run_sync(Model.metadata.create_all)
@@ -98,7 +98,7 @@ async def test_state_overrides_the_definition(db):
 
 
 async def test_overrides_passed_to_create_win_over_state(db):
-    from fastogram.database import Model
+    from aso.database import Model
 
     Post = _make_post_model()
     await db.run_sync(Model.metadata.create_all)
@@ -115,7 +115,7 @@ async def test_overrides_passed_to_create_win_over_state(db):
 
 async def test_factory_bypasses_fillable(db):
     """`__fillable__ = ["title"]` on `Post`, but the factory still sets `body`."""
-    from fastogram.database import Model
+    from aso.database import Model
 
     Post = _make_post_model()
     await db.run_sync(Model.metadata.create_all)
@@ -131,7 +131,7 @@ async def test_factory_bypasses_fillable(db):
 
 
 async def test_unknown_attribute_name_raises_attribute_error(db):
-    from fastogram.database import Model
+    from aso.database import Model
 
     Post = _make_post_model()
     await db.run_sync(Model.metadata.create_all)
@@ -147,10 +147,10 @@ async def test_unknown_attribute_name_raises_attribute_error(db):
 
 
 async def test_faker_locale_comes_from_config(db):
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     Post = _make_post_model()
-    from fastogram.database import Model
+    from aso.database import Model
 
     await db.run_sync(Model.metadata.create_all)
 

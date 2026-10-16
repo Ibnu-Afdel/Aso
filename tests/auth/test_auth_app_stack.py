@@ -28,14 +28,14 @@ async def app():
         from bootstrap.app import create_app
 
         application = create_app()
-        from fastogram.database import Model
-        from fastogram.database.engine import engine
+        from aso.database import Model
+        from aso.database.engine import engine
 
         async with engine().begin() as conn:
             await conn.run_sync(Model.metadata.create_all)
             # The real "password_reset_tokens" table a Laravel-style migration would create
             # (T-38). The password broker talks to it with raw SQL, not an ORM model, see
-            # `fastogram/auth/password_broker.py`.
+            # `aso/auth/password_broker.py`.
             await conn.execute(
                 text(
                     "CREATE TABLE password_reset_tokens ("
@@ -118,7 +118,7 @@ async def test_guest_middleware_redirects_authenticated_users_away_from_login(cl
 async def test_throttled_login_fires_lockout_after_five_attempts(client):
     await _register(client)
     await client.post("/logout")
-    from fastogram.events import Event
+    from aso.events import Event
 
     Event.fake()
     for _ in range(5):
@@ -127,7 +127,7 @@ async def test_throttled_login_fires_lockout_after_five_attempts(client):
     assert r.status_code == 422
     assert "Too many login attempts" in r.json()["errors"]["email"][0]
 
-    from fastogram.auth.events import Lockout
+    from aso.auth.events import Lockout
 
     Event.assert_dispatched(Lockout, lambda e: e.email == "jane@example.com")
 
@@ -185,14 +185,14 @@ async def test_verified_middleware_blocks_until_email_is_verified(client):
 
 async def test_email_verification_flow_marks_verified_and_fires_verified_event(client):
     await _register(client)
-    from fastogram.auth.events import Verified
-    from fastogram.events import Event
+    from aso.auth.events import Verified
+    from aso.events import Event
 
     Event.fake()
     r = await client.post("/email/verification-notification")
     assert r.status_code == 200
 
-    from fastogram.mail.drivers import array_messages
+    from aso.mail.drivers import array_messages
 
     messages = array_messages()
     assert messages, "no verification mail was recorded"
@@ -233,7 +233,7 @@ async def test_password_confirm_rejects_wrong_password(client):
 
 
 async def test_can_middleware_authorizes_via_policy(client):
-    from fastogram.database.db import DB
+    from aso.database.db import DB
 
     from app.models.post import Post
 
@@ -256,7 +256,7 @@ async def test_password_reset_flow(client):
     await _register(client, email="reset@example.com", password="old-password-1")
     await client.post("/logout")
 
-    from fastogram.mail.drivers import array_messages
+    from aso.mail.drivers import array_messages
 
     r = await client.post("/forgot-password", json={"email": "reset@example.com"})
     assert r.status_code == 200

@@ -3,8 +3,8 @@ starter kit's `routes/auth.php`: full registration, login, logout, password rese
 verification and password-confirmation flows.
 """
 
-from fastogram.auth import features
-from fastogram.routing import Route
+from aso.auth import features
+from aso.routing import Route
 
 from app.http.controllers.auth.authenticated_session_controller import AuthenticatedSessionController
 from app.http.controllers.auth.confirmable_password_controller import ConfirmablePasswordController

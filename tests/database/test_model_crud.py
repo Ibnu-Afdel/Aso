@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import String
 
-from fastogram.database import Mapped, Model, ModelNotFound, mapped_column
+from aso.database import Mapped, Model, ModelNotFound, mapped_column
 
 
 def _post_model():

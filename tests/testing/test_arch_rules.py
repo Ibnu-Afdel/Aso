@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from fastogram.foundation import paths
-from fastogram.testing.arch import ArchitectureViolation, arch, arch_preset
+from aso.foundation import paths
+from aso.testing.arch import ArchitectureViolation, arch, arch_preset
 
 GOOD = Path(__file__).parent.parent / "fixtures" / "arch_good"
 BAD = Path(__file__).parent.parent / "fixtures" / "arch_bad"
@@ -21,19 +21,19 @@ ALL_RULES = [f"A{i}" for i in range(1, 14)]
 
 @pytest.fixture(autouse=True)
 def _restore_base_path(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Isolates `fastogram.foundation.paths`' module-global `_base` to this test only."""
+    """Isolates `aso.foundation.paths`' module-global `_base` to this test only."""
     monkeypatch.setattr(paths, "_base", paths._base, raising=False)
 
 
-def test_fastogram_preset_passes_on_a_clean_project() -> None:
+def test_aso_preset_passes_on_a_clean_project() -> None:
     paths.set_base_path(GOOD)
-    arch_preset("fastogram").check()  # must not raise
+    arch_preset("aso").check()  # must not raise
 
 
-def test_fastogram_preset_reports_every_rule_on_the_bad_project() -> None:
+def test_aso_preset_reports_every_rule_on_the_bad_project() -> None:
     paths.set_base_path(BAD)
     with pytest.raises(ArchitectureViolation) as excinfo:
-        arch_preset("fastogram").check()
+        arch_preset("aso").check()
     message = str(excinfo.value)
     for rule in ALL_RULES:
         assert rule in message, f"{rule} did not fire on the bad fixture project"
@@ -45,18 +45,18 @@ def test_each_rule_fires_in_isolation_on_bad_and_not_on_good(rule: str) -> None:
     others = [r for r in ALL_RULES if r != rule]
 
     paths.set_base_path(GOOD)
-    arch_preset("fastogram").without(*others).check()  # the good project never violates it
+    arch_preset("aso").without(*others).check()  # the good project never violates it
 
     paths.set_base_path(BAD)
     with pytest.raises(ArchitectureViolation) as excinfo:
-        arch_preset("fastogram").without(*others).check()
+        arch_preset("aso").without(*others).check()
     assert rule in str(excinfo.value)
 
 
 def test_without_disables_one_rule() -> None:
     paths.set_base_path(BAD)
     with pytest.raises(ArchitectureViolation) as excinfo:
-        arch_preset("fastogram").without("A7").check()
+        arch_preset("aso").without("A7").check()
     assert "A7" not in str(excinfo.value)
     assert "A1" in str(excinfo.value)
 
@@ -64,7 +64,7 @@ def test_without_disables_one_rule() -> None:
 def test_ignoring_drops_a_whole_package() -> None:
     paths.set_base_path(BAD)
     with pytest.raises(ArchitectureViolation) as excinfo:
-        arch_preset("fastogram").ignoring("app.models").check()
+        arch_preset("aso").ignoring("app.models").check()
     message = str(excinfo.value)
     assert "A2" not in message  # app/models/post.py
     assert "A11" not in message  # app/models/comment.py
@@ -83,7 +83,7 @@ def test_arch_ignore_comment_suppresses_that_line_only(tmp_path: Path) -> None:
     )
     paths.set_base_path(project)
     with pytest.raises(ArchitectureViolation) as excinfo:
-        arch_preset("fastogram").check()
+        arch_preset("aso").check()
     message = str(excinfo.value)
     assert "A7" not in message
     assert "A1" in message  # every other violation still fires
@@ -96,7 +96,7 @@ def test_arch_ignore_without_a_reason_does_not_suppress(tmp_path: Path) -> None:
     helper.write_text(helper.read_text().replace('print("debugging")', 'print("debugging")  # arch: ignore[A7]'))
     paths.set_base_path(project)
     with pytest.raises(ArchitectureViolation) as excinfo:
-        arch_preset("fastogram").check()
+        arch_preset("aso").check()
     assert "A7" in str(excinfo.value)
 
 
@@ -141,10 +141,10 @@ def test_type_checking_imports_are_ignored(tmp_path: Path) -> None:
         "from __future__ import annotations\n"
         "from typing import TYPE_CHECKING\n"
         "if TYPE_CHECKING:\n"
-        "    from fastogram.http import Request\n"
+        "    from aso.http import Request\n"
     )
     paths.set_base_path(tmp_path)
-    arch("app.models").must_not_import("fastogram.http").check()  # must not raise
+    arch("app.models").must_not_import("aso.http").check()  # must not raise
 
 
 def test_relative_imports_resolve_against_the_owning_package(tmp_path: Path) -> None:

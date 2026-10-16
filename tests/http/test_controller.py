@@ -1,15 +1,15 @@
 """`Controller` / `ControllerMiddleware` (T-13): single-action controllers, instance-per-request,
-and the public re-export of `fastogram.http.FormRequest`."""
+and the public re-export of `aso.http.FormRequest`."""
 
 from __future__ import annotations
 
 import httpx2 as httpx
 
-from fastogram.http import Controller, ControllerMiddleware, FormRequest
-from fastogram.validation.form_request import FormRequest as ValidationFormRequest
+from aso.http import Controller, ControllerMiddleware, FormRequest
+from aso.validation.form_request import FormRequest as ValidationFormRequest
 
 
-def test_form_request_is_re_exported_from_fastogram_http():
+def test_form_request_is_re_exported_from_aso_http():
     assert FormRequest is ValidationFormRequest
 
 

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.console import Command, call, call_output, command
-from fastogram.console.registry import CommandNotFound, register, reset_registry
+from aso.console import Command, call, call_output, command
+from aso.console.registry import CommandNotFound, register, reset_registry
 
 
 @pytest.fixture(autouse=True)

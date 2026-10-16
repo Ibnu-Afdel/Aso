@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.http import Controller, Request
+from aso.http import Controller, Request
 
 from app.http.requests.store_post_request import StorePostRequest
 

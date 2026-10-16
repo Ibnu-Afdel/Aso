@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from fastogram.validation import FormRequest
+from aso.validation import FormRequest
 
 
 class OrderLine(BaseModel):

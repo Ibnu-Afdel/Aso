@@ -1,4 +1,4 @@
-"""Fixtures for the `fastogram.database` test suite.
+"""Fixtures for the `aso.database` test suite.
 
 Follows the S-2 test-binding pattern (`spikes/s2/test_s2.py`): one connection + one outer
 transaction per test, bound with `join_transaction_mode="create_savepoint"`, rolled back at the
@@ -14,7 +14,7 @@ the class object itself survives with stale mapper state.
 
 Run against SQLite (default) or PostgreSQL:
     uv run pytest -q tests/database
-    DB_URL=postgresql+asyncpg://postgres:secret@127.0.0.1:55432/fastogram uv run pytest -q tests/database
+    DB_URL=postgresql+asyncpg://postgres:secret@127.0.0.1:55432/aso uv run pytest -q tests/database
 """
 
 from __future__ import annotations
@@ -27,8 +27,8 @@ import pytest
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.pool import StaticPool
 
-from fastogram.database.engine import configure, install_query_listener, install_sqlite_recipe
-from fastogram.database.scope import open_scope, reset_test_binding, set_test_binding
+from aso.database.engine import configure, install_query_listener, install_sqlite_recipe
+from aso.database.scope import open_scope, reset_test_binding, set_test_binding
 
 DB_URL = os.environ.get("DB_URL", "sqlite+aiosqlite://")
 IS_SQLITE = DB_URL.startswith("sqlite")
@@ -100,8 +100,8 @@ def request_context():
     fresh `Context` copied from pytest's stable outer (sync) context, so a `set()` made inside
     one test's task never leaks into another test's task regardless of cleanup.
     """
-    from fastogram.context import RequestContext as _RequestContext
-    from fastogram.context import enter
+    from aso.context import RequestContext as _RequestContext
+    from aso.context import enter
 
     def _use(path: str = "/posts", query: dict[str, str] | None = None) -> FakeRequest:
         request = FakeRequest(path, query)

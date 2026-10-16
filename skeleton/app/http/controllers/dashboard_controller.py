@@ -1,7 +1,7 @@
 """The private dashboard landing page (T-05)."""
 
-from fastogram.http import Controller
-from fastogram.inertia import inertia
+from aso.http import Controller
+from aso.inertia import inertia
 
 
 class DashboardController(Controller):

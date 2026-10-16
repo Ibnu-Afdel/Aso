@@ -1,4 +1,4 @@
-"""`UploadedFile.store()` / `.store_as()` wired to `fastogram.storage` (T-43)."""
+"""`UploadedFile.store()` / `.store_as()` wired to `aso.storage` (T-43)."""
 
 from __future__ import annotations
 
@@ -6,9 +6,9 @@ import re
 
 import pytest
 
-from fastogram.config import set_config
-from fastogram.storage import storage
-from fastogram.validation.uploaded_file import UploadedFile
+from aso.config import set_config
+from aso.storage import storage
+from aso.validation.uploaded_file import UploadedFile
 
 
 @pytest.fixture(autouse=True)

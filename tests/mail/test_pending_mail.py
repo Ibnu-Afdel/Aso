@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.mail import Content, Envelope, Mail, Mailable, SendQueuedMail
-from fastogram.queue import Queue
+from aso.mail import Content, Envelope, Mail, Mailable, SendQueuedMail
+from aso.queue import Queue
 
 
 class _Greeting(Mailable):
@@ -68,7 +68,7 @@ async def test_send_renders_and_delivers_the_wire_message(monkeypatch):
         captured["message"] = message
         captured["mailer"] = mailer
 
-    monkeypatch.setattr("fastogram.mail.drivers.deliver_message", fake_deliver)
+    monkeypatch.setattr("aso.mail.drivers.deliver_message", fake_deliver)
 
     await Mail.to("a@example.com").cc("c@example.com").send(_Greeting("Ada"))
 
@@ -89,9 +89,9 @@ async def test_send_generates_text_from_html_when_no_text_is_given(monkeypatch, 
     async def fake_deliver(message, mailer=None):
         captured["message"] = message
 
-    monkeypatch.setattr("fastogram.mail.drivers.deliver_message", fake_deliver)
+    monkeypatch.setattr("aso.mail.drivers.deliver_message", fake_deliver)
 
-    from fastogram.foundation import paths
+    from aso.foundation import paths
 
     views = tmp_path / "resources" / "views" / "mail"
     views.mkdir(parents=True)
@@ -114,14 +114,14 @@ async def test_send_generates_text_from_html_when_no_text_is_given(monkeypatch, 
 
 async def test_envelope_from_as_string_uses_the_configured_from_name(monkeypatch):
     monkeypatch.setattr(
-        "fastogram.mail.drivers.default_from_address", lambda: {"address": "default@x.com", "name": "Default"}
+        "aso.mail.drivers.default_from_address", lambda: {"address": "default@x.com", "name": "Default"}
     )
     captured = {}
 
     async def fake_deliver(message, mailer=None):
         captured["message"] = message
 
-    monkeypatch.setattr("fastogram.mail.drivers.deliver_message", fake_deliver)
+    monkeypatch.setattr("aso.mail.drivers.deliver_message", fake_deliver)
 
     class FromString(Mailable):
         def envelope(self) -> Envelope:
@@ -141,7 +141,7 @@ async def test_envelope_from_as_tuple_overrides_both_address_and_name(monkeypatc
     async def fake_deliver(message, mailer=None):
         captured["message"] = message
 
-    monkeypatch.setattr("fastogram.mail.drivers.deliver_message", fake_deliver)
+    monkeypatch.setattr("aso.mail.drivers.deliver_message", fake_deliver)
 
     class FromTuple(Mailable):
         def envelope(self) -> Envelope:
@@ -161,7 +161,7 @@ async def test_reply_to_string_is_normalized_to_a_list(monkeypatch):
     async def fake_deliver(message, mailer=None):
         captured["message"] = message
 
-    monkeypatch.setattr("fastogram.mail.drivers.deliver_message", fake_deliver)
+    monkeypatch.setattr("aso.mail.drivers.deliver_message", fake_deliver)
 
     class WithReplyTo(Mailable):
         def envelope(self) -> Envelope:
@@ -214,7 +214,7 @@ async def test_queue_strips_any_model_the_mailable_held_down_to_plain_json():
     await Mail.to("a@example.com").queue(WithModel(HeldModel("Ada")))
 
     job = Queue._dispatched[0][1]
-    from fastogram.queue.serialization import validate_serializable
+    from aso.queue.serialization import validate_serializable
 
     validate_serializable(job.message)  # must not raise: the job payload is plain JSON
 
@@ -225,7 +225,7 @@ async def test_send_does_not_validate_serializability_it_sends_immediately(monke
     async def fake_deliver(message, mailer=None):
         pass
 
-    monkeypatch.setattr("fastogram.mail.drivers.deliver_message", fake_deliver)
+    monkeypatch.setattr("aso.mail.drivers.deliver_message", fake_deliver)
 
     class Holder:
         pass

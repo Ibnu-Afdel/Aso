@@ -289,6 +289,98 @@ wheels = [
 ]
 
 [[package]]
+name = "aso"
+version = "0.2.0"
+source = { editable = "." }
+dependencies = [
+    { name = "aiosmtplib" },
+    { name = "aiosqlite" },
+    { name = "alembic" },
+    { name = "croniter" },
+    { name = "cryptography" },
+    { name = "faker" },
+    { name = "fastapi" },
+    { name = "httpx2" },
+    { name = "inflect" },
+    { name = "itsdangerous" },
+    { name = "jinja2" },
+    { name = "pwdlib", extra = ["argon2"] },
+    { name = "pydantic", extra = ["email"] },
+    { name = "python-dotenv" },
+    { name = "python-multipart" },
+    { name = "sqlalchemy", extra = ["asyncio"] },
+    { name = "starlette" },
+    { name = "typer" },
+    { name = "uvicorn", extra = ["standard"] },
+    { name = "watchfiles" },
+]
+
+[package.optional-dependencies]
+mysql = [
+    { name = "asyncmy" },
+]
+pgsql = [
+    { name = "asyncpg" },
+]
+redis = [
+    { name = "redis" },
+    { name = "taskiq" },
+    { name = "taskiq-redis" },
+]
+testing = [
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "asyncpg" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiosmtplib", specifier = ">=5.1" },
+    { name = "aiosqlite", specifier = ">=0.22" },
+    { name = "alembic", specifier = ">=1.20" },
+    { name = "asyncmy", marker = "extra == 'mysql'", specifier = ">=0.2.16" },
+    { name = "asyncpg", marker = "extra == 'pgsql'", specifier = ">=0.32" },
+    { name = "croniter", specifier = ">=6.2,<7" },
+    { name = "cryptography", specifier = ">=50" },
+    { name = "faker", specifier = ">=40" },
+    { name = "fastapi", specifier = ">=0.143,<0.144" },
+    { name = "httpx2", specifier = ">=2.13" },
+    { name = "inflect", specifier = ">=7.5" },
+    { name = "itsdangerous", specifier = ">=2.2" },
+    { name = "jinja2", specifier = ">=3.1.6" },
+    { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3.1" },
+    { name = "pydantic", extras = ["email"], specifier = ">=2.14,<2.15" },
+    { name = "pytest", marker = "extra == 'testing'", specifier = ">=9.1" },
+    { name = "pytest-asyncio", marker = "extra == 'testing'", specifier = ">=1.4,<1.5" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
+    { name = "redis", marker = "extra == 'redis'", specifier = ">=8.1" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.1.4,<2.2" },
+    { name = "starlette", specifier = ">=1.7,<1.8" },
+    { name = "taskiq", marker = "extra == 'redis'", specifier = ">=0.13" },
+    { name = "taskiq-redis", marker = "extra == 'redis'", specifier = ">=1.2.4" },
+    { name = "typer", specifier = ">=0.27,<0.28" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.54" },
+    { name = "watchfiles", specifier = ">=1.0" },
+]
+provides-extras = ["pgsql", "mysql", "redis", "testing"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "asyncpg", specifier = ">=0.32" },
+    { name = "pytest", specifier = ">=9.1" },
+    { name = "pytest-asyncio", specifier = ">=1.4,<1.5" },
+    { name = "ruff", specifier = ">=0.14" },
+]
+
+[[package]]
 name = "asyncmy"
 version = "0.2.16"
 source = { registry = "https://pypi.org/simple" }
@@ -634,98 +726,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/96/16/52ca959230f9820660fd822f488f883d7dc42310716b4cc6d2a944835dcd/fastapi-0.143.1.tar.gz", hash = "sha256:4cafaab64df8534758bf0fce61947f5e27e6cd512798ccbbaad5425086c3b664", size = 469025, upload-time = "2026-10-14T12:53:09.448Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ca/73/30ee3dd8f26fd385e451bbded9e1b54766a277db588e70154dd894f4b698/fastapi-0.143.1-py3-none-any.whl", hash = "sha256:687beb445804e4c4dbe2a76fd83c25e9b973ac48c267defb86f791e099baecc4", size = 144682, upload-time = "2026-10-14T12:53:07.69Z" },
-]
-
-[[package]]
-name = "fastogram"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "aiosmtplib" },
-    { name = "aiosqlite" },
-    { name = "alembic" },
-    { name = "croniter" },
-    { name = "cryptography" },
-    { name = "faker" },
-    { name = "fastapi" },
-    { name = "httpx2" },
-    { name = "inflect" },
-    { name = "itsdangerous" },
-    { name = "jinja2" },
-    { name = "pwdlib", extra = ["argon2"] },
-    { name = "pydantic", extra = ["email"] },
-    { name = "python-dotenv" },
-    { name = "python-multipart" },
-    { name = "sqlalchemy", extra = ["asyncio"] },
-    { name = "starlette" },
-    { name = "typer" },
-    { name = "uvicorn", extra = ["standard"] },
-    { name = "watchfiles" },
-]
-
-[package.optional-dependencies]
-mysql = [
-    { name = "asyncmy" },
-]
-pgsql = [
-    { name = "asyncpg" },
-]
-redis = [
-    { name = "redis" },
-    { name = "taskiq" },
-    { name = "taskiq-redis" },
-]
-testing = [
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "asyncpg" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiosmtplib", specifier = ">=5.1" },
-    { name = "aiosqlite", specifier = ">=0.22" },
-    { name = "alembic", specifier = ">=1.20" },
-    { name = "asyncmy", marker = "extra == 'mysql'", specifier = ">=0.2.16" },
-    { name = "asyncpg", marker = "extra == 'pgsql'", specifier = ">=0.32" },
-    { name = "croniter", specifier = ">=6.2,<7" },
-    { name = "cryptography", specifier = ">=50" },
-    { name = "faker", specifier = ">=40" },
-    { name = "fastapi", specifier = ">=0.143,<0.144" },
-    { name = "httpx2", specifier = ">=2.13" },
-    { name = "inflect", specifier = ">=7.5" },
-    { name = "itsdangerous", specifier = ">=2.2" },
-    { name = "jinja2", specifier = ">=3.1.6" },
-    { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3.1" },
-    { name = "pydantic", extras = ["email"], specifier = ">=2.14,<2.15" },
-    { name = "pytest", marker = "extra == 'testing'", specifier = ">=9.1" },
-    { name = "pytest-asyncio", marker = "extra == 'testing'", specifier = ">=1.4,<1.5" },
-    { name = "python-dotenv", specifier = ">=1.2.4" },
-    { name = "python-multipart", specifier = ">=0.0.20" },
-    { name = "redis", marker = "extra == 'redis'", specifier = ">=8.1" },
-    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.1.4,<2.2" },
-    { name = "starlette", specifier = ">=1.7,<1.8" },
-    { name = "taskiq", marker = "extra == 'redis'", specifier = ">=0.13" },
-    { name = "taskiq-redis", marker = "extra == 'redis'", specifier = ">=1.2.4" },
-    { name = "typer", specifier = ">=0.27,<0.28" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.54" },
-    { name = "watchfiles", specifier = ">=1.0" },
-]
-provides-extras = ["pgsql", "mysql", "redis", "testing"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "asyncpg", specifier = ">=0.32" },
-    { name = "pytest", specifier = ">=9.1" },
-    { name = "pytest-asyncio", specifier = ">=1.4,<1.5" },
-    { name = "ruff", specifier = ">=0.14" },
 ]
 
 [[package]]

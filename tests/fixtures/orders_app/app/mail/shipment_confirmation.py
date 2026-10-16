@@ -1,4 +1,4 @@
-from fastogram.mail import Content, Envelope, Mailable
+from aso.mail import Content, Envelope, Mailable
 
 from app.models.order import Order
 

@@ -1,4 +1,4 @@
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.order_shipment_controller import OrderShipmentController
 

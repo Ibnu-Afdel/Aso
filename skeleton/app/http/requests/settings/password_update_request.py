@@ -2,8 +2,8 @@
 
 from typing import Annotated
 
-from fastogram.http import FormRequest
-from fastogram.validation import Confirmed, CurrentPassword
+from aso.http import FormRequest
+from aso.validation import Confirmed, CurrentPassword
 
 from app.actions.auth.password_validation_rules import PasswordValidationRules
 

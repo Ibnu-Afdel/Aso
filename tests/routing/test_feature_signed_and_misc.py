@@ -7,8 +7,8 @@ from datetime import timedelta
 
 import httpx2 as httpx
 
-from fastogram.routing import url
-from fastogram.routing.registry import route_list
+from aso.routing import url
+from aso.routing.registry import route_list
 
 
 async def test_signed_route_accepts_a_valid_signature(client: httpx.AsyncClient):

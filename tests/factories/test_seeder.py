@@ -6,8 +6,8 @@ from __future__ import annotations
 import pytest
 from sqlalchemy import String
 
-from fastogram.database import Mapped, Model, Seeder, mapped_column
-from fastogram.database.seeder import seed
+from aso.database import Mapped, Model, Seeder, mapped_column
+from aso.database.seeder import seed
 
 
 async def test_run_must_be_implemented():
@@ -54,7 +54,7 @@ async def test_seed_resolves_a_seeder_by_class_name(db, factories_app):
     seeders_dir.mkdir(parents=True, exist_ok=True)
     (seeders_dir / "__init__.py").touch()
     (seeders_dir / "ping_seeder.py").write_text(
-        "from fastogram.database import Seeder\n\n"
+        "from aso.database import Seeder\n\n"
         "calls = []\n\n"
         "class PingSeeder(Seeder):\n"
         "    async def run(self) -> None:\n"

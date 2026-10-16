@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastogram.testing.client import TestClient
+from aso.testing.client import TestClient
 
 
 async def test_get_and_put_patch_delete_through_the_real_stack(client: TestClient) -> None:
@@ -80,7 +80,7 @@ async def test_with_csrf_turns_checking_back_on(client: TestClient) -> None:
         client.inertia().from_url("/posts/create").with_csrf().post("/posts", json={"title": "Hello world"})
     )
     # No X-XSRF-TOKEN supplied -> CSRF now enforced -> redirected back with a flash error
-    # (T-12's Inertia-visit branch; `fastogram.testing.plugin`'s `db` fixture leaves CSRF off
+    # (T-12's Inertia-visit branch; `aso.testing.plugin`'s `db` fixture leaves CSRF off
     # by default, which is why every *other* test in this file can post without a token).
     response.assert_redirect("/posts/create")
     response.assert_session_has("error")
@@ -114,7 +114,7 @@ async def test_without_middleware_skips_the_alias_only_in_testing(client: TestCl
     (await client.without_middleware("auth").get("/guarded")).assert_ok()
     (await client.without_middleware().get("/guarded")).assert_ok()
 
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     set_config("app.environment", "production")  # the flag must never work outside tests
     try:

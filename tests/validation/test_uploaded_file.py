@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.validation.uploaded_file import UploadedFile
+from aso.validation.uploaded_file import UploadedFile
 
 
 async def test_basic_attributes_and_read():
@@ -28,10 +28,10 @@ def test_fake_image_and_create():
     assert created.content_type == "text/csv"
 
 
-async def test_store_and_store_as_persist_through_fastogram_storage():
-    """T-43 landed: `store()`/`store_as()` now go through `fastogram.storage` instead of raising
+async def test_store_and_store_as_persist_through_aso_storage():
+    """T-43 landed: `store()`/`store_as()` now go through `aso.storage` instead of raising
     `NotImplementedError`. `storage.fake()` swaps the disk for a throwaway temp directory."""
-    from fastogram.storage import storage
+    from aso.storage import storage
 
     storage.fake("local")
     try:

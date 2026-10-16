@@ -2,8 +2,8 @@ from typing import Annotated
 
 from pydantic import EmailStr, Field
 
-from fastogram.validation import Accepted, Confirmed, Exists, File, FormRequest, Image, Password, Unique
-from fastogram.validation.uploaded_file import UploadedFile
+from aso.validation import Accepted, Confirmed, Exists, File, FormRequest, Image, Password, Unique
+from aso.validation.uploaded_file import UploadedFile
 
 
 class UpdateEmailRequest(FormRequest):

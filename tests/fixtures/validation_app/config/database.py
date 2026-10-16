@@ -1,4 +1,4 @@
-from fastogram.config import env
+from aso.config import env
 
 default = env("DB_CONNECTION", "sqlite")
 connections = {

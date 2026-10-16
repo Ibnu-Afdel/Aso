@@ -5,8 +5,8 @@ from __future__ import annotations
 
 import logging
 
-from fastogram.log import configure_logging, log
-from fastogram.log.testing import LogCapture
+from aso.log import configure_logging, log
+from aso.log.testing import LogCapture
 
 
 def test_log_capture_records_message_and_context():
@@ -49,7 +49,7 @@ def test_configure_logging_is_idempotent():
 
 def test_configure_logging_does_not_disturb_caplog(caplog):
     configure_logging()
-    with caplog.at_level(logging.DEBUG, logger="fastogram"):
+    with caplog.at_level(logging.DEBUG, logger="aso"):
         log.info("seen by caplog too")
     assert "seen by caplog too" in caplog.text
 
@@ -57,8 +57,8 @@ def test_configure_logging_does_not_disturb_caplog(caplog):
 def test_reconfiguring_rebuilds_handlers_without_duplicating_them(tmp_path, monkeypatch):
     """Calling `configure_logging()` again after changing config must not pile up old handlers
     on the same channel logger (the manager docstring promises handlers are rebuilt lazily)."""
-    monkeypatch.setattr("fastogram.log.manager._log_dir", lambda: tmp_path)
-    from fastogram.log.manager import _ensure_channel
+    monkeypatch.setattr("aso.log.manager._log_dir", lambda: tmp_path)
+    from aso.log.manager import _ensure_channel
 
     before = len(_ensure_channel("rebuild-test").handlers)
     configure_logging()

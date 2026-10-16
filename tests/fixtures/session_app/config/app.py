@@ -1,4 +1,4 @@
-from fastogram.config import env
+from aso.config import env
 
 name = env("APP_NAME", "Session App")
 environment = env("APP_ENV", "local")

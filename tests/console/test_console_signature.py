@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.console.signature import parse_signature
+from aso.console.signature import parse_signature
 
 
 def test_bare_command_name_with_no_tokens() -> None:

@@ -1,10 +1,10 @@
-"""Unit tests for `fastogram.routing.paths` (T-10): parsing, cleaning and compiling route tokens."""
+"""Unit tests for `aso.routing.paths` (T-10): parsing, cleaning and compiling route tokens."""
 
 from __future__ import annotations
 
 import pytest
 
-from fastogram.routing import paths
+from aso.routing import paths
 
 
 def test_parse_params_extracts_name_binding_field_and_optional():

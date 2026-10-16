@@ -1,8 +1,8 @@
 """Resends the email-verification link (T-38). Throttled 6/min by the `email/verification-notification` route."""
 
-from fastogram.auth import auth
-from fastogram.http import Controller, redirect
-from fastogram.routing import route
+from aso.auth import auth
+from aso.http import Controller, redirect
+from aso.routing import route
 
 
 class EmailVerificationNotificationController(Controller):

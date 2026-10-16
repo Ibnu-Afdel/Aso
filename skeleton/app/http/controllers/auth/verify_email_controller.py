@@ -3,10 +3,10 @@
 import hashlib
 import hmac
 
-from fastogram.auth import AuthorizationException, auth
-from fastogram.auth.events import Verified
-from fastogram.http import Controller, redirect
-from fastogram.routing import route
+from aso.auth import AuthorizationException, auth
+from aso.auth.events import Verified
+from aso.http import Controller, redirect
+from aso.routing import route
 
 
 class VerifyEmailController(Controller):

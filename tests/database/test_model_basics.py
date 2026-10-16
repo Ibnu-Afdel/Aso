@@ -7,8 +7,8 @@ from datetime import UTC, datetime
 import pytest
 from sqlalchemy import String
 
-from fastogram.config import set_config
-from fastogram.database import Mapped, MassAssignmentError, Model, mapped_column
+from aso.config import set_config
+from aso.database import Mapped, MassAssignmentError, Model, mapped_column
 
 # ---------------------------------------------------------------- table naming (T-31)
 
@@ -299,7 +299,7 @@ async def test_to_dict_excludes_hidden_and_includes_appends(db):
 async def test_to_dict_never_triggers_a_relation_load(db):
     from sqlalchemy import ForeignKey
 
-    from fastogram.database import belongs_to, has_many
+    from aso.database import belongs_to, has_many
 
     class User(Model):
         name: Mapped[str] = mapped_column(String(50))
@@ -321,7 +321,7 @@ async def test_to_dict_never_triggers_a_relation_load(db):
 async def test_to_dict_includes_already_loaded_relations(db):
     from sqlalchemy import ForeignKey
 
-    from fastogram.database import belongs_to, has_many
+    from aso.database import belongs_to, has_many
 
     class User(Model):
         name: Mapped[str] = mapped_column(String(50))

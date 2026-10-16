@@ -8,7 +8,7 @@ import pytest
 from sqlalchemy import String
 from sqlalchemy import exc as sa_exc
 
-from fastogram.database import DB, Mapped, Model, mapped_column
+from aso.database import DB, Mapped, Model, mapped_column
 
 
 def _user_model():

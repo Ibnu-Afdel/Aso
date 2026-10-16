@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import _jobs
 
-from fastogram.queue.failed import flush_failed, forget_failed, list_failed, retry_failed
-from fastogram.queue.manager import run_job
+from aso.queue.failed import flush_failed, forget_failed, list_failed, retry_failed
+from aso.queue.manager import run_job
 
 
 async def test_record_and_list(db):

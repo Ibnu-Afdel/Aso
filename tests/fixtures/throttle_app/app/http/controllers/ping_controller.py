@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.http import Controller
+from aso.http import Controller
 
 
 class PingController(Controller):

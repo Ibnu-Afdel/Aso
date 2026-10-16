@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.database import DB
+from aso.database import DB
 
 
 async def search_posts(term: str) -> object:

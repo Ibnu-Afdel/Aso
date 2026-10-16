@@ -5,10 +5,10 @@ build-backend = "hatchling.build"
 [project]
 name = "app"
 version = "0.1.0"
-description = "A FastoGram application"
+description = "A Aso application"
 requires-python = ">=3.12"
 dependencies = [
-    "fastogram",
+    "aso",
 ]
 
 [dependency-groups]
@@ -18,10 +18,10 @@ dev = [
     "pytest-cov>=7",
 ]
 
-# Dev checkouts (and `fastogram new --dev`) point this at the framework's own repo, editable.
-# `fastogram new` (without --dev) removes this table and pins `fastogram` to a released version.
+# Dev checkouts (and `aso new --dev`) point this at the framework's own repo, editable.
+# `aso new` (without --dev) removes this table and pins `aso` to a released version.
 [tool.uv.sources]
-fastogram = { path = "..", editable = true }
+aso = { path = "..", editable = true }
 
 [tool.hatch.build.targets.wheel]
 packages = ["app", "bootstrap", "config", "database", "routes"]
@@ -41,5 +41,5 @@ select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["fastogram"]
+known-first-party = ["aso"]
 known-local-folder = ["app", "bootstrap", "config", "routes", "database"]

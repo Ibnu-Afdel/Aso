@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.mail.drivers import (
+from aso.mail.drivers import (
     _deliver_log,
     _deliver_smtp,
     array_messages,
@@ -18,7 +18,7 @@ _MESSAGE = {
     "to": ["a@example.com"],
     "cc": ["c@example.com"],
     "bcc": [],
-    "from": {"address": "hello@example.com", "name": "FastoGram"},
+    "from": {"address": "hello@example.com", "name": "Aso"},
     "reply_to": [],
     "subject": "Hi",
     "html": "<p>Hi</p>",
@@ -45,7 +45,7 @@ async def test_reset_array_clears_recorded_messages():
 
 
 async def test_log_driver_writes_the_message_via_log_info(monkeypatch):
-    from fastogram.log import log as real_log
+    from aso.log import log as real_log
 
     captured = {}
 
@@ -64,7 +64,7 @@ async def test_log_driver_writes_the_message_via_log_info(monkeypatch):
 
 
 def test_log_driver_with_no_channel_logs_through_the_default_channel(monkeypatch):
-    from fastogram.log import log as real_log
+    from aso.log import log as real_log
 
     captured = {}
     monkeypatch.setattr(real_log, "info", lambda message, **ctx: captured.update(message=message))
@@ -77,7 +77,7 @@ def test_log_driver_with_no_channel_logs_through_the_default_channel(monkeypatch
 def test_log_driver_with_a_channel_logs_through_log_channel(monkeypatch):
     """`"channel": None` (the default) logs through the default channel; a named one goes
     through `log.channel(name)` instead (T-41: `MAIL_LOG_CHANNEL`)."""
-    from fastogram.log import log as real_log
+    from aso.log import log as real_log
 
     seen = {}
 
@@ -115,7 +115,7 @@ async def test_smtp_driver_builds_the_email_message_and_calls_aiosmtplib_send(mo
     await deliver_message(message, mailer="smtp")
 
     email_message = captured["message"]
-    assert email_message["From"] == "FastoGram <hello@example.com>"
+    assert email_message["From"] == "Aso <hello@example.com>"
     assert email_message["To"] == "a@example.com"
     assert email_message["Cc"] == "c@example.com"
     assert email_message["Subject"] == "Hi"
@@ -175,7 +175,7 @@ async def test_smtp_driver_passes_credentials_through(monkeypatch):
 
 async def test_unknown_transport_raises(monkeypatch):
     """A mailer *is* configured, but its `transport` names none of `array`/`log`/`smtp`."""
-    monkeypatch.setattr("fastogram.mail.drivers.mailer_spec", lambda name=None: {"transport": "carrier-pigeon"})
+    monkeypatch.setattr("aso.mail.drivers.mailer_spec", lambda name=None: {"transport": "carrier-pigeon"})
 
     with pytest.raises(RuntimeError, match="transport"):
         await deliver_message(_MESSAGE, mailer="exotic")

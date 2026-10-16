@@ -4,8 +4,8 @@ calls `Mail.to(user).send(VerifyEmailMail(user))` directly (and auth events carr
 model, so their listeners can never be queued anyway, T-46).
 """
 
-from fastogram.auth import MustVerifyEmail
-from fastogram.auth.events import Registered
+from aso.auth import MustVerifyEmail
+from aso.auth.events import Registered
 
 
 class SendEmailVerificationNotification:

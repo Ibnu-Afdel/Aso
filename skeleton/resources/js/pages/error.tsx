@@ -1,5 +1,5 @@
-// FastoGram addition (no equivalent page in Laravel's React starter kit): renders whatever
-// `fastogram.exceptions` passes to `inertia_error_page` (T-20) -- `status` and an optional
+// Aso addition (no equivalent page in Laravel's React starter kit): renders whatever
+// `aso.exceptions` passes to `inertia_error_page` (T-20) -- `status` and an optional
 // `message`. Not wrapped in AppLayout/AuthLayout (see app.tsx): an error page must render for
 // guests and signed-in users alike.
 import { Head, Link } from "@inertiajs/react";

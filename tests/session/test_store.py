@@ -1,6 +1,6 @@
 import pytest
 
-from fastogram.session.store import Session, new_id
+from aso.session.store import Session, new_id
 
 
 @pytest.fixture

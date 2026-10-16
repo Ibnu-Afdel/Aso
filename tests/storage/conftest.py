@@ -8,7 +8,7 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def _reset_storage_fakes():
-    from fastogram.storage import storage
+    from aso.storage import storage
 
     yield
     storage.reset_fakes()

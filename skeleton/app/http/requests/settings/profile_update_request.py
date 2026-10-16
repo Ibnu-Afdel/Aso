@@ -4,8 +4,8 @@ from typing import Annotated
 
 from pydantic import EmailStr, Field
 
-from fastogram.http import FormRequest
-from fastogram.validation import Unique
+from aso.http import FormRequest
+from aso.validation import Unique
 
 
 class ProfileUpdateRequest(FormRequest):

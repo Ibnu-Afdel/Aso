@@ -7,7 +7,7 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def _reset_cache_state():
-    from fastogram.cache.manager import flush_all
+    from aso.cache.manager import flush_all
 
     flush_all()
     yield

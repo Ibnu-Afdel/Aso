@@ -4,7 +4,7 @@ since `CallQueuedListener.handle()` reimports both the listener and the event cl
 
 from __future__ import annotations
 
-from fastogram.events import Event
+from aso.events import Event
 
 calls: list[dict] = []
 

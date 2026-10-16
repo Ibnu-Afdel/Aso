@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from fastogram.database import Factory
+from aso.database import Factory
 
 from app.models.user import User
 

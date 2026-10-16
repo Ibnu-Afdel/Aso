@@ -45,10 +45,10 @@ def test_queue_failed_lifecycle(cli_group, runner: CliRunner) -> None:
 
     import asyncio
 
-    from fastogram.queue.failed import record_failed_job
+    from aso.queue.failed import record_failed_job
 
     async def _seed() -> None:
-        from fastogram.database.scope import open_scope
+        from aso.database.scope import open_scope
 
         async with open_scope():
             await record_failed_job({"uuid": "abc", "connection": "sync", "queue": "default"}, RuntimeError("boom"))
@@ -78,7 +78,7 @@ def test_queue_restart_signal_is_newer_than_a_worker_started_before_it(cli_group
     import asyncio
     from datetime import UTC, datetime
 
-    from fastogram.queue.worker import _restart_requested
+    from aso.queue.worker import _restart_requested
 
     started_at = datetime.now(UTC)
     result = runner.invoke(cli_group, ["queue:restart"])

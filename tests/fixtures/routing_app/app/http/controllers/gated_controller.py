@@ -1,4 +1,4 @@
-from fastogram.http import Controller, ControllerMiddleware
+from aso.http import Controller, ControllerMiddleware
 
 
 class GatedController(Controller):

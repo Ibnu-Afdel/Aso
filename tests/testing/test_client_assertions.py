@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from fastogram.testing.client import TestClient
+from aso.testing.client import TestClient
 
 
 async def test_status_helpers(client: TestClient) -> None:

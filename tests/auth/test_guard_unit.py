@@ -5,8 +5,8 @@ from __future__ import annotations
 
 from sqlalchemy import String
 
-from fastogram.auth import Authenticatable, auth
-from fastogram.database import Hashed, Mapped, Model, mapped_column
+from aso.auth import Authenticatable, auth
+from aso.database import Hashed, Mapped, Model, mapped_column
 
 
 def _user_model_cls():
@@ -33,8 +33,8 @@ async def test_attempt_succeeds_with_correct_credentials(db, request_context, us
 
 
 async def test_attempt_fails_with_wrong_password_and_dispatches_failed(db, request_context, user_model):
-    from fastogram.auth.events import Failed
-    from fastogram.events import Event
+    from aso.auth.events import Failed
+    from aso.events import Event
 
     User = user_model(_user_model_cls())
     await db.run_sync(Model.metadata.create_all)
@@ -49,8 +49,8 @@ async def test_attempt_fails_with_wrong_password_and_dispatches_failed(db, reque
 
 
 async def test_attempt_with_unknown_email_fails_without_leaking_credentials(db, request_context, user_model):
-    from fastogram.auth.events import Failed
-    from fastogram.events import Event
+    from aso.auth.events import Failed
+    from aso.events import Event
 
     user_model(_user_model_cls())
     await db.run_sync(Model.metadata.create_all)
@@ -74,8 +74,8 @@ async def test_validate_does_not_log_in(db, request_context, user_model):
 
 
 async def test_login_sets_user_and_does_not_regenerate_the_session(db, request_context, user_model):
-    from fastogram.auth.events import Login
-    from fastogram.events import Event
+    from aso.auth.events import Login
+    from aso.events import Event
 
     User = user_model(_user_model_cls())
     await db.run_sync(Model.metadata.create_all)
@@ -91,8 +91,8 @@ async def test_login_sets_user_and_does_not_regenerate_the_session(db, request_c
 
 
 async def test_logout_clears_user_and_dispatches_logout(db, request_context, user_model):
-    from fastogram.auth.events import Logout
-    from fastogram.events import Event
+    from aso.auth.events import Logout
+    from aso.events import Event
 
     User = user_model(_user_model_cls())
     await db.run_sync(Model.metadata.create_all)

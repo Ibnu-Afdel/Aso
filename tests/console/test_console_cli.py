@@ -7,7 +7,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from fastogram.console.cli import build_cli
+from aso.console.cli import build_cli
 
 
 def test_outside_a_project_only_new_list_and_version_work(runner: CliRunner, tmp_path: Path) -> None:
@@ -20,9 +20,9 @@ def test_outside_a_project_only_new_list_and_version_work(runner: CliRunner, tmp
 
     version_result = runner.invoke(group, ["--version"])
     assert version_result.exit_code == 0
-    assert "FastoGram" in version_result.output
+    assert "Aso" in version_result.output
 
-    # `--no-install` (so no `uv sync`/`npm install`/`fastogram migrate`) keeps this instant and
+    # `--no-install` (so no `uv sync`/`npm install`/`aso migrate`) keeps this instant and
     # offline; the skeleton-copying logic itself is exercised here, the install/migrate steps by
     # `tests/skeleton/test_new_command.py`.
     target = tmp_path / "my-app"

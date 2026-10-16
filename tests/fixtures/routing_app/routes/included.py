@@ -1,6 +1,6 @@
 """Loaded by `Route.include("routes/included.py")`: inherits the groups open at the call site (T-10)."""
 
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.group_controller import GroupController
 

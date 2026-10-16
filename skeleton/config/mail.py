@@ -1,6 +1,6 @@
 """Mail configuration (T-41)."""
 
-from fastogram.config import env
+from aso.config import env
 
 default: str = env("MAIL_MAILER", "log")
 
@@ -24,5 +24,5 @@ mailers: dict[str, dict] = {
 
 from_address: dict[str, str] = {
     "address": env("MAIL_FROM_ADDRESS", "hello@example.com"),
-    "name": env("MAIL_FROM_NAME", env("APP_NAME", "FastoGram")),
+    "name": env("MAIL_FROM_NAME", env("APP_NAME", "Aso")),
 }

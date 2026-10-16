@@ -1,4 +1,4 @@
-"""White-box unit tests for `fastogram.routing.pipeline` (T-11): alias resolution, priority
+"""White-box unit tests for `aso.routing.pipeline` (T-11): alias resolution, priority
 sorting, custom groups, `without_middleware`, and controller-declared `only`/`except_`.
 
 These construct a bare `Application` + `RouteDefinition` and call `resolve_items()` directly --
@@ -13,12 +13,12 @@ from pathlib import Path
 
 import pytest
 
-from fastogram.foundation.application import Application
-from fastogram.http.controller import Controller, ControllerMiddleware
-from fastogram.routing.pipeline import _expand, resolve_items
-from fastogram.routing.registry import RouteDefinition
+from aso.foundation.application import Application
+from aso.http.controller import Controller, ControllerMiddleware
+from aso.routing.pipeline import _expand, resolve_items
+from aso.routing.registry import RouteDefinition
 
-NOOP = "fastogram.http.middleware:Middleware"
+NOOP = "aso.http.middleware:Middleware"
 
 
 @pytest.fixture

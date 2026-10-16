@@ -1,7 +1,7 @@
-from fastogram.auth.mail import ResetPasswordMail
-from fastogram.database.db import DB
-from fastogram.mail import Mail
-from fastogram.testing import TestClient
+from aso.auth.mail import ResetPasswordMail
+from aso.database.db import DB
+from aso.mail import Mail
+from aso.testing import TestClient
 
 from app.models.user import User
 
@@ -28,7 +28,7 @@ async def test_reset_password_screen_can_be_rendered(client: TestClient) -> None
 
 
 async def test_password_can_be_reset_with_a_valid_token(client: TestClient, user) -> None:
-    from fastogram.auth import password_broker
+    from aso.auth import password_broker
 
     await password_broker().send_reset_link(user.email)
     row = await DB.select_one("SELECT token FROM password_reset_tokens WHERE email = :email", {"email": user.email})

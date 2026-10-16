@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from sqlalchemy import String
 
-from fastogram.database import Mapped, Model, SoftDeletes, mapped_column
+from aso.database import Mapped, Model, SoftDeletes, mapped_column
 
 
 def _post_model():

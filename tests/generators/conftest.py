@@ -67,7 +67,7 @@ def _restore(snapshot: dict[str, set[str]]) -> None:
 @pytest.fixture
 def console_app_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("DB_DATABASE", str(tmp_path / "db.sqlite"))
-    monkeypatch.setenv("FASTOGRAM_NO_HANDOVER", "1")
+    monkeypatch.setenv("ASO_NO_HANDOVER", "1")
     migrations_dir = CONSOLE_APP / "database" / "migrations"
     shutil.rmtree(migrations_dir, ignore_errors=True)
     before = _snapshot()
@@ -83,7 +83,7 @@ def console_app_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 
 @pytest.fixture
 def cli_group(console_app_dir: Path):
-    from fastogram.console.cli import build_cli
+    from aso.console.cli import build_cli
 
     return build_cli(console_app_dir)
 
@@ -95,5 +95,5 @@ def runner() -> CliRunner:
 
 @pytest.fixture(autouse=True)
 def _clean_env(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.delenv("FASTOGRAM_HANDED_OVER", raising=False)
+    monkeypatch.delenv("ASO_HANDED_OVER", raising=False)
     yield

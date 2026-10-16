@@ -1,5 +1,5 @@
-from fastogram.http import Controller, redirect
-from fastogram.inertia import inertia
+from aso.http import Controller, redirect
+from aso.inertia import inertia
 
 from app.http.requests.invite_member_request import InviteMemberRequest
 from app.http.requests.store_thing_request import StoreThingRequest

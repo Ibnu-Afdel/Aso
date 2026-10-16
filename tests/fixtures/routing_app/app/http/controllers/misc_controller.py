@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import uuid as _uuid
 
-from fastogram.http import Controller, Request, Response, abort, abort_if, abort_unless, back, redirect
-from fastogram.http import response as response_builder
-from fastogram.routing import url
+from aso.http import Controller, Request, Response, abort, abort_if, abort_unless, back, redirect
+from aso.http import response as response_builder
+from aso.routing import url
 
 INNER_RAN = {"value": False}
 
@@ -129,7 +129,7 @@ class MiscController(Controller):
         return back()
 
     async def set_intended(self):
-        from fastogram.session import session
+        from aso.session import session
 
         session().put("url.intended", "/misc/ping")
         return {"ok": True}

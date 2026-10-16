@@ -1,4 +1,4 @@
-from fastogram.config import env
+from aso.config import env
 
 name = env("APP_NAME", "ConsoleApp")
 environment = env("APP_ENV", "testing")

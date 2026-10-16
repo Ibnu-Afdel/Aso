@@ -8,7 +8,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from fastogram.console.commands.make import STUBS_DIR
+from aso.console.commands.make import STUBS_DIR
 
 
 def test_stub_publish_copies_every_bundled_stub(cli_group, runner: CliRunner, console_app_dir: Path) -> None:

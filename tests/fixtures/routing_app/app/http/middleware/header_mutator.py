@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.http import Middleware, Next, Request, Response
+from aso.http import Middleware, Next, Request, Response
 
 
 class HeaderMutator(Middleware):

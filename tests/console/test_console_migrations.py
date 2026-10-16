@@ -24,7 +24,7 @@ def test_make_migration_autogenerates_from_models(console_app_dir: Path, cli_gro
     assert "down_revision = None" in content
     # Custom TypeDecorator columns render as their plain SQLAlchemy type, not a dotted import
     # the file never adds (T-31's `UtcDateTime` on `created_at`/`updated_at`):
-    assert "fastogram" not in content
+    assert "aso" not in content
     assert "sa.DateTime(timezone=True)" in content
 
 

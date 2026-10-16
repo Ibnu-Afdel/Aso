@@ -1,10 +1,10 @@
 """Profile settings: update name/email, or delete the account (T-38, settings/profile)."""
 
-from fastogram.auth import MustVerifyEmail, auth
-from fastogram.http import Controller, Request, redirect
-from fastogram.inertia import inertia
-from fastogram.routing import route
-from fastogram.session import session
+from aso.auth import MustVerifyEmail, auth
+from aso.http import Controller, Request, redirect
+from aso.inertia import inertia
+from aso.routing import route
+from aso.session import session
 
 from app.http.requests.settings.delete_user_request import DeleteUserRequest
 from app.http.requests.settings.profile_update_request import ProfileUpdateRequest

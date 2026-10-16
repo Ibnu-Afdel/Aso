@@ -1,5 +1,5 @@
-from fastogram.events import Event
-from fastogram.foundation import Application
+from aso.events import Event
+from aso.foundation import Application
 
 from app.events.order_shipped import OrderShipped
 from app.listeners.log_shipment import LogShipment

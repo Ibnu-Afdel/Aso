@@ -23,7 +23,7 @@ def _purge_fixture_modules() -> None:
 
 @pytest.fixture
 def registry() -> Iterator[object]:
-    from fastogram.routing.registry import current_registry
+    from aso.routing.registry import current_registry
 
     _purge_fixture_modules()
     sys.path.insert(0, str(FIXTURE))

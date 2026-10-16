@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from fastogram.auth import auth
-from fastogram.http import Controller
+from aso.auth import auth
+from aso.http import Controller
 
 
 class DashboardController(Controller):

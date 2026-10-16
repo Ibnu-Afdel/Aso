@@ -1,9 +1,9 @@
 """Shows the reset-password form and sets the new password (T-38)."""
 
-from fastogram.auth import password_broker
-from fastogram.http import Controller, Request, redirect
-from fastogram.inertia import inertia
-from fastogram.validation import ValidationException
+from aso.auth import password_broker
+from aso.http import Controller, Request, redirect
+from aso.inertia import inertia
+from aso.validation import ValidationException
 
 from app.actions.auth.password_validation_rules import PasswordValidationRules
 from app.http.requests.auth.reset_password_request import ResetPasswordRequest

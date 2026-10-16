@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy import select  # noqa: F401
 
-from fastogram.http import Controller, Request
+from aso.http import Controller, Request
 
 
 class PostController(Controller):

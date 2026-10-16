@@ -3,12 +3,12 @@
 Note (deviation from the literal `settings/password` page name used in some early drafts of
 T-05/T-38): the current Laravel React starter kit merged password management into a single
 `settings/security` page (together with two-factor auth and passkeys, both Phase 5 per D-009).
-Since FastoGram does not ship 2FA/passkeys in v1, `SecurityController.edit` renders
+Since Aso does not ship 2FA/passkeys in v1, `SecurityController.edit` renders
 `settings/security` with only the `passwordRules` prop; the frontend port can simplify the kit's
 `security.tsx` accordingly. See the build report for the full reasoning.
 """
 
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.settings.profile_controller import ProfileController
 from app.http.controllers.settings.security_controller import SecurityController

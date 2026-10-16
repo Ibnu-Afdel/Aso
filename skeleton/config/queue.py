@@ -1,6 +1,6 @@
 """Queue configuration (T-42). `sync` runs jobs inline; switch to `redis` for a real worker."""
 
-from fastogram.config import env
+from aso.config import env
 
 default = env("QUEUE_CONNECTION", "sync")
 

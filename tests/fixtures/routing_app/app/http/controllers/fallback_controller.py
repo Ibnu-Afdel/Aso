@@ -1,5 +1,5 @@
-from fastogram.http import Controller, Request
-from fastogram.http import response as response_builder
+from aso.http import Controller, Request
+from aso.http import response as response_builder
 
 
 class FallbackController(Controller):

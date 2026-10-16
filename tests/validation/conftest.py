@@ -31,8 +31,8 @@ async def client():
 
         for info in pkgutil.iter_modules(models_pkg.__path__):
             importlib.import_module(f"app.models.{info.name}")
-        from fastogram.database import Model
-        from fastogram.database.engine import engine
+        from aso.database import Model
+        from aso.database.engine import engine
 
         async with engine().begin() as conn:
             await conn.run_sync(Model.metadata.create_all)

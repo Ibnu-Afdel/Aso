@@ -1,7 +1,7 @@
 """Authentication configuration (T-38). Guards, providers, password broker, feature flags."""
 
-from fastogram.config import env
-from fastogram.validation import Password
+from aso.config import env
+from aso.validation import Password
 
 defaults = {"guard": "web", "passwords": "users"}
 
@@ -32,9 +32,9 @@ features = ["registration", "reset_passwords", "email_verification"]
 # the `passwordRules` help text shown on the register/reset-password pages).
 password_rules = {"min": 8, "letters": False, "mixed_case": False, "numbers": False, "symbols": False}
 
-# `Password.defaults()` (fastogram.validation) reads `config("auth.password_defaults")`. It must
+# `Password.defaults()` (aso.validation) reads `config("auth.password_defaults")`. It must
 # be a concrete `Password` instance here: the config loader strips every function/lambda from a
-# config module before caching it (`fastogram.config._module_values`), so the callable form the
+# config module before caching it (`aso.config._module_values`), so the callable form the
 # docstring also documents can never actually be read back from a config file -- see the build
 # report. Keep this in sync with `password_rules` above.
 password_defaults = Password().min(password_rules["min"])

@@ -1,4 +1,4 @@
-from fastogram.routing import Route
+from aso.routing import Route
 
 from app.http.controllers.debug_controller import DebugController
 from app.http.controllers.form_controller import FormController

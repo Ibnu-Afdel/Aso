@@ -1,4 +1,4 @@
-from fastogram.database import Factory
+from aso.database import Factory
 
 from app.models.post import Post
 

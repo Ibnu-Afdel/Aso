@@ -6,8 +6,8 @@
 pages display under the password field.
 """
 
-from fastogram.config import config
-from fastogram.validation import Password
+from aso.config import config
+from aso.validation import Password
 
 
 class PasswordValidationRules:

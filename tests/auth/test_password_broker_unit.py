@@ -12,10 +12,10 @@ from contextlib import contextmanager
 
 from sqlalchemy import String, text
 
-from fastogram.auth import password_broker
-from fastogram.config import set_config
-from fastogram.database import Hashed, Mapped, Model, mapped_column
-from fastogram.database.db import DB
+from aso.auth import password_broker
+from aso.config import set_config
+from aso.database import Hashed, Mapped, Model, mapped_column
+from aso.database.db import DB
 
 
 def _user_model_cls():
@@ -41,7 +41,7 @@ async def _create_table(db) -> None:
 def _capture_plaintext_token():
     """The reset token is hashed at rest, so a test that needs the plaintext (to call `reset()`)
     captures it as `ResetPasswordMail` is constructed, exactly once, with the real send path."""
-    from fastogram.auth import mail as auth_mail
+    from aso.auth import mail as auth_mail
 
     captured: dict[str, str] = {}
     original_init = auth_mail.ResetPasswordMail.__init__
@@ -58,7 +58,7 @@ def _capture_plaintext_token():
 
 
 async def test_send_reset_link_creates_a_hashed_token_and_sends_mail(db, user_model):
-    from fastogram.mail import Mail
+    from aso.mail import Mail
 
     User = user_model(_user_model_cls())
     await db.run_sync(Model.metadata.create_all)
@@ -73,13 +73,13 @@ async def test_send_reset_link_creates_a_hashed_token_and_sends_mail(db, user_mo
     assert row is not None
     assert row["token"].startswith("$")  # hashed, not the raw token
 
-    from fastogram.auth.mail import ResetPasswordMail
+    from aso.auth.mail import ResetPasswordMail
 
     Mail.assert_sent(ResetPasswordMail, lambda m: m.has_to("a@example.com"))
 
 
 async def test_send_reset_link_is_silent_and_sends_nothing_for_an_unknown_email(db, user_model):
-    from fastogram.mail import Mail
+    from aso.mail import Mail
 
     user_model(_user_model_cls())
     await db.run_sync(Model.metadata.create_all)
@@ -126,8 +126,8 @@ async def test_reset_fails_for_an_expired_token(db, user_model):
 
 
 async def test_reset_succeeds_with_a_valid_token_and_fires_password_reset(db, user_model):
-    from fastogram.auth.events import PasswordReset
-    from fastogram.events import Event
+    from aso.auth.events import PasswordReset
+    from aso.events import Event
 
     User = user_model(_user_model_cls())
     await db.run_sync(Model.metadata.create_all)
@@ -142,7 +142,7 @@ async def test_reset_succeeds_with_a_valid_token_and_fires_password_reset(db, us
     assert ok is True
 
     refreshed = await User.find(user.id)
-    from fastogram.security import hash as hash_
+    from aso.security import hash as hash_
 
     assert hash_.check("new-password", refreshed.password) is True
     row = await DB.select_one("SELECT 1 FROM password_reset_tokens WHERE email = :e", {"e": "a@example.com"})

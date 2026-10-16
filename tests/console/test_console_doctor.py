@@ -1,4 +1,4 @@
-"""`fastogram doctor` (T-61): pass/warn/fail lines and a non-zero exit on failure."""
+"""`aso doctor` (T-61): pass/warn/fail lines and a non-zero exit on failure."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ def test_doctor_reports_healthy_on_the_console_app_fixture(cli_group, runner: Cl
 
 
 def test_doctor_fails_when_the_app_key_is_missing(cli_group, runner: CliRunner, console_app_dir: Path) -> None:
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     set_config("app.key", None)
     try:

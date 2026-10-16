@@ -6,8 +6,8 @@ from __future__ import annotations
 import _jobs
 import pytest
 
-from fastogram.queue import JobNotSerializable
-from fastogram.queue.job import Job
+from aso.queue import JobNotSerializable
+from aso.queue.job import Job
 
 
 async def test_dispatch_runs_inline_on_sync_driver():
@@ -21,7 +21,7 @@ async def test_dispatch_sync_runs_inline_too():
 
 
 async def test_dispatch_reuses_callers_db_scope(db):
-    from fastogram.database.scope import current_scope
+    from aso.database.scope import current_scope
 
     outer_session_id = id(current_scope().session())
     await _jobs.EchoJob(value="x").dispatch()
@@ -47,7 +47,7 @@ async def test_sync_dispatch_failure_calls_failed_then_reraises(db):
 
 
 async def test_sync_dispatch_failure_is_recorded_in_failed_jobs(db):
-    from fastogram.queue.failed import list_failed
+    from aso.queue.failed import list_failed
 
     with pytest.raises(RuntimeError):
         await _jobs.AlwaysFailsJob(label="y").dispatch()

@@ -82,7 +82,7 @@ async def test_body_readable_by_middleware_and_controller_via_shared_cache(clien
 
 
 async def test_request_body_too_large_raises_413(client: httpx.AsyncClient):
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     await client.get("/misc/ping")
     xsrf = {"X-XSRF-TOKEN": client.cookies.get("XSRF-TOKEN", ""), "Accept": "application/json"}
@@ -96,7 +96,7 @@ async def test_request_body_too_large_raises_413(client: httpx.AsyncClient):
 
 
 async def test_request_body_too_large_is_enforced_for_controller_reads_too(client: httpx.AsyncClient):
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     await client.get("/misc/ping")
     xsrf = {"X-XSRF-TOKEN": client.cookies.get("XSRF-TOKEN", ""), "Accept": "application/json"}

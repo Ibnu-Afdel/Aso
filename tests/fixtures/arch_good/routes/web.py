@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from fastogram.inertia import inertia
-from fastogram.routing import Route
+from aso.inertia import inertia
+from aso.routing import Route
 
 from app.http.controllers.post_controller import PostController
 

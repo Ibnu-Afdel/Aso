@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from fastogram.log import configure_logging, log
-from fastogram.log.manager import ChannelLogger
-from fastogram.log.testing import LogCapture
+from aso.log import configure_logging, log
+from aso.log.manager import ChannelLogger
+from aso.log.testing import LogCapture
 
 
 def test_log_channel_returns_a_channel_logger():
@@ -14,7 +14,7 @@ def test_log_channel_returns_a_channel_logger():
 
 
 def test_core_levels_all_emit_a_record():
-    from fastogram.config import set_config
+    from aso.config import set_config
 
     # Explicit, not relying on whatever "app.environment" another test/process state left behind
     # (the default channel level is "info" unless the app is non-production, T-22).
@@ -56,10 +56,10 @@ def test_log_channel_x_info_tags_the_record_with_its_channel_name():
 
 
 def test_different_channels_are_independent_loggers():
-    from fastogram.log.manager import _ensure_channel
+    from aso.log.manager import _ensure_channel
 
     a = _ensure_channel("alpha")
     b = _ensure_channel("beta")
     assert a is not b
-    assert a.name == "fastogram.channel.alpha"
-    assert b.name == "fastogram.channel.beta"
+    assert a.name == "aso.channel.alpha"
+    assert b.name == "aso.channel.beta"

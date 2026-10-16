@@ -33,8 +33,8 @@ async def client() -> AsyncIterator[httpx.AsyncClient]:
         from bootstrap.app import create_app
 
         app = create_app()
-        from fastogram.database import Model
-        from fastogram.database.engine import engine
+        from aso.database import Model
+        from aso.database.engine import engine
 
         async with engine().begin() as conn:
             await conn.run_sync(Model.metadata.create_all)

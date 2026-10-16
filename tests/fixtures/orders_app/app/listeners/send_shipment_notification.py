@@ -4,7 +4,7 @@ transaction committed."""
 
 from __future__ import annotations
 
-from fastogram.mail import Mail
+from aso.mail import Mail
 
 from app.events.order_shipped import OrderShipped
 from app.mail.shipment_confirmation import ShipmentConfirmation

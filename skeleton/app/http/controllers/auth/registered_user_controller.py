@@ -1,11 +1,11 @@
 """Registration (T-38). Creating the user is delegated to `CreateNewUser`, which you can edit."""
 
-from fastogram.auth import auth
-from fastogram.auth.events import Registered
-from fastogram.http import Controller, redirect
-from fastogram.inertia import inertia
-from fastogram.routing import route
-from fastogram.session import session
+from aso.auth import auth
+from aso.auth.events import Registered
+from aso.http import Controller, redirect
+from aso.inertia import inertia
+from aso.routing import route
+from aso.session import session
 
 from app.actions.auth.create_new_user import CreateNewUser
 from app.actions.auth.password_validation_rules import PasswordValidationRules

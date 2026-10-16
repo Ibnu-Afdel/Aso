@@ -21,8 +21,8 @@ from pathlib import Path
 
 import pytest
 
-from fastogram.database.scope import open_scope, reset_test_binding, set_test_binding
-from fastogram.testing.client import TestClient
+from aso.database.scope import open_scope, reset_test_binding, set_test_binding
+from aso.testing.client import TestClient
 
 FIXTURE = Path(__file__).parent.parent / "fixtures" / "testing_app"
 
@@ -43,8 +43,8 @@ async def app() -> AsyncIterator[object]:
             # `users` table would never exist unless we import it before `create_all`.
             importlib.import_module("app.models.user")
 
-            from fastogram.database import Model
-            from fastogram.database.engine import engine
+            from aso.database import Model
+            from aso.database.engine import engine
 
             async with engine().begin() as conn:
                 await conn.run_sync(Model.metadata.create_all)
@@ -55,7 +55,7 @@ async def app() -> AsyncIterator[object]:
 
 @pytest.fixture(autouse=True)
 async def db(app: object) -> AsyncIterator[object]:
-    from fastogram.database.engine import engine
+    from aso.database.engine import engine
 
     async with engine().connect() as connection:
         transaction = await connection.begin()
@@ -66,7 +66,7 @@ async def db(app: object) -> AsyncIterator[object]:
         finally:
             reset_test_binding(token)
             await transaction.rollback()
-            from fastogram.session.drivers import clear_array_store
+            from aso.session.drivers import clear_array_store
 
             clear_array_store()
 

@@ -1,4 +1,4 @@
-"""Unit tests for `fastogram.routing.ts_routes` (T-28), against the shared fixture app
+"""Unit tests for `aso.routing.ts_routes` (T-28), against the shared fixture app
 `tests/fixtures/routing_app` (resources, `{post:slug}` binding, optional/typed params, a
 single-action controller, reserved-word-safe exports). No npm/Node is needed: these tests only
 check the generated TypeScript *text*, not that it compiles (that is `npm run build`'s job, run
@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastogram.routing.registry import RouteRegistry
-from fastogram.routing.ts_routes import _safe_export, default_method, generate
+from aso.routing.registry import RouteRegistry
+from aso.routing.ts_routes import _safe_export, default_method, generate
 
 
 def test_default_method_prefers_non_head():

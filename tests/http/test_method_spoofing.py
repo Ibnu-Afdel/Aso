@@ -38,7 +38,7 @@ async def test_method_spoofing_is_not_applied_under_the_api_prefix(client: httpx
 
 
 def test_query_string_method_override_is_read() -> None:
-    from fastogram.http.method_spoofing import _query_override
+    from aso.http.method_spoofing import _query_override
 
     assert _query_override({"query_string": b"_method=patch&x=1"}) == "PATCH"
     assert _query_override({"query_string": b"x=1"}) is None

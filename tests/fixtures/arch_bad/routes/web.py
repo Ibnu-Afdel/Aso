@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.inertia import inertia
+from aso.inertia import inertia
 
 
 def render_posts() -> object:

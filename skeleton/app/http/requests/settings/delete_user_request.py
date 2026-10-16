@@ -2,8 +2,8 @@
 
 from typing import Annotated
 
-from fastogram.http import FormRequest
-from fastogram.validation import CurrentPassword
+from aso.http import FormRequest
+from aso.validation import CurrentPassword
 
 
 class DeleteUserRequest(FormRequest):

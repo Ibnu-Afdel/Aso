@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from fastogram.auth import features
-from fastogram.config import set_config
+from aso.auth import features
+from aso.config import set_config
 
 
 def test_enabled_checks_the_configured_feature_list():

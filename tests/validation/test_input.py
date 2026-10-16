@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastogram.validation.input import clean_input, expand_brackets
+from aso.validation.input import clean_input, expand_brackets
 
 
 def test_clean_input_trims_and_empties_become_none():

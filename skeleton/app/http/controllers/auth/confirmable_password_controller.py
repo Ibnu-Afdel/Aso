@@ -2,12 +2,12 @@
 
 import time
 
-from fastogram.auth import auth
-from fastogram.http import Controller, redirect
-from fastogram.inertia import inertia
-from fastogram.security import hash as hash_
-from fastogram.session import session
-from fastogram.validation import ValidationException
+from aso.auth import auth
+from aso.http import Controller, redirect
+from aso.inertia import inertia
+from aso.security import hash as hash_
+from aso.session import session
+from aso.validation import ValidationException
 
 from app.http.requests.auth.confirm_password_request import ConfirmPasswordRequest
 

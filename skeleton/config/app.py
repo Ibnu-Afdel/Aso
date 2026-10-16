@@ -1,8 +1,8 @@
 """Application configuration (T-03). Read anywhere with `config("app.<key>")`."""
 
-from fastogram.config import env
+from aso.config import env
 
-name = env("APP_NAME", "FastoGram")
+name = env("APP_NAME", "Aso")
 environment = env("APP_ENV", "production")
 debug = env("APP_DEBUG", False)
 url = env("APP_URL", "http://localhost:8000")

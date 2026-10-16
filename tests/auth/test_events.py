@@ -1,13 +1,13 @@
-"""Unit tests for `fastogram.auth.events` (T-38, T-46): `Failed` strips the password, `Lockout`
+"""Unit tests for `aso.auth.events` (T-38, T-46): `Failed` strips the password, `Lockout`
 carries only `email`/`ip`, and listeners for these events cannot be queued (they carry a model)."""
 
 from __future__ import annotations
 
 import pytest
 
-from fastogram.auth.events import Failed, Lockout, Login, Logout, PasswordReset, Registered, Verified
-from fastogram.events import Event
-from fastogram.queue import JobNotSerializable
+from aso.auth.events import Failed, Lockout, Login, Logout, PasswordReset, Registered, Verified
+from aso.events import Event
+from aso.queue import JobNotSerializable
 
 
 class _User:

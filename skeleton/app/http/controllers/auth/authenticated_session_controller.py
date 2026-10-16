@@ -1,10 +1,10 @@
 """Login and logout (T-38)."""
 
-from fastogram.auth import auth, features
-from fastogram.http import Controller, Request, redirect
-from fastogram.inertia import clear_history, inertia
-from fastogram.routing import route
-from fastogram.session import session
+from aso.auth import auth, features
+from aso.http import Controller, Request, redirect
+from aso.inertia import clear_history, inertia
+from aso.routing import route
+from aso.session import session
 
 from app.http.requests.auth.login_request import LoginRequest
 

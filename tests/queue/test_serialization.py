@@ -5,8 +5,8 @@ from uuid import uuid4
 
 import pytest
 
-from fastogram.queue import JobNotSerializable
-from fastogram.queue.serialization import decode_args, encode_args, validate_serializable
+from aso.queue import JobNotSerializable
+from aso.queue.serialization import decode_args, encode_args, validate_serializable
 
 
 def test_primitives_pass():

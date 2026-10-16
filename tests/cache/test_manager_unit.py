@@ -5,11 +5,11 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from fastogram.cache import cache
-from fastogram.cache.file import FileDriver
-from fastogram.cache.manager import CacheStore, _default_store_name, _driver_for
-from fastogram.cache.memory import MemoryDriver
-from fastogram.config import set_config
+from aso.cache import cache
+from aso.cache.file import FileDriver
+from aso.cache.manager import CacheStore, _default_store_name, _driver_for
+from aso.cache.memory import MemoryDriver
+from aso.config import set_config
 
 
 def test_default_store_is_memory_when_environment_is_testing_and_config_is_missing():
