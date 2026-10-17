@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aso"
-version = "0.2.2"
+version = "0.2.3"
 description = "The Aso framework: a Laravel-style web framework for Python (FastAPI + Inertia.js + an artisan-like CLI)"
 readme = "README.md"
 requires-python = ">=3.12"
