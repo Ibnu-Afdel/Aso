@@ -31,6 +31,13 @@ def test_table_name_handles_irregular_plurals():
     assert Person.__tablename__ == "people"
 
 
+def test_table_name_for_todo_is_todos():
+    class Todo(Model):
+        title: Mapped[str] = mapped_column(String(50), default="x")
+
+    assert Todo.__tablename__ == "todos"
+
+
 def test_table_name_override():
     class Post(Model):
         __tablename__ = "articles"

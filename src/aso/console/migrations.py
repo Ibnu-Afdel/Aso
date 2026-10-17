@@ -144,6 +144,13 @@ def downgrade() -> None:
 '''
 
 
+def _include_object(obj: Any, name: str | None, type_: str, reflected: bool, compare_to: Any) -> bool:
+    """Leave tables that no model declares alone. The first migration creates `sessions`,
+    `password_reset_tokens` and `failed_jobs` without models; autogenerate would otherwise
+    write `drop_table` for them in every new migration."""
+    return not (type_ == "table" and reflected and compare_to is None)
+
+
 async def make_migration(message: str, *, empty: bool = False, base_path: Path | None = None) -> Path:
     """`aso make:migration "create posts table"` (T-35): autogenerate a revision by
     comparing `Model.metadata` against the live schema, or `--empty` for a blank stub."""
@@ -162,7 +169,12 @@ async def make_migration(message: str, *, empty: bool = False, base_path: Path |
         def _produce(sync_conn: Any) -> Any:
             migration_context = MigrationContext.configure(
                 connection=sync_conn,
-                opts={"compare_type": True, "render_as_batch": render_as_batch, "target_metadata": Model.metadata},
+                opts={
+                    "compare_type": True,
+                    "render_as_batch": render_as_batch,
+                    "target_metadata": Model.metadata,
+                    "include_object": _include_object,
+                },
             )
             return produce_migrations(migration_context, Model.metadata)
 

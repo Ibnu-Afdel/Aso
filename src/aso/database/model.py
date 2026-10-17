@@ -44,6 +44,8 @@ log = logging.getLogger("aso.database")
 _inflect = inflect.engine()
 
 _UNCOUNTABLE = {"media", "news", "equipment", "information", "series", "species", "data"}
+# Words inflect gets wrong for table names ("todo" -> "todoes").
+_IRREGULAR = {"todo": "todos"}
 
 
 def table_name_for(class_name: str) -> str:
@@ -51,7 +53,10 @@ def table_name_for(class_name: str) -> str:
     snake = re.sub(r"(?<!^)(?=[A-Z])", "_", class_name).lower()
     parts = snake.split("_")
     last = parts[-1]
-    parts[-1] = last if last in _UNCOUNTABLE else (_inflect.plural_noun(last) or last)
+    if last in _UNCOUNTABLE:
+        parts[-1] = last
+    else:
+        parts[-1] = _IRREGULAR.get(last) or _inflect.plural_noun(last) or last
     return "_".join(parts)
 
 

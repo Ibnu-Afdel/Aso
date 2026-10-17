@@ -5,6 +5,8 @@ transaction -- each test gets its own temp file via `console_app_dir`)."""
 
 from __future__ import annotations
 
+import os
+import sqlite3
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -26,6 +28,20 @@ def test_make_migration_autogenerates_from_models(console_app_dir: Path, cli_gro
     # the file never adds (T-31's `UtcDateTime` on `created_at`/`updated_at`):
     assert "aso" not in content
     assert "sa.DateTime(timezone=True)" in content
+
+
+def test_make_migration_leaves_tables_without_a_model_alone(console_app_dir: Path, cli_group, runner: CliRunner) -> None:
+    # The skeleton's first migration creates `sessions` etc. without models; a later
+    # autogenerate must not offer to drop them.
+    with sqlite3.connect(os.environ["DB_DATABASE"]) as conn:
+        conn.execute("CREATE TABLE sessions (id VARCHAR(255) PRIMARY KEY)")
+
+    result = runner.invoke(cli_group, ["make:migration", "create posts table"])
+    assert result.exit_code == 0, result.output
+
+    content = next((console_app_dir / "database" / "migrations").glob("*.py")).read_text()
+    assert "op.create_table('posts'" in content
+    assert "sessions" not in content
 
 
 def test_make_migration_empty_is_a_blank_stub(cli_group, runner: CliRunner, console_app_dir: Path) -> None:
