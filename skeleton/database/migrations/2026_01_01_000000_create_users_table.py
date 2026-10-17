@@ -23,8 +23,8 @@ def upgrade() -> None:
         sa.Column("email_verified_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("password", sa.String(length=255), nullable=False),
         sa.Column("remember_token", sa.String(length=100), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
         sa.UniqueConstraint("email"),
     )
     op.create_table(

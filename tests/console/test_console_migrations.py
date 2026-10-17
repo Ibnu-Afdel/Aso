@@ -42,6 +42,7 @@ def test_make_migration_leaves_tables_without_a_model_alone(console_app_dir: Pat
     content = next((console_app_dir / "database" / "migrations").glob("*.py")).read_text()
     assert "op.create_table('posts'" in content
     assert "sessions" not in content
+    assert "# ###" not in content
 
 
 def test_make_migration_empty_is_a_blank_stub(cli_group, runner: CliRunner, console_app_dir: Path) -> None:

@@ -144,6 +144,15 @@ def downgrade() -> None:
 '''
 
 
+def _render_ops(ops: Any, render_as_batch: bool) -> str:
+    """Alembic's rendered ops, without its `# ### commands auto generated ###` markers (they
+    come out unindented inside the function)."""
+    code = render_python_code(ops, render_as_batch=render_as_batch, render_item=_render_item)
+    lines = [line for line in code.splitlines() if not line.strip().startswith("# ###")]
+    body = "\n".join(lines).strip("\n")
+    return body if body.strip() else "    pass"
+
+
 def _include_object(obj: Any, name: str | None, type_: str, reflected: bool, compare_to: Any) -> bool:
     """Leave tables that no model declares alone. The first migration creates `sessions`,
     `password_reset_tokens` and `failed_jobs` without models; autogenerate would otherwise
@@ -179,8 +188,8 @@ async def make_migration(message: str, *, empty: bool = False, base_path: Path |
             return produce_migrations(migration_context, Model.metadata)
 
         migration_script = await _with_sync_connection(_produce)
-        upgrade_body = render_python_code(migration_script.upgrade_ops, render_as_batch=render_as_batch, render_item=_render_item) or "    pass"
-        downgrade_body = render_python_code(migration_script.downgrade_ops, render_as_batch=render_as_batch, render_item=_render_item) or "    pass"
+        upgrade_body = _render_ops(migration_script.upgrade_ops, render_as_batch)
+        downgrade_body = _render_ops(migration_script.downgrade_ops, render_as_batch)
 
     revision = alembic_util.rev_id()
     now = datetime.now()
